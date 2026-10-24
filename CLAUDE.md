@@ -219,13 +219,13 @@ docs/                 seo-map, content-placeholders, migration, decisions (ADRs)
 Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report, and a summary for approval before the next starts.
 
 - [x] **Phase 0 — Scope audit & CLAUDE.md rewrite.** Done.
-- [~] **Phase 1 — Foundation.** _(current — partially done, see below)_
+- [x] **Phase 1 — Foundation.** Done — Resend is deferred by owner decision, not a blocker (§8).
   - [x] Project init: Next.js App Router, TS strict, Tailwind v4, shadcn/ui (manually scaffolded — `ui.shadcn.com` is blocked by this session's network policy, so `components.json` + primitives are hand-written, not CLI-generated), Framer Motion, ESLint + Prettier + Husky/lint-staged. Builds, lints and typechecks clean.
   - [x] `config/site.config.ts`, `config/nav.ts`, `.env.example`.
   - [x] Vercel Hobby ADR (`docs/decisions/0001-vercel-hobby-hosting.md`).
   - [x] Cost table verified against third-party sources (§3) — surfaced two budget conflicts needing owner decisions (Persona, Africa's Talking sender ID).
-  - [x] Supabase RBAC schema + RLS policies written (`supabase/migrations/`) — code ready, see below for live-apply status.
-  - [~] **Live Supabase project — in progress.** Using the owner's existing Boxora org (`corbpkehvooygucolexs`): the org's free-tier limit is 2 active projects, so `barber-queen` was paused to free a slot, and the paused "boxora web development Project" (`grkdajxwymmxqvsewmtd`) is being restored for reuse rather than creating a new project. Restore was still `COMING_UP` as of this commit — migrations get applied and the project renamed once it reports healthy. Resume `barber-queen` later if it's needed again, or upgrade the org.
+  - [x] Supabase RBAC schema + RLS policies written (`supabase/migrations/`) **and applied to the live project.**
+  - [x] **Live Supabase project.** `nilltech-solutions` (ref `uwzttixqpwqmuuguchyw`, eu-central-1), created fresh in the owner's existing Boxora org (`corbpkehvooygucolexs`) — see ADR 0002 for why a fresh project instead of reusing the restored-then-repaused "boxora web development Project," which turned out to hold a real, unrelated e-commerce schema. `barber-queen` stays paused to stay under the org's 2-active-project free-tier limit; resume it when it's needed again, or upgrade the org. Real URL/anon key are in the gitignored `.env.local`; `SUPABASE_SERVICE_ROLE_KEY` still needs pulling from the dashboard by the owner.
   - [~] **Resend domain verification — deferred, coming soon.** Owner will provide a Resend account when ready; not a Phase 1 blocker (see §8).
 - [ ] **Phase 2 — Public site v2.** New IA, offer pages, pricing, CTAs, SEO/AI-search layer, `llms.txt`. Design system sourced from the brand tokens in §1 (Figma pull pending — see Open Inputs).
 - [ ] **Phase 3 — Lead engine.** Forms, quote + token estimators, scoring, email/SMS automation, booking.
