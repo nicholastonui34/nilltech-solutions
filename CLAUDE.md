@@ -38,23 +38,24 @@ This file is the single source of truth for Claude Code when working in this rep
 
 Verify every price on the vendor's live pricing page before committing, and record the check date here. **This session's network policy blocked direct fetches to vendor pricing pages** (withpersona.com, africastalking.com, and others resolved `ENOTFOUND`); the figures below come from web search aggregators dated 2026, not a vendor's own page. Treat "verified" below as "corroborated by multiple third-party sources," not "confirmed on the vendor's site" — a human still needs to open each pricing page directly before this budget is final.
 
-> ⚠️ **Two budget conflicts found during this verification pass — read before Phase 5/6 work on invoicing or freelancer verification:**
+> ℹ️ **Owner decision (2026-10-24): Persona and Africa's Talking are deferred — "coming soon," not building against them yet.**
 >
-> 1. **Persona has no free tier.** Multiple sources agree its lowest published plan ("Essential") is **$250/month on a 12-month minimum commitment**, billed per verification — roughly KES 390,000/year at ~130 KES/USD. That alone is ~13x this repo's entire KES 30,000/year ceiling. One unverified source mentions a startup program with free verifications; nothing else corroborates it. **Do not build Phase 6 (freelancer onboarding) against Persona until the owner confirms real pricing or picks a cheaper alternative** (iDenfy and Didit were mentioned as having free tiers, unverified).
-> 2. **Africa's Talking likely has a one-off sender ID registration fee of KES 5,000–15,000**, on top of the ~KES 0.80/SMS usage rate. That fee alone could consume up to half the annual infra budget in a single line item not currently reflected in the `{{BUDGET: KES ~6,000 cap}}` figure. Confirm before Phase 3 (SMS automation) ships.
+> 1. **ID verification (Persona):** no free tier found — cheapest confirmed plan is $250/month on a 12-month minimum (~KES 390,000/year, ~13x the whole infra budget). Not a current blocker: freelancer ID verification ships as a "coming soon" placeholder (§11) until a vendor decision is made. Don't wire a real Persona integration yet.
+> 2. **SMS (Africa's Talking):** likely has a one-off sender ID registration fee (~KES 5,000–15,000) on top of ~KES 0.80/SMS usage, not currently budgeted. Not a current blocker: SMS automation ships as "coming soon" (§9) until confirmed. Don't wire a real Africa's Talking integration yet.
+> 3. **Email (Resend):** no account/domain yet — the owner will provide credentials once ready. Build the sending abstraction (`lib/resend.ts`) so templates aren't blocked, but there's no live sending until the account exists.
 
-| Service                                 | Choice                                                            | Plan                                                        | Est. annual cost                                                       | Price last verified                                                                                                                                           |
-| --------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hosting                                 | Vercel                                                            | Hobby (temporary)                                           | KES 0 now; Pro $20/seat/mo on upgrade                                  | 2026-10-24 (third-party aggregators; confirms free/non-commercial terms, ~100GB/mo transfer, no overage — see ADR 0001)                                       |
-| Database/Auth/Storage                   | Supabase                                                          | Free tier                                                   | KES 0                                                                  | 2026-10-24 (aggregators: 2 projects, 500MB DB, 1GB storage, 5GB egress, 50k MAU — **free projects auto-pause after 7 days' inactivity**, relevant pre-launch) |
-| Transactional + marketing email         | Resend                                                            | Free: 3,000/mo, 100/day, 1 domain, 1,000 marketing contacts | KES 0                                                                  | 2026-10-24 (confirmed by Resend's own 2023 free-tier announcement + 2026 aggregators)                                                                         |
-| Inbound mailboxes                       | Cloudflare Email Routing → existing inbox, or Zoho Mail free tier | Free                                                        | KES 0                                                                  | `{{VERIFY}}` — not searched this pass                                                                                                                         |
-| DNS, CDN, WAF, Turnstile, Web Analytics | Cloudflare                                                        | Free                                                        | KES 0                                                                  | 2026-10-24 (CDN/DNS/WAF managed rules/Web Analytics corroborated free; **Turnstile free-tier terms not found in search results — unverified**)                |
-| Cron/background jobs                    | Supabase `pg_cron` + Edge Functions                               | Included                                                    | KES 0                                                                  | —                                                                                                                                                             |
-| SMS                                     | Africa's Talking (prepaid)                                        | Usage                                                       | `{{BUDGET: KES ~6,000 cap}}` **+ one-off sender ID fee, see ⚠️ above** | 2026-10-24 (no official rate card found; aggregators estimate ~KES 0.80/SMS, sender ID KES 5,000–15,000 one-off)                                              |
-| ID verification                         | Persona                                                           | Usage-based                                                 | **See ⚠️ above — likely $250/mo min, not usage-based at low volume**   | 2026-10-24 (no free tier found; Essential plan $250/mo, 12-month minimum)                                                                                     |
-| AI APIs (quote estimator)               | Cheapest capable model + hard monthly spend cap                   | Usage                                                       | `{{BUDGET: KES ~6,000 cap}}`                                           | `{{VERIFY}}` — not searched this pass                                                                                                                         |
-| Domain                                  | Existing registrar                                                | Renewal                                                     | ~KES 2,000                                                             | `{{VERIFY}}` — depends on current registrar                                                                                                                   |
+| Service                                 | Choice                                                            | Plan                                                                                       | Est. annual cost                      | Price last verified                                                                                                                                           |
+| --------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hosting                                 | Vercel                                                            | Hobby (temporary)                                                                          | KES 0 now; Pro $20/seat/mo on upgrade | 2026-10-24 (third-party aggregators; confirms free/non-commercial terms, ~100GB/mo transfer, no overage — see ADR 0001)                                       |
+| Database/Auth/Storage                   | Supabase                                                          | Free tier                                                                                  | KES 0                                 | 2026-10-24 (aggregators: 2 projects, 500MB DB, 1GB storage, 5GB egress, 50k MAU — **free projects auto-pause after 7 days' inactivity**, relevant pre-launch) |
+| Transactional + marketing email         | Resend                                                            | Free: 3,000/mo, 100/day, 1 domain, 1,000 marketing contacts — **deferred, no account yet** | KES 0                                 | 2026-10-24 (confirmed by Resend's own 2023 free-tier announcement + 2026 aggregators)                                                                         |
+| Inbound mailboxes                       | Cloudflare Email Routing → existing inbox, or Zoho Mail free tier | Free                                                                                       | KES 0                                 | `{{VERIFY}}` — not searched this pass                                                                                                                         |
+| DNS, CDN, WAF, Turnstile, Web Analytics | Cloudflare                                                        | Free                                                                                       | KES 0                                 | 2026-10-24 (CDN/DNS/WAF managed rules/Web Analytics corroborated free; **Turnstile free-tier terms not found in search results — unverified**)                |
+| Cron/background jobs                    | Supabase `pg_cron` + Edge Functions                               | Included                                                                                   | KES 0                                 | —                                                                                                                                                             |
+| SMS                                     | Africa's Talking (prepaid) — **deferred, coming soon**            | Usage                                                                                      | KES 0 (not active)                    | 2026-10-24 (no official rate card found; aggregators estimate ~KES 0.80/SMS, sender ID KES 5,000–15,000 one-off — confirm before activating)                  |
+| ID verification                         | Persona — **deferred, coming soon**                               | Usage-based                                                                                | KES 0 (not active)                    | 2026-10-24 (no free tier found; Essential plan $250/mo, 12-month minimum — confirm vendor before activating)                                                  |
+| AI APIs (quote estimator)               | Cheapest capable model + hard monthly spend cap                   | Usage                                                                                      | `{{BUDGET: KES ~6,000 cap}}`          | `{{VERIFY}}` — not searched this pass                                                                                                                         |
+| Domain                                  | Existing registrar                                                | Renewal                                                                                    | ~KES 2,000                            | `{{VERIFY}}` — depends on current registrar                                                                                                                   |
 
 **Rules:**
 
@@ -114,7 +115,9 @@ Action-specific CTAs mapped by intent — never generic "Submit" or "Learn more"
 - Rate-limit (Turnstile + per-IP limit), hard monthly AI spend cap, graceful fallback if AI is unavailable.
 - Clear disclaimer: estimates are indicative, final quote after discovery.
 
-## 8. Email (Resend)
+## 8. Email (Resend) — deferred, coming soon
+
+**No Resend account exists yet; the owner will provide it once ready.** Build templates and the `lib/resend.ts` sending abstraction against this spec so nothing is blocked, but there is no live sending — and no Phase ships depending on real email delivery — until credentials land in `.env.local`.
 
 React Email templates in `emails/`. Verified sending domain with SPF, DKIM, DMARC.
 
@@ -127,9 +130,9 @@ React Email templates in `emails/`. Verified sending domain with SPF, DKIM, DMAR
 
 - **Lead capture → qualification:** forms write to `leads`; rules-based scoring (budget, timeline, company size, service, region) → tier Hot/Warm/Cold; Hot leads trigger instant email + SMS to sales.
 - **Nurture:** scheduled email sequences per service (Supabase `pg_cron` → Edge Function → Resend), throttled to the free-tier daily cap.
-- **SMS:** Africa's Talking for booking reminders and hot-lead alerts; opt-in recorded.
-- **Newsletter:** double opt-in, Resend audiences, segment by interest (services / AI / Academy / podcast).
-- **Freelancer onboarding & hiring:** apply → skills form → automated screening → Persona ID verification → tax info → test task → approval → added to talent pool. Status emails at each step.
+- **SMS — deferred, coming soon:** Africa's Talking for booking reminders and hot-lead alerts; opt-in recorded. No vendor wired yet (see §3/§18) — build behind an `SmsProvider` interface so the real integration slots in later without a rewrite.
+- **Newsletter:** double opt-in, Resend audiences, segment by interest (services / AI / Academy / podcast). Blocked on the Resend account (§8).
+- **Freelancer onboarding & hiring:** apply → skills form → automated screening → ID verification (**deferred, coming soon** — see §11) → tax info → test task → approval → added to talent pool. Status emails at each step.
 - All automations logged in `automation_runs` with retry + failure alerts on the admin dashboard.
 
 ## 10. Portals & dashboards (`/portal`, auth-gated, `noindex`)
@@ -155,7 +158,8 @@ Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security
 
 ## 11. Identity verification & tax info
 
-- **Freelancers:** Persona hosted/embedded inquiry for ID verification; webhook updates `verification_status`. Collect tax info (KRA PIN or country equivalent). Store only Persona inquiry IDs + status — never raw ID images on our side.
+- **Freelancers — ID verification deferred, coming soon.** No vendor decided yet: Persona's cheapest confirmed plan (~KES 390,000/year) is far outside the infra budget (§3). Ship the freelancer flow with verification shown as "Coming soon" in the UI and `verification_status` defaulting to `pending_setup` — don't block the rest of onboarding on it, and don't wire Persona (or any vendor) until the owner picks one. Design `lib/verification.ts` as a swappable `IdVerificationProvider` interface, same pattern as the eTIMS stub in §10, so a real vendor drops in later without a rewrite.
+- Collect tax info (KRA PIN or country equivalent) independent of ID verification status. Store only verification-provider inquiry IDs + status once a vendor exists — never raw ID images on our side.
 - **Clients:** no ID verification. Optional tax info (KRA PIN/VAT number) for eTIMS-compliant invoices.
 - Encrypt tax identifiers at rest; restrict reads to finance + super_admin via RLS. Kenya Data Protection Act 2019-compliant privacy notice and consent capture.
 
@@ -220,9 +224,9 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] `config/site.config.ts`, `config/nav.ts`, `.env.example`.
   - [x] Vercel Hobby ADR (`docs/decisions/0001-vercel-hobby-hosting.md`).
   - [x] Cost table verified against third-party sources (§3) — surfaced two budget conflicts needing owner decisions (Persona, Africa's Talking sender ID).
-  - [x] Supabase RBAC schema + RLS policies written (`supabase/migrations/`) — code only.
-  - [ ] **Live Supabase project.** Blocked: the only connected Supabase account (org "BOXORA CONTAINERS LLC") isn't NillTech's. Needs the right account connected before migrations can actually be applied.
-  - [ ] **Resend domain verification.** Needs a real Resend account + DNS access to nilltechsolutions.com — not something this session can do without the owner's account.
+  - [x] Supabase RBAC schema + RLS policies written (`supabase/migrations/`) — code ready, see below for live-apply status.
+  - [~] **Live Supabase project — in progress.** Using the owner's existing Boxora org (`corbpkehvooygucolexs`): the org's free-tier limit is 2 active projects, so `barber-queen` was paused to free a slot, and the paused "boxora web development Project" (`grkdajxwymmxqvsewmtd`) is being restored for reuse rather than creating a new project. Restore was still `COMING_UP` as of this commit — migrations get applied and the project renamed once it reports healthy. Resume `barber-queen` later if it's needed again, or upgrade the org.
+  - [~] **Resend domain verification — deferred, coming soon.** Owner will provide a Resend account when ready; not a Phase 1 blocker (see §8).
 - [ ] **Phase 2 — Public site v2.** New IA, offer pages, pricing, CTAs, SEO/AI-search layer, `llms.txt`. Design system sourced from the brand tokens in §1 (Figma pull pending — see Open Inputs).
 - [ ] **Phase 3 — Lead engine.** Forms, quote + token estimators, scoring, email/SMS automation, booking.
 - [ ] **Phase 4 — Admin core.** Main Admin + Role Assignment, Sales, Marketing, Analytics dashboards.
@@ -232,8 +236,9 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 
 ## 18. Open Inputs (keep updated)
 
-- **Decide ID-verification vendor before Phase 6.** Persona's cheapest confirmed plan ($250/mo, 12-month minimum) is ~13x the entire infra budget — confirm real Persona pricing/startup program, or switch to a cheaper alternative (iDenfy/Didit mentioned as having free tiers, both unverified). See §3 budget table.
-- **Confirm Africa's Talking sender ID one-off fee (~KES 5,000–15,000) before Phase 3** and fold it into the SMS budget line, which currently only accounts for per-message usage.
+- **ID verification vendor — deferred, coming soon (owner decision 2026-10-24).** Persona's cheapest confirmed plan ($250/mo, 12-month minimum) is ~13x the entire infra budget, so freelancer verification ships as a placeholder until a vendor is picked (iDenfy/Didit mentioned as having free tiers, both unverified). Not blocking current phases.
+- **SMS vendor — deferred, coming soon (owner decision 2026-10-24).** Africa's Talking likely has a one-off sender ID fee (~KES 5,000–15,000) not yet budgeted. SMS automation ships behind a swappable interface, not wired to a real vendor, until confirmed. Not blocking current phases.
+- **Resend account — deferred, coming soon (owner decision 2026-10-24).** Owner will provide credentials when ready; email sending is stubbed until then. Not blocking current phases.
 - "Where to Play" strategy doc — not found in this repo; needed before finalizing IA/keyword targets.
 - Figma file link — none provided yet. Needed to pull real tokens/components via Figma MCP for Phase 2; until then, the design system starts from the brand tokens in §1 and is built directly in code/Figma from scratch rather than imported.
 - Logo master file — current `public/brand/nilltech-logo.jpg` is a flat JPEG with a baked-in white background (no transparency). Needs an SVG or transparent PNG before it goes into a real header/dark-mode nav.
@@ -242,6 +247,4 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - YouTube channel + episode list.
 - Academy course list & pricing.
 - eTIMS integration route.
-- Persona account/pricing confirmation.
-- Africa's Talking sender ID.
 - Current hosting provider & cost breakdown (if the live nilltechsolutions.com site is ever folded into this repo's scope — currently out of scope, see Conflicts).
