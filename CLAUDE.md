@@ -10,15 +10,15 @@ This file is the single source of truth for Claude Code when working in this rep
 - **Markets:** Kenya, Uganda, Tanzania, Rwanda (primary growth) + US, UK, Canada.
 - **Contact — single source of truth in `config/site.config.ts`:** info@nilltechsolutions.com · +254 725 830 334 (call + WhatsApp).
 - **Brand tokens:**
-  | Token | Value |
-  |---|---|
-  | Navy | `#060B1F` |
-  | Blue | `#38BDF8` |
-  | Purple | `#5B2D8E` |
-  | Gold | `#F4C430` |
-  | Font | Poppins via `next/font` (subset, `display: swap`) |
-  | Mark | Gradient purple→blue "N" mark |
-  | Tone | Aspirational, craft-led, excellence — never fear-based |
+  | Token  | Value                                                  |
+  | ------ | ------------------------------------------------------ |
+  | Navy   | `#060B1F`                                              |
+  | Blue   | `#38BDF8`                                              |
+  | Purple | `#5B2D8E`                                              |
+  | Gold   | `#F4C430`                                              |
+  | Font   | Poppins via `next/font` (subset, `display: swap`)      |
+  | Mark   | Gradient purple→blue "N" mark                          |
+  | Tone   | Aspirational, craft-led, excellence — never fear-based |
 - **Objective:** modern, cost-effective site that clearly communicates offers, ranks on Google/Bing, gets cited by AI search, and converts.
 
 ## 2. Non-negotiable rules
@@ -36,22 +36,28 @@ This file is the single source of truth for Claude Code when working in this rep
 
 ## 3. Cost ceiling — infrastructure ≤ KES 30,000/year
 
-Verify every price on the vendor's live pricing page before committing, and record the check date here.
+Verify every price on the vendor's live pricing page before committing, and record the check date here. **This session's network policy blocked direct fetches to vendor pricing pages** (withpersona.com, africastalking.com, and others resolved `ENOTFOUND`); the figures below come from web search aggregators dated 2026, not a vendor's own page. Treat "verified" below as "corroborated by multiple third-party sources," not "confirmed on the vendor's site" — a human still needs to open each pricing page directly before this budget is final.
 
-| Service | Choice | Plan | Est. annual cost | Price last verified |
-|---|---|---|---|---|
-| Hosting | Vercel | Hobby (temporary) | KES 0 now; Pro $20/seat/mo on upgrade | `{{VERIFY}}` |
-| Database/Auth/Storage | Supabase | Free tier | KES 0 | `{{VERIFY}}` |
-| Transactional + marketing email | Resend | Free: 3,000/mo, 100/day, 1 domain, 1,000 marketing contacts | KES 0 | `{{VERIFY}}` |
-| Inbound mailboxes | Cloudflare Email Routing → existing inbox, or Zoho Mail free tier | Free | KES 0 | `{{VERIFY}}` |
-| DNS, CDN, WAF, Turnstile, Web Analytics | Cloudflare | Free | KES 0 | `{{VERIFY}}` |
-| Cron/background jobs | Supabase `pg_cron` + Edge Functions | Included | KES 0 | — |
-| SMS | Africa's Talking (prepaid) | Usage | `{{BUDGET: KES ~6,000 cap}}` | `{{VERIFY}}` |
-| ID verification | Persona | Usage-based | `{{BUDGET: verify startup/free allowance}}` | `{{VERIFY}}` |
-| AI APIs (quote estimator) | Cheapest capable model + hard monthly spend cap | Usage | `{{BUDGET: KES ~6,000 cap}}` | `{{VERIFY}}` |
-| Domain | Existing registrar | Renewal | ~KES 2,000 | `{{VERIFY}}` |
+> ⚠️ **Two budget conflicts found during this verification pass — read before Phase 5/6 work on invoicing or freelancer verification:**
+>
+> 1. **Persona has no free tier.** Multiple sources agree its lowest published plan ("Essential") is **$250/month on a 12-month minimum commitment**, billed per verification — roughly KES 390,000/year at ~130 KES/USD. That alone is ~13x this repo's entire KES 30,000/year ceiling. One unverified source mentions a startup program with free verifications; nothing else corroborates it. **Do not build Phase 6 (freelancer onboarding) against Persona until the owner confirms real pricing or picks a cheaper alternative** (iDenfy and Didit were mentioned as having free tiers, unverified).
+> 2. **Africa's Talking likely has a one-off sender ID registration fee of KES 5,000–15,000**, on top of the ~KES 0.80/SMS usage rate. That fee alone could consume up to half the annual infra budget in a single line item not currently reflected in the `{{BUDGET: KES ~6,000 cap}}` figure. Confirm before Phase 3 (SMS automation) ships.
+
+| Service                                 | Choice                                                            | Plan                                                        | Est. annual cost                                                       | Price last verified                                                                                                                                           |
+| --------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hosting                                 | Vercel                                                            | Hobby (temporary)                                           | KES 0 now; Pro $20/seat/mo on upgrade                                  | 2026-10-24 (third-party aggregators; confirms free/non-commercial terms, ~100GB/mo transfer, no overage — see ADR 0001)                                       |
+| Database/Auth/Storage                   | Supabase                                                          | Free tier                                                   | KES 0                                                                  | 2026-10-24 (aggregators: 2 projects, 500MB DB, 1GB storage, 5GB egress, 50k MAU — **free projects auto-pause after 7 days' inactivity**, relevant pre-launch) |
+| Transactional + marketing email         | Resend                                                            | Free: 3,000/mo, 100/day, 1 domain, 1,000 marketing contacts | KES 0                                                                  | 2026-10-24 (confirmed by Resend's own 2023 free-tier announcement + 2026 aggregators)                                                                         |
+| Inbound mailboxes                       | Cloudflare Email Routing → existing inbox, or Zoho Mail free tier | Free                                                        | KES 0                                                                  | `{{VERIFY}}` — not searched this pass                                                                                                                         |
+| DNS, CDN, WAF, Turnstile, Web Analytics | Cloudflare                                                        | Free                                                        | KES 0                                                                  | 2026-10-24 (CDN/DNS/WAF managed rules/Web Analytics corroborated free; **Turnstile free-tier terms not found in search results — unverified**)                |
+| Cron/background jobs                    | Supabase `pg_cron` + Edge Functions                               | Included                                                    | KES 0                                                                  | —                                                                                                                                                             |
+| SMS                                     | Africa's Talking (prepaid)                                        | Usage                                                       | `{{BUDGET: KES ~6,000 cap}}` **+ one-off sender ID fee, see ⚠️ above** | 2026-10-24 (no official rate card found; aggregators estimate ~KES 0.80/SMS, sender ID KES 5,000–15,000 one-off)                                              |
+| ID verification                         | Persona                                                           | Usage-based                                                 | **See ⚠️ above — likely $250/mo min, not usage-based at low volume**   | 2026-10-24 (no free tier found; Essential plan $250/mo, 12-month minimum)                                                                                     |
+| AI APIs (quote estimator)               | Cheapest capable model + hard monthly spend cap                   | Usage                                                       | `{{BUDGET: KES ~6,000 cap}}`                                           | `{{VERIFY}}` — not searched this pass                                                                                                                         |
+| Domain                                  | Existing registrar                                                | Renewal                                                     | ~KES 2,000                                                             | `{{VERIFY}}` — depends on current registrar                                                                                                                   |
 
 **Rules:**
+
 - **Hosting decision (owner-approved, temporary):** Vercel Hobby for now. Known risk: Hobby's terms restrict it to non-commercial use, and it caps usage with no overage (site pauses at the limit). Record this in `docs/decisions/` as an ADR before Phase 1 ships.
 - **Upgrade triggers → Vercel Pro:** first paid client transaction through the site, approaching any Hobby usage limit, needing team seats, or any notice from Vercel. Admin dashboard shows a warning before limits are hit.
 - Keep the app host-portable: no Vercel-only APIs in core logic (avoid Vercel KV/Blob/Edge Config lock-in) — storage and jobs live in Supabase so a move to Pro or another host needs no rewrite.
@@ -66,13 +72,13 @@ Verify every price on the vendor's live pricing page before committing, and reco
 
 Primary nav (max 6): **Services · AI Solutions · Managed Teams · Academy · Pricing · Podcast** + primary CTA button. Secondary/footer: About, Partnerships, Case Studies, Blog/Insights, Careers, Contact, Legal.
 
-| Offer | Route | Primary CTA | Audience |
-|---|---|---|---|
-| AI-Powered Software Development (websites, custom software, e-commerce, systems) | `/services/*` | Get a Quote (AI estimator) | SMEs, schools, churches, e-commerce, organisations |
-| AI Solutions for SMEs (automation, chatbots, AI integrations) | `/ai-solutions/*` | Book a Demo | SME owners/ops leads |
-| Managed Tech Delivery Teams | `/managed-teams/*` | Book a Discovery Call | B2B companies outsourcing work |
-| NillTech Academy — free + paid AI & software courses | `/academy/*` | Start Free / Enrol | Learners, career-switchers, teams |
-| Partnerships — B2B outsourcing & vetted teams | `/partnerships` | Contact Sales | Agencies, enterprises, international firms |
+| Offer                                                                            | Route              | Primary CTA                | Audience                                           |
+| -------------------------------------------------------------------------------- | ------------------ | -------------------------- | -------------------------------------------------- |
+| AI-Powered Software Development (websites, custom software, e-commerce, systems) | `/services/*`      | Get a Quote (AI estimator) | SMEs, schools, churches, e-commerce, organisations |
+| AI Solutions for SMEs (automation, chatbots, AI integrations)                    | `/ai-solutions/*`  | Book a Demo                | SME owners/ops leads                               |
+| Managed Tech Delivery Teams                                                      | `/managed-teams/*` | Book a Discovery Call      | B2B companies outsourcing work                     |
+| NillTech Academy — free + paid AI & software courses                             | `/academy/*`       | Start Free / Enrol         | Learners, career-switchers, teams                  |
+| Partnerships — B2B outsourcing & vetted teams                                    | `/partnerships`    | Contact Sales              | Agencies, enterprises, international firms         |
 
 - Position NillTech as a **leading East African provider of localised managed software and AI delivery teams** — defensible language only, no unverifiable "first/only" claims.
 - **Out of scope for now:** LLM training, data annotation, RLHF, AI data operations. Do not mention these anywhere on the site, schema, or `llms.txt`. Keep the IA flexible enough to add an offer page later without restructuring.
@@ -83,13 +89,13 @@ Primary nav (max 6): **Services · AI Solutions · Managed Teams · Academy · P
 
 Action-specific CTAs mapped by intent — never generic "Submit" or "Learn more":
 
-| CTA | Used for |
-|---|---|
-| Book a Discovery Call | Managed teams, custom software |
-| Book a Demo | AI solutions, products with live demos |
-| Get a Free Quote | Services (feeds AI quote estimator) |
-| Contact Sales | Partnerships, enterprise |
-| Talk on WhatsApp | Sticky mobile secondary CTA (`wa.me` click-to-chat) |
+| CTA                   | Used for                                            |
+| --------------------- | --------------------------------------------------- |
+| Book a Discovery Call | Managed teams, custom software                      |
+| Book a Demo           | AI solutions, products with live demos              |
+| Get a Free Quote      | Services (feeds AI quote estimator)                 |
+| Contact Sales         | Partnerships, enterprise                            |
+| Talk on WhatsApp      | Sticky mobile secondary CTA (`wa.me` click-to-chat) |
 
 - Booking: embed Cal.com (free tier) behind a click-to-load facade so it never blocks LCP.
 - Every CTA fires a tracked conversion event: `cta_click`, `form_start`, `form_submit`, `booking_complete`, `whatsapp_click`, `call_click`, `quote_generated`.
@@ -130,17 +136,17 @@ React Email templates in `emails/`. Verified sending domain with SPF, DKIM, DMAR
 
 Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security on every table**. RBAC roles: `super_admin`, `director`, `finance`, `marketing`, `sales`, `quality`, `freelancer`, `client`.
 
-| Dashboard | Role(s) | Core views |
-|---|---|---|
-| Director/Shareholder | director, super_admin | Revenue, pipeline value, margins, growth KPIs, read-only |
-| Main Admin | super_admin | Users, Role Assignment (invite, assign/revoke roles, audit log), settings, system health, budget/usage triggers |
-| Finance | finance | Invoices, receipts, payments, KRA eTIMS invoice automation, expenses, exports |
-| Marketing | marketing | Traffic, sources, conversions, newsletter, podcast performance, campaign UTM |
-| Sales | sales | Leads, scoring, pipeline stages, bookings, follow-ups, quotes |
-| Quality | quality | Project QA checklists, delivery reviews, freelancer performance |
-| Analytics | director, super_admin, marketing | Funnel, CWV field data, conversion events |
-| Freelancer | freelancer | Profile, verification status, tax info, assignments |
-| Client | client | Projects, invoices, receipts, documents, optional tax info |
+| Dashboard            | Role(s)                          | Core views                                                                                                      |
+| -------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Director/Shareholder | director, super_admin            | Revenue, pipeline value, margins, growth KPIs, read-only                                                        |
+| Main Admin           | super_admin                      | Users, Role Assignment (invite, assign/revoke roles, audit log), settings, system health, budget/usage triggers |
+| Finance              | finance                          | Invoices, receipts, payments, KRA eTIMS invoice automation, expenses, exports                                   |
+| Marketing            | marketing                        | Traffic, sources, conversions, newsletter, podcast performance, campaign UTM                                    |
+| Sales                | sales                            | Leads, scoring, pipeline stages, bookings, follow-ups, quotes                                                   |
+| Quality              | quality                          | Project QA checklists, delivery reviews, freelancer performance                                                 |
+| Analytics            | director, super_admin, marketing | Funnel, CWV field data, conversion events                                                                       |
+| Freelancer           | freelancer                       | Profile, verification status, tax info, assignments                                                             |
+| Client               | client                           | Projects, invoices, receipts, documents, optional tax info                                                      |
 
 - **Document automation:** server-generated PDFs (invoices, receipts, quotes, contracts, onboarding letters) with numbering, stored in Supabase Storage, emailed via Resend.
 - **eTIMS:** KRA eTIMS (OSCU/VSCU) typically needs KRA approval or a certified integrator. Build an `EtimsProvider` interface with a stub adapter now; plug in the certified integrator later. `{{INPUT NEEDED: eTIMS integration route}}`.
@@ -208,8 +214,15 @@ docs/                 seo-map, content-placeholders, migration, decisions (ADRs)
 
 Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report, and a summary for approval before the next starts.
 
-- [x] **Phase 0 — Scope audit & CLAUDE.md rewrite.** This document. *(current)*
-- [ ] **Phase 1 — Foundation.** Project init (Next.js App Router, TS strict, Tailwind, shadcn/ui, Framer Motion, ESLint/Prettier, Husky — nothing exists yet, so this is a true cold start, not an audit of existing config), hosting + Vercel Hobby ADR, cost setup, Resend domain verification, `site.config.ts`, Supabase project + RBAC schema + RLS policies.
+- [x] **Phase 0 — Scope audit & CLAUDE.md rewrite.** Done.
+- [~] **Phase 1 — Foundation.** _(current — partially done, see below)_
+  - [x] Project init: Next.js App Router, TS strict, Tailwind v4, shadcn/ui (manually scaffolded — `ui.shadcn.com` is blocked by this session's network policy, so `components.json` + primitives are hand-written, not CLI-generated), Framer Motion, ESLint + Prettier + Husky/lint-staged. Builds, lints and typechecks clean.
+  - [x] `config/site.config.ts`, `config/nav.ts`, `.env.example`.
+  - [x] Vercel Hobby ADR (`docs/decisions/0001-vercel-hobby-hosting.md`).
+  - [x] Cost table verified against third-party sources (§3) — surfaced two budget conflicts needing owner decisions (Persona, Africa's Talking sender ID).
+  - [x] Supabase RBAC schema + RLS policies written (`supabase/migrations/`) — code only.
+  - [ ] **Live Supabase project.** Blocked: the only connected Supabase account (org "BOXORA CONTAINERS LLC") isn't NillTech's. Needs the right account connected before migrations can actually be applied.
+  - [ ] **Resend domain verification.** Needs a real Resend account + DNS access to nilltechsolutions.com — not something this session can do without the owner's account.
 - [ ] **Phase 2 — Public site v2.** New IA, offer pages, pricing, CTAs, SEO/AI-search layer, `llms.txt`. Design system sourced from the brand tokens in §1 (Figma pull pending — see Open Inputs).
 - [ ] **Phase 3 — Lead engine.** Forms, quote + token estimators, scoring, email/SMS automation, booking.
 - [ ] **Phase 4 — Admin core.** Main Admin + Role Assignment, Sales, Marketing, Analytics dashboards.
@@ -219,6 +232,8 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 
 ## 18. Open Inputs (keep updated)
 
+- **Decide ID-verification vendor before Phase 6.** Persona's cheapest confirmed plan ($250/mo, 12-month minimum) is ~13x the entire infra budget — confirm real Persona pricing/startup program, or switch to a cheaper alternative (iDenfy/Didit mentioned as having free tiers, both unverified). See §3 budget table.
+- **Confirm Africa's Talking sender ID one-off fee (~KES 5,000–15,000) before Phase 3** and fold it into the SMS budget line, which currently only accounts for per-message usage.
 - "Where to Play" strategy doc — not found in this repo; needed before finalizing IA/keyword targets.
 - Figma file link — none provided yet. Needed to pull real tokens/components via Figma MCP for Phase 2; until then, the design system starts from the brand tokens in §1 and is built directly in code/Figma from scratch rather than imported.
 - Logo master file — current `public/brand/nilltech-logo.jpg` is a flat JPEG with a baked-in white background (no transparency). Needs an SVG or transparent PNG before it goes into a real header/dark-mode nav.
