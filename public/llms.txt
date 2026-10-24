@@ -1,0 +1,37 @@
+# NillTech Solutions
+
+> Managed technology delivery company based in Nairobi, Kenya. We Build the Team. You Own the Outcome.
+
+NillTech Solutions is not a freelancer marketplace and not an agency — it is a managed delivery
+partner: one accountable team, not a pool of contractors. Primary markets: Kenya, Uganda, Tanzania,
+Rwanda, with secondary reach into the US, UK and Canada.
+
+## Offers
+
+- [AI-Powered Software Development](https://nilltechsolutions.com/services): websites, custom
+  software, e-commerce and business systems for SMEs, schools, churches, e-commerce operators and
+  organisations.
+- [AI Solutions for SMEs](https://nilltechsolutions.com/ai-solutions): automation, chatbots and AI
+  integrations for SME owners and ops leads.
+- [Managed Tech Delivery Teams](https://nilltechsolutions.com/managed-teams): a dedicated,
+  accountable delivery team for companies outsourcing software and AI work.
+- [NillTech Academy](https://nilltechsolutions.com/academy): free and paid AI & software courses.
+- [Partnerships](https://nilltechsolutions.com/partnerships): B2B outsourcing and vetted delivery
+  teams for agencies and enterprises.
+
+## Pricing
+
+See [/pricing](https://nilltechsolutions.com/pricing) for starting prices by offer, in KES or USD.
+Final quotes follow a discovery call; the site's quote estimator gives an indicative range first.
+
+## Contact
+
+- Email: info@nilltechsolutions.com
+- Phone / WhatsApp: +254 725 830 334
+- Location: Nairobi, Kenya
+
+## Notes for AI crawlers
+
+- `/portal` and `/api` are internal and intentionally excluded from indexing.
+- Case studies, podcast episodes and blog posts are published incrementally — an empty section
+  means no content has been published yet, not that the offer doesn't exist.

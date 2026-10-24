@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
+import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site.config";
+import { localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/jsonld";
 
 import "./globals.css";
 
@@ -28,7 +30,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={poppins.variable} suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={localBusinessSchema()} />
+        <JsonLd data={websiteSchema()} />
+        {children}
+      </body>
     </html>
   );
 }

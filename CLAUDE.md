@@ -199,15 +199,19 @@ LCP ≤ 2.5s · INP ≤ 200ms · CLS ≤ 0.1 · Lighthouse Performance ≥ 90, S
 
 ```
 app/(marketing)/...   public pages (SSG/ISR)
-app/(portal)/...      auth-gated dashboards (dynamic, noindex)
-app/api/...           route handlers (webhooks: resend, persona, africastalking, cal)
-components/ui         shadcn/ui primitives
-components/sections   reusable marketing sections
-features/<domain>     leads, estimator, academy, podcast, invoicing, verification, rbac
-lib/                  clients (supabase, resend, sms, persona, etims), utils
-config/               site.config.ts, pricing-rules.ts, ai-model-pricing.ts, nav.ts
-emails/               React Email templates
-supabase/migrations   SQL + RLS policies
+app/(portal)/...      auth-gated dashboards (dynamic, noindex) — Phase 4
+app/api/...           route handlers (webhooks: resend, persona, africastalking, cal) — Phase 3+
+components/ui         shadcn/ui primitives (hand-scaffolded — see Phase 1 note)
+components/sections   reusable marketing sections (Hero, ServiceCard, Faq, CtaBand, ...)
+components/layout     SiteHeader, SiteFooter, WhatsappFab
+components/cta        CtaButton — the CLAUDE.md §5 CTA system
+components/seo        JsonLd
+features/<domain>     leads, estimator, academy, podcast, invoicing, verification, rbac — Phase 3+
+lib/                  clients (supabase, resend, sms, persona, etims — Phase 3+), seo.ts, jsonld.ts, analytics.ts, utils.ts
+lib/content           typed content sources (case-studies, podcast-episodes, blog-posts) — empty until real content exists
+config/               site.config.ts, nav.ts, cta.ts, offers.ts, pricing-rules.ts (Phase 3), ai-model-pricing.ts (Phase 3)
+emails/               React Email templates — Phase 3+
+supabase/migrations   SQL + RLS policies (applied to the live project — see Phase 1)
 docs/                 seo-map, content-placeholders, migration, decisions (ADRs)
 ```
 
@@ -227,7 +231,13 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] Supabase RBAC schema + RLS policies written (`supabase/migrations/`) **and applied to the live project.**
   - [x] **Live Supabase project.** `nilltech-solutions` (ref `uwzttixqpwqmuuguchyw`, eu-central-1), created fresh in the owner's existing Boxora org (`corbpkehvooygucolexs`) — see ADR 0002 for why a fresh project instead of reusing the restored-then-repaused "boxora web development Project," which turned out to hold a real, unrelated e-commerce schema. `barber-queen` stays paused to stay under the org's 2-active-project free-tier limit; resume it when it's needed again, or upgrade the org. Real URL/anon key are in the gitignored `.env.local`; `SUPABASE_SERVICE_ROLE_KEY` still needs pulling from the dashboard by the owner.
   - [~] **Resend domain verification — deferred, coming soon.** Owner will provide a Resend account when ready; not a Phase 1 blocker (see §8).
-- [ ] **Phase 2 — Public site v2.** New IA, offer pages, pricing, CTAs, SEO/AI-search layer, `llms.txt`. Design system sourced from the brand tokens in §1 (Figma pull pending — see Open Inputs).
+- [x] **Phase 2 — Public site v2.** Done.
+  - [x] Figma design system built from scratch: [NillTech Solutions — Design System](https://www.figma.com/design/Jk7ESTZ2R2XMppy2Uw6R25) — primitive + semantic color tokens (single-mode; the Figma plan is on Starter, which caps variable collections at 1 mode, so light/dark lives in code CSS instead, not Figma modes), Poppins type ramp, spacing/radius scale, elevation effect styles, and three signature components (Button variant/state set, Service Card with the gradient accent bar, dark Hero with the purple→blue glow) that set the "not generic" visual direction implemented in code.
+  - [x] Full route skeleton: `/ /services /ai-solutions /managed-teams /academy /pricing /podcast /partnerships /about /work /work/[slug] /contact /careers /legal /blog`, shared header/footer/WhatsApp FAB, 404 + error states.
+  - [x] CTA system (`config/cta.ts`, `components/cta/cta-button.tsx`) wired to `lib/analytics.ts` event stubs. "Book a Discovery Call" / "Book a Demo" / "Get a Free Quote" point at `/contact` until Phase 3 ships Cal.com and `/estimate` — one-line swap when those exist, not a rewrite.
+  - [x] SEO/AI-search layer: per-route metadata (`lib/seo.ts`), `sitemap.ts`, `robots.ts` (allows the AI-search bots listed in §14), JSON-LD (`lib/jsonld.ts`: Organization + LocalBusiness + WebSite site-wide, Service on /services /ai-solutions /managed-teams /partnerships, Course on /academy, FAQPage wherever the FAQ component renders, BreadcrumbList on /work/[slug]), `public/llms.txt`.
+  - [x] Proof-layer discipline held: `/work`, `/podcast`, `/blog` read from typed content files that are currently empty and render an honest "nothing published yet" state — no fake case studies, episodes, or posts.
+  - Not done (Phase 3+ concern, not a Phase 2 gap): real copy (everything is `{{PLACEHOLDER}}`), Cal.com embed, the AI quote/token estimators, a working contact form wired to a `leads` table, Turnstile.
 - [ ] **Phase 3 — Lead engine.** Forms, quote + token estimators, scoring, email/SMS automation, booking.
 - [ ] **Phase 4 — Admin core.** Main Admin + Role Assignment, Sales, Marketing, Analytics dashboards.
 - [ ] **Phase 5 — Finance & docs.** Invoicing, receipts, PDF generation, eTIMS adapter.
@@ -240,7 +250,7 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - **SMS vendor — deferred, coming soon (owner decision 2026-10-24).** Africa's Talking likely has a one-off sender ID fee (~KES 5,000–15,000) not yet budgeted. SMS automation ships behind a swappable interface, not wired to a real vendor, until confirmed. Not blocking current phases.
 - **Resend account — deferred, coming soon (owner decision 2026-10-24).** Owner will provide credentials when ready; email sending is stubbed until then. Not blocking current phases.
 - "Where to Play" strategy doc — not found in this repo; needed before finalizing IA/keyword targets.
-- Figma file link — none provided yet. Needed to pull real tokens/components via Figma MCP for Phase 2; until then, the design system starts from the brand tokens in §1 and is built directly in code/Figma from scratch rather than imported.
+- Figma design system: [Jk7ESTZ2R2XMppy2Uw6R25](https://www.figma.com/design/Jk7ESTZ2R2XMppy2Uw6R25) — built from scratch in Phase 2 (owner decision 2026-10-24), not imported from an existing file. Scope was foundations + three signature components, not an exhaustive library — extend it there first before adding new one-off visual treatments in code.
 - Logo master file — current `public/brand/nilltech-logo.jpg` is a flat JPEG with a baked-in white background (no transparency). Needs an SVG or transparent PNG before it goes into a real header/dark-mode nav.
 - Starting prices per service.
 - Testimonials/case studies.
