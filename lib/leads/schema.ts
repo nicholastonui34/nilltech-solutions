@@ -12,7 +12,23 @@ export const honeypotSchema = z.object({
   website: z.string().max(0, "Leave this field empty."),
 });
 
+// Offer slugs from config/offers.ts, plus an explicit "not sure" so nobody
+// is forced to guess. Feeds lead scoring's service-interest points.
+export const SERVICE_INTEREST_VALUES = [
+  "services",
+  "ai-solutions",
+  "managed-teams",
+  "academy",
+  "partnerships",
+  "not-sure",
+] as const;
+
+export type ServiceInterest = (typeof SERVICE_INTEREST_VALUES)[number];
+
 export const contactFormSchema = honeypotSchema.extend({
+  serviceInterest: z.enum(SERVICE_INTEREST_VALUES, {
+    error: "Choose what you're interested in.",
+  }),
   name: z.string().trim().min(2, "Enter your name."),
   email: z.string().trim().email("Enter a valid email."),
   phone: z.string().trim().optional(),

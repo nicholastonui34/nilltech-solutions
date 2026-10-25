@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { offers } from "@/config/offers";
 import {
   SUBMIT_ERROR_MESSAGE,
   contactFormSchema,
@@ -112,6 +113,32 @@ export function ContactForm() {
           <Label htmlFor="company">Company (optional)</Label>
           <Input id="company" className="mt-1.5" {...register("company")} />
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="serviceInterest">What are you interested in?</Label>
+        <select
+          id="serviceInterest"
+          defaultValue=""
+          className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive mt-1.5 flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-xs outline-none focus-visible:ring-[3px] md:text-sm"
+          {...register("serviceInterest")}
+          aria-invalid={!!errors.serviceInterest}
+        >
+          <option value="" disabled>
+            Select one
+          </option>
+          {offers.map((offer) => (
+            <option key={offer.slug} value={offer.slug}>
+              {offer.title}
+            </option>
+          ))}
+          <option value="not-sure">Not sure yet</option>
+        </select>
+        {errors.serviceInterest ? (
+          <p className="text-destructive mt-1 text-sm">
+            {errors.serviceInterest.message}
+          </p>
+        ) : null}
       </div>
 
       <div>
