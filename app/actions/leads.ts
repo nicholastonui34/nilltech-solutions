@@ -1,6 +1,10 @@
 "use server";
 
-import { PRICING_FINALIZED, computeProjectEstimate } from "@/config/pricing-rules";
+import {
+  PRICING_FINALIZED,
+  computeProjectEstimate,
+  formatTimeline,
+} from "@/config/pricing-rules";
 import { createLead } from "@/lib/leads/create-lead";
 import { TURNSTILE_FAILED_MESSAGE, verifyTurnstile } from "@/lib/turnstile";
 import {
@@ -67,7 +71,7 @@ export async function submitProjectEstimator(input: unknown): Promise<SubmitResu
             const estimate = computeProjectEstimate(parsed.data);
             return {
               estimateKes: `${estimate.price.minKes}–${estimate.price.maxKes}`,
-              estimateWeeks: `${estimate.timeline.minWeeks}–${estimate.timeline.maxWeeks}`,
+              estimateTimeline: formatTimeline(estimate.timeline),
             };
           })()
         : {}),

@@ -20,7 +20,7 @@ export type TimelineUrgency = "asap" | "1-3-months" | "3-6-months" | "exploring"
 export type Region = "primary-market" | "secondary-market" | "other";
 
 type PriceRange = { minKes: number; maxKes: number };
-type TimelineRange = { minWeeks: number; maxWeeks: number };
+type TimelineRange = { minDays: number; maxDays: number };
 
 export const projectTypeBase: Record<
   ProjectType,
@@ -28,19 +28,19 @@ export const projectTypeBase: Record<
 > = {
   website: {
     price: { minKes: 45_000, maxKes: 90_000 },
-    timeline: { minWeeks: 2, maxWeeks: 4 },
+    timeline: { minDays: 1, maxDays: 7 },
   },
   ecommerce: {
     price: { minKes: 95_000, maxKes: 180_000 },
-    timeline: { minWeeks: 4, maxWeeks: 8 },
+    timeline: { minDays: 7, maxDays: 14 },
   },
   "business-systems": {
     price: { minKes: 180_000, maxKes: 400_000 },
-    timeline: { minWeeks: 6, maxWeeks: 12 },
+    timeline: { minDays: 14, maxDays: 28 },
   },
   "custom-software": {
     price: { minKes: 250_000, maxKes: 600_000 },
-    timeline: { minWeeks: 8, maxWeeks: 16 },
+    timeline: { minDays: 14, maxDays: 28 },
   },
 };
 
@@ -90,6 +90,14 @@ export function roundKes(value: number) {
   return Math.round(value / 5_000) * 5_000;
 }
 
+/** "1–7 days", or whole weeks ("1–2 weeks") once the range reaches two weeks. */
+export function formatTimeline({ minDays, maxDays }: TimelineRange) {
+  if (maxDays < 14) return `${minDays}–${maxDays} days`;
+  const minWeeks = Math.max(1, Math.round(minDays / 7));
+  const maxWeeks = Math.max(minWeeks, Math.round(maxDays / 7));
+  return minWeeks === maxWeeks ? `${maxWeeks} weeks` : `${minWeeks}–${maxWeeks} weeks`;
+}
+
 /** KES → USD for display, rounded to the nearest 50. */
 export function kesToUsd(value: number) {
   return Math.round(value / USD_KES_RATE / 50) * 50;
@@ -131,8 +139,8 @@ export function computeProjectEstimate(input: ProjectEstimateInput): ProjectEsti
       ),
     },
     timeline: {
-      minWeeks: Math.round(base.timeline.minWeeks * timelineMultiplier),
-      maxWeeks: Math.round(base.timeline.maxWeeks * timelineMultiplier),
+      minDays: Math.max(1, Math.round(base.timeline.minDays * timelineMultiplier)),
+      maxDays: Math.max(1, Math.round(base.timeline.maxDays * timelineMultiplier)),
     },
   };
 }
