@@ -137,7 +137,7 @@ React Email templates in `emails/`. Verified sending domain with SPF, DKIM, DMAR
 
 ## 10. Portals & dashboards (`/portal`, auth-gated, `noindex`)
 
-Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security on every table**. RBAC roles: `super_admin`, `director`, `finance`, `marketing`, `sales`, `quality`, `freelancer`, `client`.
+Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security on every table**. RBAC roles: `super_admin`, `director`, `finance`, `marketing`, `sales`, `quality`, `recruitment` (added Phase 6 — the recruitment department screens applicants), `freelancer`, `client`.
 
 | Dashboard            | Role(s)                          | Core views                                                                                                      |
 | -------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -147,6 +147,7 @@ Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security
 | Marketing            | marketing                        | Traffic, sources, conversions, newsletter, podcast performance, campaign UTM                                    |
 | Sales                | sales                            | Leads, scoring, pipeline stages, bookings, follow-ups, quotes                                                   |
 | Quality              | quality                          | Project QA checklists, delivery reviews, freelancer performance                                                 |
+| Recruitment          | recruitment                      | Applications, screening stages, test tasks (tracked), approvals, KRA PIN capture, freelancer portal accounts    |
 | Analytics            | director, super_admin, marketing | Funnel, CWV field data, conversion events                                                                       |
 | Freelancer           | freelancer                       | Profile, verification status, tax info, assignments                                                             |
 | Client               | client                           | Projects, invoices, receipts, documents, optional tax info                                                      |
@@ -262,7 +263,15 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] eTIMS: `EtimsProvider` interface + stub (`not_configured`, logged to `automation_runs`).
   - [x] Verified in rolled-back SQL transactions (no real numbers consumed): totals, issue/lock, overpay + void guards, direct-insert blocks, client/director RLS. One real bug caught and fixed (`record_payment` status cast).
   - Not built: emailing documents (Resend deferred), credit notes/refunds, client KRA PIN capture (waits for the eTIMS integrator + encryption).
-- [ ] **Phase 6 — Talent.** Freelancer onboarding, Persona, tax info, Quality dashboard.
+- [~] **Phase 6 — Talent.** Built (ADR 0005); awaiting owner sign-off.
+  - [x] `recruitment` role + `talent_applications` (`…06`, `…07` migrations): EAC-only countries (DB CHECK), owner's 8 hiring roles, manual stage pipeline with audit-logged transitions, approval requires engagement type, rejection requires a reason, `verification_status = 'pending_setup'`.
+  - [x] Public `/careers/apply` (RHF + Zod + honeypot + privacy consent), linked from `/careers`; service-role insert; ack email logged as skipped (Resend deferred).
+  - [x] Recruitment dashboard (`/portal/recruitment`): stage filters with counts, applicant detail, stage/notes/test-task tracking, freelancer portal-account creation.
+  - [x] KRA PIN for approved full-time Kenyan hires only — pgcrypto with a Vault-held key, `set_talent_tax_pin` / `get_talent_tax_pin` (read: finance + super_admin, audit-logged), ciphertext column not selectable. Freelancers handle their own tax.
+  - [x] ID verification: `IdVerificationProvider` interface, "Coming soon" — no vendor wired.
+  - [x] Quality dashboard (`/portal/quality`): projects (optional client link), auto-seeded QA checklist (code review, testing, client sign-off), assignments (approved talent only, RLS), 1–5 delivery reviews, freelancer performance table. Freelancer portal at `/portal/talent`.
+  - [x] Verified in a rolled-back SQL transaction (EAC + stage constraints, column privileges, PIN encrypt/decrypt + role limits, checklist seeding, assignment RLS, freelancer visibility) and the public form in a browser.
+  - Not built: applicant status emails (Resend deferred), a real ID-verification vendor.
 - [ ] **Phase 7 — Content.** Podcast, Academy (free courses first; paid later), Careers.
 
 ## 18. Open Inputs (keep updated)
@@ -278,6 +287,8 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - Figma design system: [Jk7ESTZ2R2XMppy2Uw6R25](https://www.figma.com/design/Jk7ESTZ2R2XMppy2Uw6R25) — built from scratch in Phase 2 (owner decision 2026-10-24), not imported from an existing file. Scope was foundations + three signature components, not an exhaustive library — extend it there first before adding new one-off visual treatments in code.
 - Logo master file — current `public/brand/nilltech-logo.jpg` is a flat JPEG with a baked-in white background (no transparency). Needs an SVG or transparent PNG before it goes into a real header/dark-mode nav.
 - **Starting prices per service** — fill the real numbers into `config/pricing-rules.ts` (every base price is currently a placeholder `0`) and flip `PRICING_FINALIZED` to `true`; see Phase 3 above.
+- **Privacy notice (Kenya DPA 2019)** — `/legal` is still a placeholder, but `/careers/apply` (and the lead forms) now capture consent that links to it. Real legal text needed before taking real applications.
+- `docs/content-placeholders.md` — required by §2 but doesn't exist yet; the `{{PLACEHOLDER}}` strings across the site aren't logged anywhere central.
 - Testimonials/case studies.
 - YouTube channel + episode list.
 - Academy course list & pricing.

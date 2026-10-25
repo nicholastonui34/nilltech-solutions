@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Container } from "@/components/sections/container";
 import { EmptyState } from "@/components/sections/empty-state";
-import { siteConfig } from "@/config/site.config";
+import { Button } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -12,9 +13,7 @@ export const metadata: Metadata = buildMetadata({
 });
 
 // Deliberately low prominence (footer-only, not primary nav) per CLAUDE.md
-// §13. The freelancer onboarding flow (§9) is Phase 6 — until it exists,
-// "Join as Freelancer" points at a real, working email rather than a flow
-// that isn't built yet.
+// §13. "Join as a freelancer" routes into the onboarding flow (§9).
 export default function CareersPage() {
   return (
     <section className="py-20">
@@ -31,16 +30,12 @@ export default function CareersPage() {
         <div className="mt-10">
           <h2 className="text-lg font-semibold">Join as a freelancer</h2>
           <p className="text-muted-foreground mt-2 text-sm">
-            {"{{PLACEHOLDER: one sentence on the freelancer talent pool}}"} Our full
-            application flow is coming soon — in the meantime, email{" "}
-            <a
-              href={`mailto:${siteConfig.contact.email}`}
-              className="text-primary hover:underline"
-            >
-              {siteConfig.contact.email}
-            </a>
-            .
+            {"{{PLACEHOLDER: one sentence on the freelancer talent pool}}"} We hire within
+            East Africa, and every application is reviewed by our recruitment team.
           </p>
+          <Button asChild className="mt-4">
+            <Link href="/careers/apply">Apply to join our delivery teams</Link>
+          </Button>
         </div>
       </Container>
     </section>

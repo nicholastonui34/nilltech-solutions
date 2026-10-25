@@ -16,6 +16,7 @@ const staticRoutes = [
   "/work",
   "/contact",
   "/careers",
+  "/careers/apply",
   "/legal",
   "/blog",
 ];
