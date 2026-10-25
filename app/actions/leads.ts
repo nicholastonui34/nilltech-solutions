@@ -1,5 +1,6 @@
 "use server";
 
+import { PRICING_FINALIZED, computeProjectEstimate } from "@/config/pricing-rules";
 import { createLead } from "@/lib/leads/create-lead";
 import {
   SUBMIT_ERROR_MESSAGE,
@@ -53,6 +54,16 @@ export async function submitProjectEstimator(input: unknown): Promise<SubmitResu
       projectType: parsed.data.projectType,
       features: parsed.data.features,
       integrations: parsed.data.integrations,
+      // What the visitor was shown, recomputed server-side so Sales sees it.
+      ...(PRICING_FINALIZED
+        ? (() => {
+            const estimate = computeProjectEstimate(parsed.data);
+            return {
+              estimateKes: `${estimate.price.minKes}–${estimate.price.maxKes}`,
+              estimateWeeks: `${estimate.timeline.minWeeks}–${estimate.timeline.maxWeeks}`,
+            };
+          })()
+        : {}),
     },
   });
 

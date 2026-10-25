@@ -28,7 +28,7 @@ const data: OfferPageData = {
     "{{PLACEHOLDER: audience 2}}",
     "{{PLACEHOLDER: audience 3}}",
   ],
-  startingFrom: "{{PRICE}}",
+  startingFrom: "KES 180,000 · USD 1,800 per developer / month",
   deliverables: [
     {
       icon: Users,

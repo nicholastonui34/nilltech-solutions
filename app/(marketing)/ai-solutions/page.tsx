@@ -28,7 +28,7 @@ const data: OfferPageData = {
     "{{PLACEHOLDER: audience 2}}",
     "{{PLACEHOLDER: audience 3}}",
   ],
-  startingFrom: "{{PRICE}}",
+  startingFrom: "KES 40,000 setup · USD 450 (international)",
   deliverables: [
     {
       icon: Zap,

@@ -20,15 +20,14 @@ export default function PricingPage() {
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <h1 className="text-4xl font-semibold">Pricing</h1>
             <p className="text-muted-foreground mt-4">
-              {
-                "{{PLACEHOLDER: one sentence on how pricing works and what the estimator feeds into}}"
-              }
+              Every price below is a starting point. Use the estimator for a range based
+              on your project, then we confirm a fixed quote after a short discovery call.
             </p>
           </div>
           <PricingTiers />
           <p className="text-muted-foreground mt-10 text-center text-xs">
-            Estimates are indicative. Final quote after a discovery call.{" "}
-            {"{{PLACEHOLDER: guarantee statement}}"}
+            Every project includes free support after launch. Estimates are indicative —
+            final quote after a discovery call.
           </p>
         </Container>
       </section>
