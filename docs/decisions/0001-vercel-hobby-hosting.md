@@ -30,6 +30,12 @@ entirely — needs no rewrite:
 - `next/image` optimization is used within Hobby's allowance; hero/brand
   imagery is pre-optimized (AVIF/WebP, correct `sizes`) to stay inside it
   rather than relying on headroom we don't have.
+- Functions run in **Frankfurt (`fra1`)**, set in `vercel.json` rather than
+  the dashboard so it survives project re-creation. The Supabase project is
+  in eu-central-1 (Frankfurt), so every server action that writes a lead
+  stays in-region instead of crossing the Atlantic; Frankfurt is also the
+  closest Vercel region to the East African primary market. The first
+  deploy defaulted to `iad1` (Washington DC) before this was set.
 
 ## Upgrade triggers → Vercel Pro
 
