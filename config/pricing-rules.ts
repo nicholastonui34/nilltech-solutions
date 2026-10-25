@@ -1,14 +1,18 @@
 /**
- * Deterministic pricing-rules engine (CLAUDE.md §7A). Fully typed and
- * functional, but every base number below is a placeholder `0` — the
- * owner hasn't set real prices yet (§18 Open Inputs: "Starting prices per
- * service"). `PRICING_FINALIZED` gates whether the UI shows a computed
- * range at all: while it's `false`, /estimate shows an honest "pricing is
- * being finalized" state instead of a range built from zeros, per §2's
- * never-invent-prices rule. Flip it to `true` once real numbers are in.
+ * Deterministic pricing-rules engine (CLAUDE.md §7A). Numbers set from
+ * the owner's brief (2026-10-25: "agency quality product at a freelancer
+ * price") and a market comparison of Kenyan freelancer and agency pricing
+ * — see docs/decisions/0006-pricing.md for sources and reasoning. The
+ * owner approves them by merging; change them here, nowhere else.
  */
 
-export const PRICING_FINALIZED = false;
+export const PRICING_FINALIZED = true;
+
+/**
+ * Display-only conversion for showing USD alongside KES. Not a live rate —
+ * review it when the shilling moves materially. Last reviewed 2026-10-25.
+ */
+export const USD_KES_RATE = 130;
 
 export type ProjectType =
   "website" | "custom-software" | "ecommerce" | "business-systems";
@@ -22,32 +26,44 @@ export const projectTypeBase: Record<
   ProjectType,
   { price: PriceRange; timeline: TimelineRange }
 > = {
-  website: { price: { minKes: 0, maxKes: 0 }, timeline: { minWeeks: 0, maxWeeks: 0 } },
-  "custom-software": {
-    price: { minKes: 0, maxKes: 0 },
-    timeline: { minWeeks: 0, maxWeeks: 0 },
+  website: {
+    price: { minKes: 45_000, maxKes: 90_000 },
+    timeline: { minWeeks: 2, maxWeeks: 4 },
   },
-  ecommerce: { price: { minKes: 0, maxKes: 0 }, timeline: { minWeeks: 0, maxWeeks: 0 } },
+  ecommerce: {
+    price: { minKes: 95_000, maxKes: 180_000 },
+    timeline: { minWeeks: 4, maxWeeks: 8 },
+  },
   "business-systems": {
-    price: { minKes: 0, maxKes: 0 },
-    timeline: { minWeeks: 0, maxWeeks: 0 },
+    price: { minKes: 180_000, maxKes: 400_000 },
+    timeline: { minWeeks: 6, maxWeeks: 12 },
+  },
+  "custom-software": {
+    price: { minKes: 250_000, maxKes: 600_000 },
+    timeline: { minWeeks: 8, maxWeeks: 16 },
   },
 };
 
 export const featureAddons: Record<string, { label: string; priceDeltaKes: number }> = {
-  auth: { label: "User accounts / authentication", priceDeltaKes: 0 },
-  payments: { label: "Payments", priceDeltaKes: 0 },
-  "multi-language": { label: "Multi-language", priceDeltaKes: 0 },
-  "admin-dashboard": { label: "Admin dashboard", priceDeltaKes: 0 },
+  auth: { label: "User accounts / authentication", priceDeltaKes: 15_000 },
+  payments: { label: "Payments", priceDeltaKes: 20_000 },
+  "multi-language": { label: "Multi-language", priceDeltaKes: 15_000 },
+  "admin-dashboard": { label: "Admin dashboard", priceDeltaKes: 35_000 },
 };
 
 export const integrationAddons: Record<string, { label: string; priceDeltaKes: number }> =
   {
-    crm: { label: "CRM integration", priceDeltaKes: 0 },
-    "payment-gateway": { label: "Payment gateway", priceDeltaKes: 0 },
-    "sms-email": { label: "SMS/Email provider", priceDeltaKes: 0 },
-    "erp-accounting": { label: "ERP/Accounting system", priceDeltaKes: 0 },
+    crm: { label: "CRM integration", priceDeltaKes: 25_000 },
+    "payment-gateway": { label: "Payment gateway (M-Pesa, card)", priceDeltaKes: 20_000 },
+    "sms-email": { label: "SMS/Email provider", priceDeltaKes: 12_000 },
+    "erp-accounting": { label: "ERP/Accounting system", priceDeltaKes: 45_000 },
   };
+
+/** Add-ons already covered by a project type's base price — never charged twice. */
+export const includedAddons: Partial<Record<ProjectType, readonly string[]>> = {
+  // Online stores are quoted with M-Pesa/card checkout built in.
+  ecommerce: ["payments", "payment-gateway"],
+};
 
 // Rush work costs more and compresses timeline; exploratory work is
 // cheaper but takes longer to schedule.
@@ -61,11 +77,23 @@ export const timelineUrgencyMultiplier: Record<
   exploring: { priceMultiplier: 0.9, timelineMultiplier: 1.3 },
 };
 
+// East Africa pays the base (KES) price. US/UK/Canada clients pay 1.5x —
+// still roughly a third of a typical US freelancer quote (ADR 0006).
 export const regionMultiplier: Record<Region, number> = {
   "primary-market": 1,
-  "secondary-market": 1,
+  "secondary-market": 1.5,
   other: 1,
 };
+
+/** Rounds a KES amount to the nearest 5,000 for display. */
+export function roundKes(value: number) {
+  return Math.round(value / 5_000) * 5_000;
+}
+
+/** KES → USD for display, rounded to the nearest 50. */
+export function kesToUsd(value: number) {
+  return Math.round(value / USD_KES_RATE / 50) * 50;
+}
 
 export type ProjectEstimateInput = {
   projectType: ProjectType;
@@ -79,14 +107,14 @@ export type ProjectEstimate = { price: PriceRange; timeline: TimelineRange };
 
 export function computeProjectEstimate(input: ProjectEstimateInput): ProjectEstimate {
   const base = projectTypeBase[input.projectType];
-  const featureDelta = input.features.reduce(
-    (sum, key) => sum + (featureAddons[key]?.priceDeltaKes ?? 0),
-    0,
-  );
-  const integrationDelta = input.integrations.reduce(
-    (sum, key) => sum + (integrationAddons[key]?.priceDeltaKes ?? 0),
-    0,
-  );
+  const included = includedAddons[input.projectType] ?? [];
+  const charged = (key: string) => !included.includes(key);
+  const featureDelta = input.features
+    .filter(charged)
+    .reduce((sum, key) => sum + (featureAddons[key]?.priceDeltaKes ?? 0), 0);
+  const integrationDelta = input.integrations
+    .filter(charged)
+    .reduce((sum, key) => sum + (integrationAddons[key]?.priceDeltaKes ?? 0), 0);
   const { priceMultiplier, timelineMultiplier } =
     timelineUrgencyMultiplier[input.timelineUrgency];
   const region = regionMultiplier[input.region];

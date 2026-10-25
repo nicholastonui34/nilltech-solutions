@@ -13,6 +13,10 @@ import {
   featureAddons,
   integrationAddons,
   PRICING_FINALIZED,
+  computeProjectEstimate,
+  kesToUsd,
+  roundKes,
+  type ProjectEstimate,
   type ProjectType,
   type Region,
 } from "@/config/pricing-rules";
@@ -52,6 +56,10 @@ export function ProjectEstimatorForm() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [stepError, setStepError] = useState(false);
+  const [estimate, setEstimate] = useState<{
+    result: ProjectEstimate;
+    international: boolean;
+  } | null>(null);
 
   const {
     register,
@@ -117,6 +125,10 @@ export function ProjectEstimatorForm() {
       return;
     }
     if (result.ok) {
+      setEstimate({
+        result: computeProjectEstimate(values),
+        international: values.region === "secondary-market",
+      });
       setStatus("success");
       trackEvent("form_submit", { tier: result.tier, form: "project_estimator" });
     } else {
@@ -131,11 +143,28 @@ export function ProjectEstimatorForm() {
         <p className="text-lg font-semibold">
           Thanks — that&rsquo;s enough to get started.
         </p>
-        <p className="text-muted-foreground mt-2">
-          {PRICING_FINALIZED
-            ? "Check your email for your indicative range."
-            : "Our pricing tables are being finalized — we'll follow up with a real range shortly."}
-        </p>
+        {PRICING_FINALIZED && estimate ? (
+          <div className="bg-muted/50 mx-auto mt-6 max-w-md rounded-lg p-5">
+            <p className="text-muted-foreground text-sm">Indicative range</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums">
+              {estimate.international
+                ? `USD ${kesToUsd(estimate.result.price.minKes).toLocaleString()} – ${kesToUsd(estimate.result.price.maxKes).toLocaleString()}`
+                : `KES ${roundKes(estimate.result.price.minKes).toLocaleString()} – ${roundKes(estimate.result.price.maxKes).toLocaleString()}`}
+            </p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Typical timeline: {estimate.result.timeline.minWeeks}–
+              {estimate.result.timeline.maxWeeks} weeks
+            </p>
+            <p className="text-muted-foreground mt-3 text-xs">
+              Estimates are indicative. Your final quote follows a short discovery call.
+            </p>
+          </div>
+        ) : (
+          <p className="text-muted-foreground mt-2">
+            Our pricing tables are being finalized — we&rsquo;ll follow up with a real
+            range shortly.
+          </p>
+        )}
         <div className="mt-6 flex justify-center">
           <CtaButton intent="discovery-call" />
         </div>

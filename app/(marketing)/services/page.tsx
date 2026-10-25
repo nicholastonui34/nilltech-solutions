@@ -28,7 +28,7 @@ const data: OfferPageData = {
     "{{PLACEHOLDER: audience 2}}",
     "{{PLACEHOLDER: audience 3}}",
   ],
-  startingFrom: "{{PRICE}}",
+  startingFrom: "KES 45,000 · USD 500 (international)",
   deliverables: [
     {
       icon: Globe,

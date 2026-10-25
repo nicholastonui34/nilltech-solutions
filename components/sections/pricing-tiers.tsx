@@ -15,30 +15,47 @@ type Tier = {
   driversDown: string[];
 };
 
+// Starting prices from config/pricing-rules.ts and ADR 0006. KES is the
+// East Africa price; USD is the international (US/UK/Canada) price at the
+// 1.5x region multiplier, not a straight currency conversion.
 const tiers: Tier[] = [
   {
     name: "AI-Powered Software Development",
-    priceKes: "KES {{PRICE}}",
-    priceUsd: "USD {{PRICE}}",
-    timeline: "{{PLACEHOLDER: typical timeline}}",
-    driversUp: ["{{PLACEHOLDER: driver}}", "{{PLACEHOLDER: driver}}"],
-    driversDown: ["{{PLACEHOLDER: driver}}"],
+    priceKes: "KES 45,000",
+    priceUsd: "USD 500",
+    timeline: "Websites in 2–4 weeks · online stores 4–8 · custom systems 6–16",
+    driversUp: [
+      "More pages, features and custom integrations",
+      "Online payments, user accounts and admin dashboards",
+      "Rush timelines (under a month)",
+    ],
+    driversDown: [
+      "Clear scope and content ready at kickoff",
+      "Flexible timelines (3+ months)",
+    ],
   },
   {
     name: "AI Solutions for SMEs",
-    priceKes: "KES {{PRICE}}",
-    priceUsd: "USD {{PRICE}}",
-    timeline: "{{PLACEHOLDER: typical timeline}}",
-    driversUp: ["{{PLACEHOLDER: driver}}", "{{PLACEHOLDER: driver}}"],
-    driversDown: ["{{PLACEHOLDER: driver}}"],
+    priceKes: "KES 40,000",
+    priceUsd: "USD 450",
+    timeline: "Live in 1–3 weeks · support from KES 5,000 / USD 60 a month",
+    driversUp: [
+      "Connecting to M-Pesa, your CRM or internal systems",
+      "Multiple channels (WhatsApp, web, email)",
+      "High message volumes (WhatsApp and AI usage billed at cost)",
+    ],
+    driversDown: ["Starting with one channel and a focused set of questions"],
   },
   {
     name: "Managed Tech Delivery Teams",
-    priceKes: "KES {{PRICE}}",
-    priceUsd: "USD {{PRICE}}",
-    timeline: "{{PLACEHOLDER: typical timeline}}",
-    driversUp: ["{{PLACEHOLDER: driver}}", "{{PLACEHOLDER: driver}}"],
-    driversDown: ["{{PLACEHOLDER: driver}}"],
+    priceKes: "KES 180,000",
+    priceUsd: "USD 1,800",
+    timeline: "Per developer, per month · team in place in 2–4 weeks",
+    driversUp: ["Senior specialists (AI/ML, DevOps)", "Larger teams and extended hours"],
+    driversDown: [
+      "Longer engagements",
+      "Blended teams of mid-level and senior engineers",
+    ],
   },
 ];
 
@@ -47,6 +64,9 @@ export function PricingTiers() {
 
   return (
     <div>
+      <p className="text-muted-foreground mb-3 text-center text-xs">
+        KES pricing for East Africa · USD pricing for international clients
+      </p>
       <div className="mb-10 flex items-center justify-center gap-2">
         <Button
           type="button"
