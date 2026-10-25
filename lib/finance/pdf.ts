@@ -1,7 +1,5 @@
 import "server-only";
 
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import {
   PDFDocument,
   StandardFonts,
@@ -12,18 +10,20 @@ import {
 } from "pdf-lib";
 
 import { formatAmount, type Currency } from "@/lib/finance/money";
+import {
+  MARGIN,
+  MUTED,
+  NAVY,
+  PAGE_H,
+  PAGE_W,
+  PURPLE,
+  RULE,
+  loadLogo,
+  sanitize,
+  wrap,
+} from "@/lib/pdf/text";
 import type { ClientSnapshot, SellerSnapshot } from "@/lib/finance/snapshots";
 import { PAYMENT_METHOD_LABELS, type PaymentMethod } from "@/lib/finance/labels";
-
-// Brand tokens (CLAUDE.md §1).
-const NAVY = rgb(6 / 255, 11 / 255, 31 / 255);
-const PURPLE = rgb(91 / 255, 45 / 255, 142 / 255);
-const MUTED = rgb(0.42, 0.45, 0.5);
-const RULE = rgb(0.88, 0.89, 0.92);
-
-const PAGE_W = 595.28; // A4
-const PAGE_H = 841.89;
-const MARGIN = 48;
 
 export type InvoicePdfData = {
   number: string;
@@ -59,38 +59,6 @@ export type ReceiptPdfData = {
 };
 
 type Fonts = { regular: PDFFont; bold: PDFFont };
-
-/** Standard PDF fonts only cover WinAnsi; replace anything else so drawing never throws. */
-function sanitize(font: PDFFont, text: string) {
-  let out = "";
-  for (const char of text.normalize("NFC")) {
-    try {
-      font.encodeText(char);
-      out += char;
-    } catch {
-      out += "?";
-    }
-  }
-  return out;
-}
-
-function wrap(font: PDFFont, text: string, size: number, maxWidth: number) {
-  const lines: string[] = [];
-  for (const paragraph of sanitize(font, text).split(/\r?\n/)) {
-    let line = "";
-    for (const word of paragraph.split(/\s+/)) {
-      const candidate = line ? `${line} ${word}` : word;
-      if (font.widthOfTextAtSize(candidate, size) <= maxWidth || !line) {
-        line = candidate;
-      } else {
-        lines.push(line);
-        line = word;
-      }
-    }
-    lines.push(line);
-  }
-  return lines;
-}
 
 class Writer {
   y = PAGE_H - MARGIN;
@@ -130,17 +98,6 @@ class Writer {
       thickness: 0.75,
       color: RULE,
     });
-  }
-}
-
-async function loadLogo(doc: PDFDocument) {
-  try {
-    const bytes = await readFile(
-      path.join(process.cwd(), "public/brand/nilltech-logo.jpg"),
-    );
-    return await doc.embedJpg(bytes);
-  } catch {
-    return null; // Documents still render without the logo.
   }
 }
 
