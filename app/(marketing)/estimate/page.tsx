@@ -7,7 +7,8 @@ import { EstimateTabs } from "./estimate-tabs";
 
 export const metadata: Metadata = buildMetadata({
   title: "Get an Estimate",
-  description: "{{PLACEHOLDER: meta description for /estimate, 150-160 characters}}",
+  description:
+    "Free project cost estimator for websites, online stores and custom software in Kenya, plus an AI token cost calculator for Claude, ChatGPT and Gemini.",
   path: "/estimate",
 });
 

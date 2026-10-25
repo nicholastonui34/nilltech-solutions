@@ -10,7 +10,8 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Careers",
-  description: "{{PLACEHOLDER: meta description for /careers, 150-160 characters}}",
+  description:
+    "Careers at NillTech Solutions in Nairobi: open roles and how to join our managed software and AI delivery teams as an engineer from East Africa.",
   path: "/careers",
 });
 
@@ -60,8 +61,9 @@ export default function CareersPage() {
         <div className="mt-12">
           <h2 className="text-lg font-semibold">Join as a freelancer</h2>
           <p className="text-muted-foreground mt-2 text-sm">
-            {"{{PLACEHOLDER: one sentence on the freelancer talent pool}}"} We hire within
-            East Africa, and every application is reviewed by our recruitment team.
+            Our talent pool supplies the engineers, designers and specialists behind every
+            client team. We hire within East Africa, and every application is reviewed by
+            our recruitment team.
           </p>
           <Button asChild variant="outline" className="mt-4">
             <Link href="/careers/apply">Apply to join our delivery teams</Link>

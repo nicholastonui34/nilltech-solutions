@@ -10,7 +10,8 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Contact",
-  description: "{{PLACEHOLDER: meta description for /contact, 150-160 characters}}",
+  description:
+    "Contact NillTech Solutions in Nairobi: email info@nilltechsolutions.com, call or WhatsApp +254 725 830 334, or send us your project details.",
   path: "/contact",
 });
 
@@ -43,7 +44,8 @@ export default function ContactPage() {
       <Container className="max-w-5xl">
         <h1 className="text-4xl font-semibold">Contact</h1>
         <p className="text-muted-foreground mt-4 max-w-xl">
-          {"{{PLACEHOLDER: one sentence inviting the visitor to reach out}}"}
+          Tell us what you&rsquo;re working on. We reply to every enquiry, usually within
+          one working day.
         </p>
 
         <div className="mt-12 grid gap-10 lg:grid-cols-5">

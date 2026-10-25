@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BookOpen, Briefcase, GraduationCap, Users } from "lucide-react";
+import { BookOpen, GraduationCap, Users } from "lucide-react";
 
 import {
   OfferPageContent,
@@ -14,7 +14,8 @@ const title = "NillTech Academy";
 
 export const metadata: Metadata = buildMetadata({
   title,
-  description: "{{PLACEHOLDER: meta description for /academy, 150-160 characters}}",
+  description:
+    "Free practical AI and software courses from NillTech Academy in Nairobi. No sign-up needed. Team training for companies across East Africa on request.",
   path: "/academy",
 });
 
@@ -23,59 +24,76 @@ export const metadata: Metadata = buildMetadata({
 // paid enrolment comes later, so the main CTA stays "contact-sales".
 const data: OfferPageData = {
   eyebrow: "NillTech Academy",
-  headline: "{{PLACEHOLDER: /academy hero headline}}",
-  subheadline: "{{PLACEHOLDER: /academy hero subheadline}}",
+  headline: "Learn the AI and software skills that get real work done.",
+  subheadline:
+    "Free, practical courses from the team that builds software and AI for businesses every day.",
   primaryCta: "contact-sales",
-  summary: "{{PLACEHOLDER: answer-first summary of this offer, 2 to 3 sentences}}",
+  summary:
+    "NillTech Academy teaches practical AI and software skills, taught from real client work rather than theory. Free courses need no sign-up: open a course and start learning straight away. Paid courses and training for company teams are on the way.",
   audience: [
-    "{{PLACEHOLDER: audience 1}}",
-    "{{PLACEHOLDER: audience 2}}",
-    "{{PLACEHOLDER: audience 3}}",
+    "Learners starting out in software or AI",
+    "Professionals switching into tech",
+    "Companies upskilling their teams in AI",
   ],
   startingFrom: "Free",
   deliverables: [
     {
       icon: BookOpen,
-      title: "Free Courses",
-      description: "{{PLACEHOLDER: deliverable description}}",
+      title: "Free courses",
+      description:
+        "Short, practical courses you can start right now, with no account or payment needed.",
       href: "/academy#courses",
     },
     {
       icon: GraduationCap,
-      title: "Paid Tracks",
-      description: "{{PLACEHOLDER: deliverable description}}",
+      title: "Paid courses",
+      description:
+        "In-depth courses with projects, coming soon. Get in touch to hear when enrolment opens.",
       href: "/contact",
     },
     {
       icon: Users,
-      title: "Live Cohorts",
-      description: "{{PLACEHOLDER: deliverable description}}",
-      href: "/contact",
-    },
-    {
-      icon: Briefcase,
-      title: "Career Support",
-      description: "{{PLACEHOLDER: deliverable description}}",
+      title: "Team training",
+      description:
+        "AI and software training for your company's team, built around your tools and work. Contact us to plan it.",
       href: "/contact",
     },
   ],
   process: [
-    { title: "{{PLACEHOLDER: step 1}}", description: "{{PLACEHOLDER: step 1 detail}}" },
-    { title: "{{PLACEHOLDER: step 2}}", description: "{{PLACEHOLDER: step 2 detail}}" },
-    { title: "{{PLACEHOLDER: step 3}}", description: "{{PLACEHOLDER: step 3 detail}}" },
+    {
+      title: "Pick a course",
+      description: "Browse the free courses below and choose where to start.",
+    },
+    {
+      title: "Learn at your pace",
+      description: "Work through short lessons whenever it suits you, on any device.",
+    },
+    {
+      title: "Apply it",
+      description:
+        "Use what you learn on your own projects, or apply to join our delivery teams.",
+    },
   ],
   faq: [
     {
-      question: "{{PLACEHOLDER: FAQ question 1}}",
-      answer: "{{PLACEHOLDER: FAQ answer 1}}",
+      question: "Are the courses really free?",
+      answer:
+        "Yes. Free courses are open to everyone with no sign-up or payment. Paid courses, when they launch, will be clearly marked.",
     },
     {
-      question: "{{PLACEHOLDER: FAQ question 2}}",
-      answer: "{{PLACEHOLDER: FAQ answer 2}}",
+      question: "Do I need experience to start?",
+      answer:
+        "No. Each course says who it's for and what you need before you start, and beginner courses assume no background.",
+    },
+    {
+      question: "Can you train our company's team?",
+      answer:
+        "Yes. Contact us with your team's size and goals, and we'll plan training around the tools and work you already do.",
     },
   ],
-  ctaHeading: "{{PLACEHOLDER: closing CTA heading}}",
-  ctaBody: "{{PLACEHOLDER: closing CTA body}}",
+  ctaHeading: "Want training for your team?",
+  ctaBody:
+    "Tell us what your team needs to learn, and we'll put together a plan and a price.",
 };
 
 export default function AcademyPage() {

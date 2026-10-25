@@ -20,7 +20,8 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Workshift by NillTech | Podcast",
-  description: "{{PLACEHOLDER: meta description for /podcast, 150-160 characters}}",
+  description:
+    "Workshift by NillTech: a podcast on remote work, managed teams and how AI is changing the way work gets done, from Nairobi, Kenya.",
   path: "/podcast",
 });
 
@@ -38,8 +39,8 @@ export default function PodcastPage() {
       />
       <Hero
         eyebrow={podcast.name}
-        headline="{{PLACEHOLDER: /podcast hero headline}}"
-        subheadline="{{PLACEHOLDER: /podcast hero subheadline}}"
+        headline="Conversations on how work is changing."
+        subheadline="Remote work, managed teams and AI at work, with the people building the future of work in Africa and beyond."
         primaryCta="whatsapp"
       />
 

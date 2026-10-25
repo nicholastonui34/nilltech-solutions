@@ -280,6 +280,11 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - Layouts verified locally with throwaway sample data (not committed). The dynamic routes use `instant = false` while empty; switch to `generateStaticParams` once the first entries exist.
   - Not built: newsletter capture (blocked on Resend), paid course enrolment.
 
+- [~] **Phase 8 — Launch readiness.** In progress (owner, 2026-10-25: "Begin launch").
+  - [x] Real copy on every public page (home, services, AI solutions, managed teams, academy, partnerships, pricing, estimate, contact, about, careers, podcast, work, blog), written from known facts only: offers, published prices and timelines, process, terms. No invented stats, clients or credentials. Offer cards use action-specific link labels instead of "Learn more". `llms.txt` now lists starting prices.
+  - [x] `docs/seo-map.md` (primary term + intent per page) and `docs/content-placeholders.md` (hidden sections waiting on owner content, and policy statements for the owner to confirm).
+  - [ ] Per-IP rate limit on the public forms. [ ] Cloudflare Web Analytics (traffic + CWV). [ ] UTM capture into `leads.metadata`. [ ] Mobile Lighthouse pass against §15 targets.
+
 ## 18. Open Inputs (keep updated)
 
 - **ID verification vendor — deferred, coming soon (owner decision 2026-10-24).** Persona's cheapest confirmed plan ($250/mo, 12-month minimum) is ~13x the entire infra budget, so freelancer verification ships as a placeholder until a vendor is picked (iDenfy/Didit mentioned as having free tiers, both unverified). Not blocking current phases.
@@ -296,7 +301,7 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - **Privacy notice (Kenya DPA 2019)** — drafted 2026-10-25 at the owner's request from public sources (the Act, ODPC guidance notes, Tax Procedures Act s. 23) in `lib/content/legal.ts`, live at `/legal#privacy` and as a PDF at `/legal/privacy-notice.pdf`, linked at every form. **Not legal advice — have a Kenyan advocate review it.** Update it whenever a form, vendor or data use changes.
 - **Terms of service** — drafted 2026-10-25 at the owner's request (`lib/content/legal.ts`, `/legal#terms`, PDF at `/legal/terms-of-service.pdf`): estimates indicative, KES/USD invoicing without VAT, M-Pesa/bank payment, free post-launch bug fixes for the period in each proposal, IP assigned to the client on full payment, liability capped at fees paid, Kenyan law. **Not legal advice — have a Kenyan advocate review it.** Every proposal should state its bug-fix period, payment schedule and validity.
 - **ODPC registration** — check whether NillTech must register as a data controller: exemption needs BOTH annual turnover under KES 5M AND fewer than 10 employees, and is lost for some purposes (e.g. direct marketing) regardless of size. The privacy notice deliberately makes no registration claim.
-- `docs/content-placeholders.md` — required by §2 but doesn't exist yet; the `{{PLACEHOLDER}}` strings across the site aren't logged anywhere central.
+- **Founders for `/about`** — names, roles, short bios (photo optional). The section stays hidden until supplied. Also confirm the policy statements listed in `docs/content-placeholders.md` (reply time, white-label, NDA, meeting engineers before they start).
 - Testimonials/case studies.
 - YouTube channel + episode list.
 - Academy course list & pricing.

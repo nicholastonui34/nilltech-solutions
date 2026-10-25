@@ -9,8 +9,9 @@ import { siteConfig } from "@/config/site.config";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
-  title: siteConfig.name,
-  description: siteConfig.description,
+  title: "Software Development and AI Company in Kenya",
+  description:
+    "NillTech builds websites, custom software and AI solutions, and runs managed delivery teams, for businesses in Kenya, East Africa, the US, UK and Canada.",
   path: "/",
 });
 
@@ -20,7 +21,7 @@ export default function HomePage() {
       <Hero
         eyebrow="Managed Tech Delivery in Nairobi, Kenya"
         headline={siteConfig.tagline}
-        subheadline="{{PLACEHOLDER: one-sentence summary of the company's core promise for a buyer who lands here cold.}}"
+        subheadline="NillTech builds software and AI for businesses in Kenya, East Africa and beyond, with one accountable team that designs, builds, tests and supports it, so you get the result without managing the work."
         primaryCta="quote"
         secondaryCta="whatsapp"
       />
@@ -36,6 +37,7 @@ export default function HomePage() {
                 title={offer.title}
                 description={offer.shortDescription}
                 href={offer.href}
+                linkLabel={offer.cardLinkLabel}
               />
             ))}
           </div>
@@ -46,8 +48,8 @@ export default function HomePage() {
           CLAUDE.md §2: renders nothing when empty, never fake placeholder proof. */}
 
       <CtaBand
-        heading="{{PLACEHOLDER: closing CTA heading}}"
-        body="{{PLACEHOLDER: one sentence reinforcing why to act now.}}"
+        heading="Have a project in mind? Let's talk it through."
+        body="A short discovery call is free. You'll leave with a clear plan, a timeline and a price."
         cta="discovery-call"
       />
     </>

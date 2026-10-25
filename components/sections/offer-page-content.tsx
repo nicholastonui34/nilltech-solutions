@@ -9,6 +9,13 @@ import type { CtaIntent } from "@/config/cta";
 import type { LucideIcon } from "lucide-react";
 
 type Deliverable = { icon: LucideIcon; title: string; description: string; href: string };
+// Link text follows where the card goes (CLAUDE.md §5: no generic "Learn more").
+function deliverableLinkLabel(href: string) {
+  if (href.startsWith("/estimate")) return "Get an estimate";
+  if (href.startsWith("/academy")) return "Browse free courses";
+  return "Talk to us";
+}
+
 type Step = { title: string; description: string };
 type FaqItem = { question: string; answer: string };
 
@@ -62,6 +69,7 @@ export function OfferPageContent({ data }: { data: OfferPageData }) {
                 title={d.title}
                 description={d.description}
                 href={d.href}
+                linkLabel={deliverableLinkLabel(d.href)}
               />
             ))}
           </div>
