@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { PRIVACY_NOTICE_UPDATED, PrivacyNotice } from "@/components/legal/privacy-notice";
-import { TERMS_UPDATED, TermsOfService } from "@/components/legal/terms-of-service";
+import { LegalDocumentView } from "@/components/legal/legal-document";
 import { Container } from "@/components/sections/container";
+import { privacyNotice, termsOfService } from "@/lib/content/legal";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -12,39 +12,26 @@ export const metadata: Metadata = buildMetadata({
   path: "/legal",
 });
 
+// Content lives in lib/content/legal.ts — the same source as the PDFs at
+// /legal/privacy-notice.pdf and /legal/terms-of-service.pdf.
 export default function LegalPage() {
   return (
     <section className="py-20">
       <Container className="max-w-2xl">
         <h1 className="text-4xl font-semibold">Legal</h1>
-        <nav aria-label="On this page" className="mt-4 flex gap-4 text-sm">
-          <a href="#privacy" className="text-primary hover:underline">
-            Privacy notice
-          </a>
-          <a href="#terms" className="text-primary hover:underline">
-            Terms of service
-          </a>
+        <nav aria-label="On this page" className="mt-4 flex flex-wrap gap-4 text-sm">
+          {[privacyNotice, termsOfService].map((doc) => (
+            <a
+              key={doc.slug}
+              href={`#${doc.anchor}`}
+              className="text-primary hover:underline"
+            >
+              {doc.title}
+            </a>
+          ))}
         </nav>
-
-        <div id="privacy" className="mt-10 scroll-mt-24">
-          <h2 className="text-2xl font-semibold">Privacy notice</h2>
-          <p className="text-muted-foreground mt-1 text-xs">
-            Last updated {PRIVACY_NOTICE_UPDATED}
-          </p>
-          <div className="mt-6">
-            <PrivacyNotice />
-          </div>
-        </div>
-
-        <div id="terms" className="mt-16 scroll-mt-24">
-          <h2 className="text-2xl font-semibold">Terms of service</h2>
-          <p className="text-muted-foreground mt-1 text-xs">
-            Last updated {TERMS_UPDATED}
-          </p>
-          <div className="mt-6">
-            <TermsOfService />
-          </div>
-        </div>
+        <LegalDocumentView doc={privacyNotice} />
+        <LegalDocumentView doc={termsOfService} />
       </Container>
     </section>
   );
