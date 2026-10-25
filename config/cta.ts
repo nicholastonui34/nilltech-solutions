@@ -3,10 +3,10 @@ import type { AnalyticsEvent } from "@/lib/analytics";
 
 /**
  * CTA system — CLAUDE.md §5. Every intent maps to a label, a real
- * destination, and the event it fires. "Book a Discovery Call", "Book a
- * Demo" and "Get a Free Quote" point at /contact until Phase 3 ships
- * Cal.com and the AI estimator (/estimate) — that's a one-line change here
- * when those routes exist, not a rewrite of every call site.
+ * destination, and the event it fires. "Book a Discovery Call" and "Book
+ * a Demo" point at /contact (which now has a real lead-capture form and
+ * Cal.com facade, Phase 3) until a dedicated booking flow exists. "Get a
+ * Free Quote" now points at /estimate, Phase 3's AI quote estimator.
  */
 
 export type CtaIntent =
@@ -22,7 +22,7 @@ export const ctaConfig: Record<
     event: "cta_click",
   },
   demo: { label: "Book a Demo", href: "/contact", event: "cta_click" },
-  quote: { label: "Get a Free Quote", href: "/contact", event: "cta_click" },
+  quote: { label: "Get a Free Quote", href: "/estimate", event: "cta_click" },
   "contact-sales": { label: "Contact Sales", href: "/contact", event: "cta_click" },
   whatsapp: {
     label: "Talk on WhatsApp",
