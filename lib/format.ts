@@ -28,3 +28,15 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export function daysAgoIso(days: number) {
   return new Date(Date.now() - days * DAY_MS).toISOString();
 }
+
+const isoDateFormat = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Africa/Nairobi",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** Today's date in Nairobi as YYYY-MM-DD, optionally offset by `days`. */
+export function nairobiDateIso(days = 0) {
+  return isoDateFormat.format(new Date(Date.now() + days * DAY_MS));
+}
