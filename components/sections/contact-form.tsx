@@ -8,10 +8,12 @@ import { submitContactForm } from "@/app/actions/leads";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { offers } from "@/config/offers";
 import {
   SUBMIT_ERROR_MESSAGE,
+  TIMELINE_URGENCY_OPTIONS,
   contactFormSchema,
   type ContactFormValues,
 } from "@/lib/leads/schema";
@@ -117,10 +119,10 @@ export function ContactForm() {
 
       <div>
         <Label htmlFor="serviceInterest">What are you interested in?</Label>
-        <select
+        <NativeSelect
           id="serviceInterest"
           defaultValue=""
-          className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive mt-1.5 flex h-9 w-full rounded-md border px-3 py-1 text-base shadow-xs outline-none focus-visible:ring-[3px] md:text-sm"
+          className="mt-1.5"
           {...register("serviceInterest")}
           aria-invalid={!!errors.serviceInterest}
         >
@@ -133,10 +135,35 @@ export function ContactForm() {
             </option>
           ))}
           <option value="not-sure">Not sure yet</option>
-        </select>
+        </NativeSelect>
         {errors.serviceInterest ? (
           <p className="text-destructive mt-1 text-sm">
             {errors.serviceInterest.message}
+          </p>
+        ) : null}
+      </div>
+
+      <div>
+        <Label htmlFor="timelineUrgency">When do you need this?</Label>
+        <NativeSelect
+          id="timelineUrgency"
+          defaultValue=""
+          className="mt-1.5"
+          {...register("timelineUrgency")}
+          aria-invalid={!!errors.timelineUrgency}
+        >
+          <option value="" disabled>
+            Select one
+          </option>
+          {TIMELINE_URGENCY_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </NativeSelect>
+        {errors.timelineUrgency ? (
+          <p className="text-destructive mt-1 text-sm">
+            {errors.timelineUrgency.message}
           </p>
         ) : null}
       </div>

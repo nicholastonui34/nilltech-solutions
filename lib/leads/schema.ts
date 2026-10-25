@@ -25,9 +25,26 @@ export const SERVICE_INTEREST_VALUES = [
 
 export type ServiceInterest = (typeof SERVICE_INTEREST_VALUES)[number];
 
+export const TIMELINE_URGENCY_OPTIONS = [
+  { value: "asap", label: "ASAP" },
+  { value: "1-3-months", label: "1–3 months" },
+  { value: "3-6-months", label: "3–6 months" },
+  { value: "exploring", label: "Just exploring" },
+] as const;
+
+const TIMELINE_URGENCY_VALUES = [
+  "asap",
+  "1-3-months",
+  "3-6-months",
+  "exploring",
+] as const;
+
 export const contactFormSchema = honeypotSchema.extend({
   serviceInterest: z.enum(SERVICE_INTEREST_VALUES, {
     error: "Choose what you're interested in.",
+  }),
+  timelineUrgency: z.enum(TIMELINE_URGENCY_VALUES, {
+    error: "Choose when you need this.",
   }),
   name: z.string().trim().min(2, "Enter your name."),
   email: z.string().trim().email("Enter a valid email."),
@@ -45,7 +62,7 @@ export const projectEstimatorSchema = honeypotSchema.extend({
   projectType: z.enum(["website", "custom-software", "ecommerce", "business-systems"]),
   features: z.array(z.string()),
   integrations: z.array(z.string()),
-  timelineUrgency: z.enum(["asap", "1-3-months", "3-6-months", "exploring"]),
+  timelineUrgency: z.enum(TIMELINE_URGENCY_VALUES),
   budgetBand: z.enum(["under-500k", "500k-2m", "2m-plus", "unsure"]),
   region: z.enum(["primary-market", "secondary-market", "other"]),
 });
