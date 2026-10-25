@@ -145,3 +145,91 @@ export function jobPostingSchema(job: {
     },
   };
 }
+
+/** PodcastSeries (CLAUDE.md §12) for /podcast. */
+export function podcastSeriesSchema(series: {
+  name: string;
+  description: string;
+  channelUrl: string | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "PodcastSeries",
+    name: series.name,
+    description: series.description,
+    url: `${siteConfig.url}/podcast`,
+    ...(series.channelUrl ? { sameAs: series.channelUrl } : {}),
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      url: siteConfig.url,
+    },
+  };
+}
+
+/** PodcastEpisode with its YouTube VideoObject (CLAUDE.md §12). */
+export function podcastEpisodeSchema(
+  episode: {
+    slug: string;
+    number: number;
+    title: string;
+    summary: string;
+    publishedAt: string;
+    youtubeId: string;
+    duration?: string;
+  },
+  seriesName: string,
+) {
+  const url = `${siteConfig.url}/podcast/${episode.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "PodcastEpisode",
+    name: episode.title,
+    episodeNumber: episode.number,
+    description: episode.summary,
+    datePublished: episode.publishedAt,
+    url,
+    partOfSeries: {
+      "@type": "PodcastSeries",
+      name: seriesName,
+      url: `${siteConfig.url}/podcast`,
+    },
+    associatedMedia: {
+      "@type": "VideoObject",
+      name: episode.title,
+      description: episode.summary,
+      uploadDate: episode.publishedAt,
+      thumbnailUrl: `https://i.ytimg.com/vi/${episode.youtubeId}/hqdefault.jpg`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${episode.youtubeId}`,
+      contentUrl: `https://www.youtube.com/watch?v=${episode.youtubeId}`,
+      ...(episode.duration ? { duration: episode.duration } : {}),
+    },
+  };
+}
+
+/** Course schema for an individual Academy course page. */
+export function academyCourseSchema(course: {
+  slug: string;
+  title: string;
+  summary: string;
+  level: string;
+  isFree: boolean;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description: course.summary,
+    url: `${siteConfig.url}/academy/${course.slug}`,
+    educationalLevel: course.level,
+    isAccessibleForFree: course.isFree,
+    provider: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      sameAs: siteConfig.url,
+    },
+    ...(course.isFree
+      ? { offers: { "@type": "Offer", price: 0, priceCurrency: "KES", category: "Free" } }
+      : {}),
+  };
+}
