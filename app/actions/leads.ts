@@ -2,6 +2,7 @@
 
 import { createLead } from "@/lib/leads/create-lead";
 import {
+  SUBMIT_ERROR_MESSAGE,
   contactFormSchema,
   projectEstimatorSchema,
   tokenEstimatorSchema,
@@ -10,8 +11,7 @@ import {
 export type SubmitResult =
   { ok: true; tier: "hot" | "warm" | "cold" } | { ok: false; error: string };
 
-const genericError =
-  "Something went wrong submitting that. Please email info@nilltechsolutions.com or WhatsApp us instead.";
+const genericError = SUBMIT_ERROR_MESSAGE;
 
 export async function submitContactForm(input: unknown): Promise<SubmitResult> {
   const parsed = contactFormSchema.safeParse(input);

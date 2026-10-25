@@ -15,7 +15,11 @@ import {
   lastVerified,
 } from "@/config/ai-model-pricing";
 import { trackEvent } from "@/lib/analytics";
-import { tokenEstimatorSchema, type TokenEstimatorValues } from "@/lib/leads/schema";
+import {
+  SUBMIT_ERROR_MESSAGE,
+  tokenEstimatorSchema,
+  type TokenEstimatorValues,
+} from "@/lib/leads/schema";
 
 const taskOptions = [
   { value: "chatbot", label: "Chatbot" },
@@ -56,7 +60,14 @@ export function TokenEstimatorForm() {
 
   const onSubmit = async (values: TokenEstimatorValues) => {
     trackEvent("quote_generated", { form: "token_estimator" });
-    const result = await submitTokenEstimator(values);
+    let result: Awaited<ReturnType<typeof submitTokenEstimator>>;
+    try {
+      result = await submitTokenEstimator(values);
+    } catch {
+      setStatus("error");
+      setErrorMessage(SUBMIT_ERROR_MESSAGE);
+      return;
+    }
     if (result.ok) {
       setStatus("success");
       trackEvent("form_submit", { tier: result.tier, form: "token_estimator" });
