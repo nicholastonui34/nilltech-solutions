@@ -26,6 +26,8 @@ export async function submitContactForm(input: unknown): Promise<SubmitResult> {
     phone: parsed.data.phone,
     company: parsed.data.company,
     message: parsed.data.message,
+    serviceInterest: parsed.data.serviceInterest,
+    timelineUrgency: parsed.data.timelineUrgency,
   });
 
   if (!result.ok) return { ok: false, error: genericError };

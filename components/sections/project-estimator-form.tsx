@@ -15,11 +15,11 @@ import {
   PRICING_FINALIZED,
   type ProjectType,
   type Region,
-  type TimelineUrgency,
 } from "@/config/pricing-rules";
 import { trackEvent } from "@/lib/analytics";
 import {
   SUBMIT_ERROR_MESSAGE,
+  TIMELINE_URGENCY_OPTIONS,
   projectEstimatorSchema,
   type ProjectEstimatorValues,
 } from "@/lib/leads/schema";
@@ -29,13 +29,6 @@ const projectTypes: { value: ProjectType; label: string }[] = [
   { value: "custom-software", label: "Custom software" },
   { value: "ecommerce", label: "E-commerce" },
   { value: "business-systems", label: "Business systems" },
-];
-
-const timelineOptions: { value: TimelineUrgency; label: string }[] = [
-  { value: "asap", label: "ASAP" },
-  { value: "1-3-months", label: "1–3 months" },
-  { value: "3-6-months", label: "3–6 months" },
-  { value: "exploring", label: "Just exploring" },
 ];
 
 const budgetOptions = [
@@ -245,7 +238,7 @@ export function ProjectEstimatorForm() {
             <fieldset>
               <legend className="mb-3 text-lg font-semibold">Timeline</legend>
               <div className="grid grid-cols-2 gap-3">
-                {timelineOptions.map((opt) => (
+                {TIMELINE_URGENCY_OPTIONS.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2 text-sm">
                     <input
                       type="radio"
