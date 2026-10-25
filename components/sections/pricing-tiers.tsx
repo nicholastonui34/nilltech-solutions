@@ -38,7 +38,7 @@ const tiers: Tier[] = [
     name: "AI Solutions for SMEs",
     priceKes: "KES 40,000",
     priceUsd: "USD 450",
-    timeline: "Live in 1–3 weeks · support from KES 5,000 / USD 60 a month",
+    timeline: "Live in 1–3 weeks · running costs from KES 5,000 / USD 60 a month",
     driversUp: [
       "Connecting to M-Pesa, your CRM or internal systems",
       "Multiple channels (WhatsApp, web, email)",

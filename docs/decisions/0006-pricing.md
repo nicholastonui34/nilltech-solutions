@@ -63,6 +63,10 @@ below offshore vendor rates. The USD conversion uses a display-only
   promised an email that couldn't be sent while Resend is deferred. The
   range is also saved on the lead (`estimateKes`, `estimateWeeks`) so Sales
   sees what the visitor saw.
+- **Free support after launch** is included with every project (owner,
+  2026-10-25), and the pricing page says so. The AI tier's monthly fee
+  covers running costs (hosting, WhatsApp and AI usage), not support. No
+  support duration has been defined yet.
 - **Review prices at least every 6 months,** or whenever the shilling moves
   materially (`USD_KES_RATE`).
 - **Positioning copy:** "agency quality at a freelancer price" works as a

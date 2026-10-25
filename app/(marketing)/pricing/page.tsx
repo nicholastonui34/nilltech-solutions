@@ -26,8 +26,8 @@ export default function PricingPage() {
           </div>
           <PricingTiers />
           <p className="text-muted-foreground mt-10 text-center text-xs">
-            Estimates are indicative. Final quote after a discovery call.{" "}
-            {"{{PLACEHOLDER: guarantee statement}}"}
+            Every project includes free support after launch. Estimates are indicative —
+            final quote after a discovery call.
           </p>
         </Container>
       </section>
