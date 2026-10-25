@@ -18,7 +18,11 @@ import {
   type TimelineUrgency,
 } from "@/config/pricing-rules";
 import { trackEvent } from "@/lib/analytics";
-import { projectEstimatorSchema, type ProjectEstimatorValues } from "@/lib/leads/schema";
+import {
+  SUBMIT_ERROR_MESSAGE,
+  projectEstimatorSchema,
+  type ProjectEstimatorValues,
+} from "@/lib/leads/schema";
 
 const projectTypes: { value: ProjectType; label: string }[] = [
   { value: "website", label: "Website" },
@@ -111,7 +115,14 @@ export function ProjectEstimatorForm() {
 
   const onSubmit = async (values: ProjectEstimatorValues) => {
     trackEvent("quote_generated");
-    const result = await submitProjectEstimator(values);
+    let result: Awaited<ReturnType<typeof submitProjectEstimator>>;
+    try {
+      result = await submitProjectEstimator(values);
+    } catch {
+      setStatus("error");
+      setErrorMessage(SUBMIT_ERROR_MESSAGE);
+      return;
+    }
     if (result.ok) {
       setStatus("success");
       trackEvent("form_submit", { tier: result.tier, form: "project_estimator" });

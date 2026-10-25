@@ -9,7 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { contactFormSchema, type ContactFormValues } from "@/lib/leads/schema";
+import {
+  SUBMIT_ERROR_MESSAGE,
+  contactFormSchema,
+  type ContactFormValues,
+} from "@/lib/leads/schema";
 import { trackEvent } from "@/lib/analytics";
 
 export function ContactForm() {
@@ -35,7 +39,14 @@ export function ContactForm() {
 
   const onSubmit = async (values: ContactFormValues) => {
     trackEvent("form_start");
-    const result = await submitContactForm(values);
+    let result: Awaited<ReturnType<typeof submitContactForm>>;
+    try {
+      result = await submitContactForm(values);
+    } catch {
+      setStatus("error");
+      setErrorMessage(SUBMIT_ERROR_MESSAGE);
+      return;
+    }
     if (result.ok) {
       setStatus("success");
       trackEvent("form_submit", { tier: result.tier });
