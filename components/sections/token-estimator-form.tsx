@@ -13,6 +13,7 @@ import {
   aiModels,
   estimateMonthlyTokenCostUsd,
   lastVerified,
+  providerLabels,
 } from "@/config/ai-model-pricing";
 import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { PrivacyLine } from "@/components/legal/privacy-line";
@@ -59,6 +60,8 @@ export function TokenEstimatorForm() {
     defaultValues: { name: "", email: "", company: "", website: "" },
   });
 
+  const selectedModel = aiModels.find((m) => m.id === modelId) ?? aiModels[0];
+  const providers = [...new Set(aiModels.map((m) => m.provider))];
   const task = watch("task");
   const monthlyVolume = watch("monthlyVolume");
 
@@ -137,10 +140,16 @@ export function TokenEstimatorForm() {
             value={modelId}
             onChange={(e) => setModelId(e.target.value)}
           >
-            {aiModels.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.label} ({m.provider})
-              </option>
+            {providers.map((provider) => (
+              <optgroup key={provider} label={providerLabels[provider]}>
+                {aiModels
+                  .filter((m) => m.provider === provider)
+                  .map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
+                    </option>
+                  ))}
+              </optgroup>
             ))}
           </select>
         </div>
@@ -178,13 +187,23 @@ export function TokenEstimatorForm() {
         </div>
       </div>
 
-      {estimate !== null ? (
+      {selectedModel.pricing.kind === "subscription" ? (
         <div className="bg-muted/50 mt-6 rounded-lg p-4 text-sm">
-          <p className="font-semibold">Estimated: ${estimate}/month</p>
+          <p className="font-semibold">Plan-based pricing</p>
+          <p className="text-muted-foreground mt-1">
+            {selectedModel.pricing.summary} Plans checked {lastVerified}.
+          </p>
+        </div>
+      ) : estimate !== null ? (
+        <div className="bg-muted/50 mt-6 rounded-lg p-4 text-sm">
+          <p className="font-semibold">Estimated: ${estimate.toFixed(2)}/month</p>
           <p className="text-muted-foreground mt-1">
             Based on public model pricing, verified {lastVerified}. Indicative only — your
             actual prompt/response lengths will shift this.
           </p>
+          {selectedModel.note ? (
+            <p className="text-muted-foreground mt-1">{selectedModel.note}</p>
+          ) : null}
         </div>
       ) : null}
 
