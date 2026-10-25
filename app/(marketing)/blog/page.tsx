@@ -7,7 +7,8 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Insights",
-  description: "{{PLACEHOLDER: meta description for /blog, 150-160 characters}}",
+  description:
+    "Insights from NillTech Solutions on software, AI and managed delivery teams for businesses in Kenya and East Africa.",
   path: "/blog",
 });
 

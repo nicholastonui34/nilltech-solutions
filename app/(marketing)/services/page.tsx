@@ -13,66 +13,107 @@ const title = "AI-Powered Software Development";
 
 export const metadata: Metadata = buildMetadata({
   title,
-  description: "{{PLACEHOLDER: meta description for /services, 150-160 characters}}",
+  description:
+    "Website, e-commerce and custom software development in Kenya. Websites from KES 45,000, live in 1 to 7 days, tested and supported by one accountable team.",
   path: "/services",
 });
 
 const data: OfferPageData = {
   eyebrow: "AI-Powered Software Development",
-  headline: "{{PLACEHOLDER: /services hero headline}}",
-  subheadline: "{{PLACEHOLDER: /services hero subheadline}}",
+  headline: "Websites, stores and systems, built properly and delivered fast.",
+  subheadline:
+    "One accountable team designs, builds, tests and launches your software, using AI to move faster without cutting corners.",
   primaryCta: "quote",
-  summary: "{{PLACEHOLDER: answer-first summary of this offer, 2 to 3 sentences}}",
+  summary:
+    "NillTech builds websites, online stores, business systems and custom software for businesses and organisations in Kenya and East Africa. A business website starts from KES 45,000 and is live in 1 to 7 days; online stores take 1 to 2 weeks and custom systems 2 to 4 weeks. Every project is code reviewed, tested and signed off by you before launch, and bug fixes after launch are free.",
   audience: [
-    "{{PLACEHOLDER: audience 1}}",
-    "{{PLACEHOLDER: audience 2}}",
-    "{{PLACEHOLDER: audience 3}}",
+    "SMEs that need a credible website or online store",
+    "Schools, churches and organisations running on spreadsheets",
+    "Businesses that need a custom system or web app",
   ],
   startingFrom: "KES 45,000 · USD 500 (international)",
   deliverables: [
     {
       icon: Globe,
       title: "Websites",
-      description: "{{PLACEHOLDER: deliverable description}}",
-      href: "/contact",
-    },
-    {
-      icon: Code2,
-      title: "Custom Software",
-      description: "{{PLACEHOLDER: deliverable description}}",
-      href: "/contact",
+      description:
+        "Fast, mobile-first business websites that rank on Google and turn visitors into enquiries. From KES 45,000, live in 1 to 7 days.",
+      href: "/estimate",
     },
     {
       icon: ShoppingCart,
       title: "E-commerce",
-      description: "{{PLACEHOLDER: deliverable description}}",
-      href: "/contact",
+      description:
+        "Online stores with M-Pesa and card checkout built in, product management and order tracking. From KES 95,000, in 1 to 2 weeks.",
+      href: "/estimate",
     },
     {
       icon: Layers,
       title: "Business Systems",
-      description: "{{PLACEHOLDER: deliverable description}}",
-      href: "/contact",
+      description:
+        "School management, inventory, bookings, HR and other internal tools that replace spreadsheets and paperwork. From KES 180,000.",
+      href: "/estimate",
+    },
+    {
+      icon: Code2,
+      title: "Custom Software",
+      description:
+        "Web apps and platforms built around how your business actually works, with integrations to M-Pesa, CRMs and accounting tools. From KES 250,000.",
+      href: "/estimate",
     },
   ],
   process: [
-    { title: "{{PLACEHOLDER: step 1}}", description: "{{PLACEHOLDER: step 1 detail}}" },
-    { title: "{{PLACEHOLDER: step 2}}", description: "{{PLACEHOLDER: step 2 detail}}" },
-    { title: "{{PLACEHOLDER: step 3}}", description: "{{PLACEHOLDER: step 3 detail}}" },
-    { title: "{{PLACEHOLDER: step 4}}", description: "{{PLACEHOLDER: step 4 detail}}" },
+    {
+      title: "Discovery",
+      description:
+        "A short call to understand your goals, users and budget. You get a fixed quote and timeline in writing.",
+    },
+    {
+      title: "Design",
+      description:
+        "We agree the pages, features and look before any build work starts, so there are no surprises.",
+    },
+    {
+      title: "Build and test",
+      description:
+        "Our team builds with AI-assisted tooling, then every release is code reviewed and tested against the agreed scope.",
+    },
+    {
+      title: "Launch and support",
+      description:
+        "You sign off, we launch, and we fix any bugs free of charge for the period in your proposal. The code is yours on full payment.",
+    },
   ],
   faq: [
     {
-      question: "{{PLACEHOLDER: FAQ question 1}}",
-      answer: "{{PLACEHOLDER: FAQ answer 1}}",
+      question: "How much does a website cost in Kenya?",
+      answer:
+        "A NillTech business website starts from KES 45,000 and usually lands between KES 45,000 and 90,000, depending on pages and features. Online stores start from KES 95,000. Use the estimator for a range based on your project.",
     },
     {
-      question: "{{PLACEHOLDER: FAQ question 2}}",
-      answer: "{{PLACEHOLDER: FAQ answer 2}}",
+      question: "How long does it take to build a website or system?",
+      answer:
+        "Business websites take 1 to 7 days, online stores 1 to 2 weeks, and business systems or custom software 2 to 4 weeks. Having your content ready at kickoff keeps things on the fast end.",
+    },
+    {
+      question: "Do I own the website and code?",
+      answer:
+        "Yes. Ownership of the code and design we create for you passes to you once the project is paid in full.",
+    },
+    {
+      question: "What happens after launch?",
+      answer:
+        "Bug fixes are free for the period stated in your proposal. New features and changes are quoted separately, and hosting or third-party services are billed at cost.",
+    },
+    {
+      question: "Can you accept M-Pesa?",
+      answer:
+        "Yes. You can pay us by M-Pesa Paybill or bank transfer, in KES or USD. Online stores we build include M-Pesa and card checkout.",
     },
   ],
-  ctaHeading: "{{PLACEHOLDER: closing CTA heading}}",
-  ctaBody: "{{PLACEHOLDER: closing CTA body}}",
+  ctaHeading: "Know what you need? Get a price in two minutes.",
+  ctaBody:
+    "Answer a few questions and the estimator gives you an indicative range and timeline. A fixed quote follows a short discovery call.",
 };
 
 export default function ServicesPage() {

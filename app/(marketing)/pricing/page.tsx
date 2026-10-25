@@ -8,7 +8,8 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Pricing",
-  description: "{{PLACEHOLDER: meta description for /pricing, 150-160 characters}}",
+  description:
+    "NillTech pricing: websites from KES 45,000, AI solutions from KES 40,000 and developers from KES 180,000 a month. USD pricing for international clients.",
   path: "/pricing",
 });
 
@@ -35,19 +36,31 @@ export default function PricingPage() {
       <Faq
         items={[
           {
-            question: "{{PLACEHOLDER: FAQ question 1}}",
-            answer: "{{PLACEHOLDER: FAQ answer 1}}",
+            question: "Why is the USD price different from the KES price?",
+            answer:
+              "KES prices are for clients in East Africa. USD prices are for clients in the US, UK and Canada and reflect international project requirements, so they aren't a straight currency conversion.",
           },
           {
-            question: "{{PLACEHOLDER: FAQ question 2}}",
-            answer: "{{PLACEHOLDER: FAQ answer 2}}",
+            question: "How do payments work?",
+            answer:
+              "Each proposal sets out a payment schedule. You can pay by M-Pesa Paybill or bank transfer, in KES or USD, and every payment gets a receipt.",
+          },
+          {
+            question: "What's included in the price?",
+            answer:
+              "Design, build, testing, launch and free bug fixes for the period in your proposal. Hosting, domains and other third-party services are billed at cost, and new features after launch are quoted separately.",
+          },
+          {
+            question: "Is the estimate my final price?",
+            answer:
+              "No. The estimator gives an indicative range. After a short discovery call we confirm a fixed quote in writing before any work starts.",
           },
         ]}
       />
 
       <CtaBand
-        heading="{{PLACEHOLDER: closing CTA heading}}"
-        body="{{PLACEHOLDER: closing CTA body}}"
+        heading="Get a range for your project."
+        body="The estimator takes about two minutes and shows an indicative price and timeline on screen."
         cta="quote"
       />
     </>

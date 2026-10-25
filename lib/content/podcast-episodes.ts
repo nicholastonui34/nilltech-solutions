@@ -47,7 +47,8 @@ export type PodcastShort = {
 
 export const podcast = {
   name: "Workshift by NillTech",
-  description: "{{PLACEHOLDER: one-paragraph description of the Workshift podcast}}",
+  description:
+    "Workshift by NillTech is a podcast about how work is changing: remote work, managed remote teams, and how AI is reshaping the way teams build and deliver. Episodes share practical insights for business owners, leaders and professionals.",
   /** Set once the channel exists — subscribe links stay hidden until then (no links to nothing). */
   youtubeChannelUrl: null as string | null,
 };

@@ -7,6 +7,8 @@ type ServiceCardProps = {
   title: string;
   description: string;
   href: string;
+  // Action-specific link text (CLAUDE.md §5: never a generic "Learn more").
+  linkLabel: string;
 };
 
 /**
@@ -14,7 +16,13 @@ type ServiceCardProps = {
  * component: gradient accent bar (purple→blue, echoes the brand mark),
  * gold icon badge, elevation on hover.
  */
-export function ServiceCard({ icon: Icon, title, description, href }: ServiceCardProps) {
+export function ServiceCard({
+  icon: Icon,
+  title,
+  description,
+  href,
+  linkLabel,
+}: ServiceCardProps) {
   return (
     <div className="border-border bg-card overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-lg">
       <div
@@ -31,7 +39,7 @@ export function ServiceCard({ icon: Icon, title, description, href }: ServiceCar
           href={href}
           className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
         >
-          Learn more
+          {linkLabel}
           <ArrowRight className="size-3.5" aria-hidden />
         </Link>
       </div>

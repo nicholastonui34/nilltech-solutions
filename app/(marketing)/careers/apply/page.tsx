@@ -6,7 +6,8 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Apply to join our delivery teams",
-  description: "{{PLACEHOLDER: meta description for /careers/apply, 150-160 characters}}",
+  description:
+    "Apply to join NillTech's managed delivery teams. Engineers, designers and specialists from Kenya, Uganda, Tanzania and Rwanda, screened by our team.",
   path: "/careers/apply",
 });
 
@@ -19,9 +20,9 @@ export default function CareersApplyPage() {
       <Container className="max-w-2xl">
         <h1 className="text-4xl font-semibold">Apply to join our delivery teams</h1>
         <p className="text-muted-foreground mt-4">
-          {
-            "{{PLACEHOLDER: two sentences on working in NillTech's managed delivery teams}}"
-          }
+          At NillTech you work on real client projects inside a managed team, with code
+          review, clear scope and one person accountable for delivery. We match approved
+          applicants to projects that fit their skills, whether full-time or freelance.
         </p>
         <ol className="text-muted-foreground mt-6 list-decimal space-y-1 pl-5 text-sm">
           <li>Send your application below.</li>

@@ -15,14 +15,27 @@ Rwanda, with secondary reach into the US, UK and Canada.
   integrations for SME owners and ops leads.
 - [Managed Tech Delivery Teams](https://nilltechsolutions.com/managed-teams): a dedicated,
   accountable delivery team for companies outsourcing software and AI work.
-- [NillTech Academy](https://nilltechsolutions.com/academy): free and paid AI & software courses.
+- [NillTech Academy](https://nilltechsolutions.com/academy): free AI and software courses, no sign-up needed (paid courses
+  and team training coming soon).
 - [Partnerships](https://nilltechsolutions.com/partnerships): B2B outsourcing and vetted delivery
   teams for agencies and enterprises.
 
 ## Pricing
 
-See [/pricing](https://nilltechsolutions.com/pricing) for starting prices by offer, in KES or USD.
-Final quotes follow a discovery call; the site's quote estimator gives an indicative range first.
+Starting prices for East African clients (international clients in the US, UK and Canada are
+quoted in USD):
+
+- Business website: from KES 45,000 (USD 500), live in 1 to 7 days.
+- Online store with M-Pesa and card checkout: from KES 95,000 (USD 1,100), 1 to 2 weeks.
+- Business system: from KES 180,000; custom software from KES 250,000; 2 to 4 weeks.
+- AI assistant or automation: from KES 40,000 setup (USD 450), running costs from KES 5,000 a
+  month, live in 4 to 10 days.
+- Dedicated developer: from KES 180,000 (USD 1,800) per month, team in place in 1 to 2 weeks.
+
+Every project includes free bug fixes after launch for the period in the proposal. Payment by
+M-Pesa Paybill or bank transfer, in KES or USD. See [/pricing](https://nilltechsolutions.com/pricing)
+and the [estimator](https://nilltechsolutions.com/estimate) for an indicative range; final quotes
+follow a discovery call.
 
 ## Contact
 
