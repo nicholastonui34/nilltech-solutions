@@ -181,6 +181,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      admin_database_size_bytes: { Args: never; Returns: number };
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"];
