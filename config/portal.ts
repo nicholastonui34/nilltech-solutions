@@ -9,6 +9,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   marketing: "Marketing",
   sales: "Sales",
   quality: "Quality",
+  recruitment: "Recruitment",
   freelancer: "Freelancer",
   client: "Client",
 };
@@ -57,6 +58,24 @@ export const portalDashboards: readonly PortalDashboard[] = [
     label: "My invoices",
     description: "Your invoices and receipts.",
     roles: ["client"],
+  },
+  {
+    href: "/portal/recruitment",
+    label: "Recruitment",
+    description: "Applications, screening, test tasks and the talent pool.",
+    roles: ["recruitment", "super_admin"],
+  },
+  {
+    href: "/portal/quality",
+    label: "Quality",
+    description: "Projects, QA checklists, delivery reviews and freelancer performance.",
+    roles: ["quality", "super_admin"],
+  },
+  {
+    href: "/portal/talent",
+    label: "My profile",
+    description: "Your application status, verification and assignments.",
+    roles: ["freelancer"],
   },
   {
     href: "/portal/analytics",

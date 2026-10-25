@@ -110,6 +110,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      delivery_reviews: {
+        Row: {
+          created_at: string;
+          id: string;
+          notes: string | null;
+          project_id: string;
+          rating: number;
+          reviewed_by: string | null;
+          talent_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          project_id: string;
+          rating: number;
+          reviewed_by?: string | null;
+          talent_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          project_id?: string;
+          rating?: number;
+          reviewed_by?: string | null;
+          talent_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "delivery_reviews_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "delivery_reviews_talent_id_fkey";
+            columns: ["talent_id"];
+            isOneToOne: false;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       document_sequences: {
         Row: {
           doc_type: string;
@@ -416,6 +461,86 @@ export type Database = {
           },
         ];
       };
+      project_assignments: {
+        Row: {
+          assigned_at: string;
+          assigned_by: string | null;
+          project_id: string;
+          role_on_project: string | null;
+          talent_id: string;
+        };
+        Insert: {
+          assigned_at?: string;
+          assigned_by?: string | null;
+          project_id: string;
+          role_on_project?: string | null;
+          talent_id: string;
+        };
+        Update: {
+          assigned_at?: string;
+          assigned_by?: string | null;
+          project_id?: string;
+          role_on_project?: string | null;
+          talent_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "project_assignments_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "project_assignments_talent_id_fkey";
+            columns: ["talent_id"];
+            isOneToOne: false;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      projects: {
+        Row: {
+          client_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          delivered_at: string | null;
+          description: string | null;
+          id: string;
+          name: string;
+          status: Database["public"]["Enums"]["project_status"];
+        };
+        Insert: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          delivered_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name: string;
+          status?: Database["public"]["Enums"]["project_status"];
+        };
+        Update: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          delivered_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          status?: Database["public"]["Enums"]["project_status"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "projects_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -437,6 +562,134 @@ export type Database = {
           full_name?: string | null;
           id?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      qa_checklist_items: {
+        Row: {
+          done: boolean;
+          done_at: string | null;
+          done_by: string | null;
+          id: string;
+          label: string;
+          notes: string | null;
+          position: number;
+          project_id: string;
+        };
+        Insert: {
+          done?: boolean;
+          done_at?: string | null;
+          done_by?: string | null;
+          id?: string;
+          label: string;
+          notes?: string | null;
+          position?: number;
+          project_id: string;
+        };
+        Update: {
+          done?: boolean;
+          done_at?: string | null;
+          done_by?: string | null;
+          id?: string;
+          label?: string;
+          notes?: string | null;
+          position?: number;
+          project_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "qa_checklist_items_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      talent_applications: {
+        Row: {
+          availability: string | null;
+          consent_at: string;
+          country: string;
+          created_at: string;
+          email: string;
+          engagement_preference: string;
+          engagement_type: Database["public"]["Enums"]["engagement_type"] | null;
+          full_name: string;
+          id: string;
+          message: string | null;
+          phone: string | null;
+          portfolio_url: string | null;
+          primary_role: string;
+          profile_url: string | null;
+          rejection_reason: string | null;
+          screening_notes: string | null;
+          skills: string[];
+          stage: Database["public"]["Enums"]["talent_stage"];
+          stage_changed_at: string;
+          tax_pin_encrypted: string | null;
+          tax_pin_recorded_at: string | null;
+          test_task_notes: string | null;
+          updated_by: string | null;
+          user_id: string | null;
+          verification_status: string;
+          years_experience: number;
+        };
+        Insert: {
+          availability?: string | null;
+          consent_at: string;
+          country: string;
+          created_at?: string;
+          email: string;
+          engagement_preference: string;
+          engagement_type?: Database["public"]["Enums"]["engagement_type"] | null;
+          full_name: string;
+          id?: string;
+          message?: string | null;
+          phone?: string | null;
+          portfolio_url?: string | null;
+          primary_role: string;
+          profile_url?: string | null;
+          rejection_reason?: string | null;
+          screening_notes?: string | null;
+          skills?: string[];
+          stage?: Database["public"]["Enums"]["talent_stage"];
+          stage_changed_at?: string;
+          tax_pin_encrypted?: string | null;
+          tax_pin_recorded_at?: string | null;
+          test_task_notes?: string | null;
+          updated_by?: string | null;
+          user_id?: string | null;
+          verification_status?: string;
+          years_experience: number;
+        };
+        Update: {
+          availability?: string | null;
+          consent_at?: string;
+          country?: string;
+          created_at?: string;
+          email?: string;
+          engagement_preference?: string;
+          engagement_type?: Database["public"]["Enums"]["engagement_type"] | null;
+          full_name?: string;
+          id?: string;
+          message?: string | null;
+          phone?: string | null;
+          portfolio_url?: string | null;
+          primary_role?: string;
+          profile_url?: string | null;
+          rejection_reason?: string | null;
+          screening_notes?: string | null;
+          skills?: string[];
+          stage?: Database["public"]["Enums"]["talent_stage"];
+          stage_changed_at?: string;
+          tax_pin_encrypted?: string | null;
+          tax_pin_recorded_at?: string | null;
+          test_task_notes?: string | null;
+          updated_by?: string | null;
+          user_id?: string | null;
+          verification_status?: string;
+          years_experience?: number;
         };
         Relationships: [];
       };
@@ -467,6 +720,7 @@ export type Database = {
     };
     Functions: {
       admin_database_size_bytes: { Args: never; Returns: number };
+      get_talent_tax_pin: { Args: { _application_id: string }; Returns: string };
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"];
@@ -498,6 +752,10 @@ export type Database = {
         };
         Returns: string;
       };
+      set_talent_tax_pin: {
+        Args: { _application_id: string; _pin: string };
+        Returns: undefined;
+      };
       void_invoice: {
         Args: { _invoice_id: string; _reason: string };
         Returns: undefined;
@@ -512,12 +770,17 @@ export type Database = {
         | "sales"
         | "quality"
         | "freelancer"
-        | "client";
+        | "client"
+        | "recruitment";
       currency_code: "KES" | "USD";
+      engagement_type: "freelance" | "full_time";
       invoice_status: "draft" | "issued" | "partially_paid" | "paid" | "void";
       lead_status: "new" | "contacted" | "qualified" | "disqualified";
       lead_tier: "hot" | "warm" | "cold";
       payment_method: "mpesa" | "bank_transfer" | "other";
+      project_status: "active" | "in_review" | "delivered" | "on_hold";
+      talent_stage:
+        "applied" | "screening" | "test_task" | "test_review" | "approved" | "rejected";
     };
     CompositeTypes: {
       [_ in never]: never;
