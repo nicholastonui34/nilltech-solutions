@@ -1,0 +1,129 @@
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { submitContactForm } from "@/app/actions/leads";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { contactFormSchema, type ContactFormValues } from "@/lib/leads/schema";
+import { trackEvent } from "@/lib/analytics";
+
+export function ContactForm() {
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
+      message: "",
+      website: "",
+    },
+  });
+
+  const onSubmit = async (values: ContactFormValues) => {
+    trackEvent("form_start");
+    const result = await submitContactForm(values);
+    if (result.ok) {
+      setStatus("success");
+      trackEvent("form_submit", { tier: result.tier });
+      reset();
+    } else {
+      setStatus("error");
+      setErrorMessage(result.error);
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <div className="border-border bg-card rounded-lg border p-6 text-center">
+        <p className="font-semibold">Thanks — we got it.</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          We&rsquo;ll follow up shortly.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+      {/* Honeypot — visually hidden, real users never fill it in. */}
+      <div className="hidden" aria-hidden="true">
+        <Label htmlFor="website">Website</Label>
+        <Input id="website" tabIndex={-1} autoComplete="off" {...register("website")} />
+      </div>
+
+      <div>
+        <Label htmlFor="name">Name</Label>
+        <Input
+          id="name"
+          className="mt-1.5"
+          {...register("name")}
+          aria-invalid={!!errors.name}
+        />
+        {errors.name ? (
+          <p className="text-destructive mt-1 text-sm">{errors.name.message}</p>
+        ) : null}
+      </div>
+
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          className="mt-1.5"
+          {...register("email")}
+          aria-invalid={!!errors.email}
+        />
+        {errors.email ? (
+          <p className="text-destructive mt-1 text-sm">{errors.email.message}</p>
+        ) : null}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="phone">Phone (optional)</Label>
+          <Input id="phone" className="mt-1.5" {...register("phone")} />
+        </div>
+        <div>
+          <Label htmlFor="company">Company (optional)</Label>
+          <Input id="company" className="mt-1.5" {...register("company")} />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="message">What do you need?</Label>
+        <Textarea
+          id="message"
+          className="mt-1.5"
+          rows={4}
+          {...register("message")}
+          aria-invalid={!!errors.message}
+        />
+        {errors.message ? (
+          <p className="text-destructive mt-1 text-sm">{errors.message.message}</p>
+        ) : null}
+      </div>
+
+      {status === "error" ? (
+        <p className="text-destructive text-sm">{errorMessage}</p>
+      ) : null}
+
+      <Button type="submit" disabled={isSubmitting} size="lg">
+        {isSubmitting ? "Sending…" : "Send message"}
+      </Button>
+    </form>
+  );
+}
