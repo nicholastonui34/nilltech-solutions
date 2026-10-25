@@ -15,6 +15,7 @@ import {
   lastVerified,
 } from "@/config/ai-model-pricing";
 import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
+import { PrivacyLine } from "@/components/legal/privacy-line";
 import { trackEvent } from "@/lib/analytics";
 import {
   SUBMIT_ERROR_MESSAGE,
@@ -208,6 +209,7 @@ export function TokenEstimatorForm() {
         </div>
       </div>
 
+      <PrivacyLine purpose="to prepare your estimate and follow up" />
       <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
       {status === "error" ? (
         <p className="text-destructive mt-4 text-sm">{errorMessage}</p>

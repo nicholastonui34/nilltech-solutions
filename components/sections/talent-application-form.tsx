@@ -301,7 +301,7 @@ export function TalentApplicationForm() {
           <span>
             I agree to NillTech Solutions processing the details above to assess my
             application, as described in the{" "}
-            <Link href="/legal" className="text-primary hover:underline">
+            <Link href="/legal#privacy" className="text-primary hover:underline">
               privacy notice
             </Link>
             .

@@ -22,6 +22,7 @@ import {
   type Region,
 } from "@/config/pricing-rules";
 import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
+import { PrivacyLine } from "@/components/legal/privacy-line";
 import { trackEvent } from "@/lib/analytics";
 import {
   SUBMIT_ERROR_MESSAGE,
@@ -354,6 +355,7 @@ export function ProjectEstimatorForm() {
               <Label htmlFor="pe-company">Company (optional)</Label>
               <Input id="pe-company" className="mt-1.5" {...register("company")} />
             </div>
+            <PrivacyLine purpose="to prepare your estimate and follow up" />
             <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
             {status === "error" ? (
               <p className="text-destructive text-sm">{errorMessage}</p>
