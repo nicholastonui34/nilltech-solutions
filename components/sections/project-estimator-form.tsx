@@ -14,6 +14,7 @@ import {
   integrationAddons,
   PRICING_FINALIZED,
   computeProjectEstimate,
+  formatTimeline,
   kesToUsd,
   roundKes,
   type ProjectEstimate,
@@ -172,8 +173,7 @@ export function ProjectEstimatorForm() {
                 : `KES ${roundKes(estimate.result.price.minKes).toLocaleString()} – ${roundKes(estimate.result.price.maxKes).toLocaleString()}`}
             </p>
             <p className="text-muted-foreground mt-1 text-sm">
-              Typical timeline: {estimate.result.timeline.minWeeks}–
-              {estimate.result.timeline.maxWeeks} weeks
+              Typical timeline: {formatTimeline(estimate.result.timeline)}
             </p>
             <p className="text-muted-foreground mt-3 text-xs">
               Estimates are indicative. Your final quote follows a short discovery call.

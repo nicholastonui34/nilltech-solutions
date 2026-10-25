@@ -34,14 +34,14 @@ disagree 2–3x, so these are market _bands_, not quotes.
   than a freelancer for team continuity, QA (the Phase 6 checklist) and
   accountability.
 
-| NillTech                                            | Range (KES)                          | Timeline           |
-| --------------------------------------------------- | ------------------------------------ | ------------------ |
-| Business website                                    | 45,000–90,000                        | 2–4 weeks          |
-| Online store (M-Pesa/card checkout included)        | 95,000–180,000                       | 4–8 weeks          |
-| Business system (school, ERP-style, internal tools) | 180,000–400,000                      | 6–12 weeks         |
-| Custom software / web app                           | 250,000–600,000                      | 8–16 weeks         |
-| AI assistant / automation                           | from 40,000 setup + from 5,000/month | 1–3 weeks          |
-| Dedicated developer                                 | from 180,000 per developer-month     | 2–4 weeks to start |
+| NillTech                                            | Range (KES)                                                                      | Timeline           |
+| --------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------ |
+| Business website                                    | 45,000–90,000                                                                    | 1–7 days           |
+| Online store (M-Pesa/card checkout included)        | 95,000–180,000                                                                   | 1–2 weeks          |
+| Business system (school, ERP-style, internal tools) | 180,000–400,000                                                                  | 2–4 weeks          |
+| Custom software / web app                           | 250,000–600,000                                                                  | 2–4 weeks          |
+| AI assistant / automation                           | from 40,000 setup + running costs from 5,000/month (hosting, WhatsApp, AI usage) | 4–10 days          |
+| Dedicated developer                                 | from 180,000 per developer-month                                                 | 1–2 weeks to start |
 
 **Add-ons (KES):** user accounts 15k · payments 20k · multi-language 15k ·
 admin dashboard 35k · CRM integration 25k · payment gateway 20k · SMS/email
@@ -61,12 +61,15 @@ below offshore vendor rates. The USD conversion uses a display-only
 
 - **The estimator now shows an indicative range on screen.** The old copy
   promised an email that couldn't be sent while Resend is deferred. The
-  range is also saved on the lead (`estimateKes`, `estimateWeeks`) so Sales
+  range is also saved on the lead (`estimateKes`, `estimateTimeline`) so Sales
   sees what the visitor saw.
 - **Free bug fixes after launch** are included with every project (owner,
   2026-10-25: "bug fixes only"). New features and changes are quoted
   separately. The AI tier's monthly fee covers running costs (hosting,
   WhatsApp and AI usage), not support.
+- **Timelines halved** (owner, 2026-10-25): websites 1–7 days, stores 1–2
+  weeks, business systems and custom software 2–4 weeks, AI 4–10 days,
+  teams in place in 1–2 weeks. The estimator now works in days.
 - **Review prices at least every 6 months,** or whenever the shilling moves
   materially (`USD_KES_RATE`).
 - **Positioning copy:** "agency quality at a freelancer price" works as a

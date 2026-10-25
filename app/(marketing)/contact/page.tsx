@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 import { BookingFacade } from "@/components/sections/booking-facade";
 import { ContactForm } from "@/components/sections/contact-form";
@@ -18,6 +18,8 @@ export const metadata: Metadata = buildMetadata({
 // server action. It degrades gracefully — on-screen success/error either
 // way — if SUPABASE_SERVICE_ROLE_KEY isn't configured yet. Direct contact
 // methods stay alongside it as a redundant, always-working fallback.
+// WhatsApp isn't repeated here: the booking card below and the floating
+// button already offer it (owner, 2026-10-25).
 const methods = [
   {
     icon: Mail,
@@ -32,13 +34,6 @@ const methods = [
     value: siteConfig.contact.phoneDisplay,
     href: `tel:${siteConfig.contact.phone}`,
     event: "call_click" as const,
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: siteConfig.contact.phoneDisplay,
-    href: siteConfig.contact.whatsapp,
-    event: "whatsapp_click" as const,
   },
 ];
 
