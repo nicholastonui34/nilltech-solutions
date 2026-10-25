@@ -2,6 +2,7 @@
 
 import { PRICING_FINALIZED, computeProjectEstimate } from "@/config/pricing-rules";
 import { createLead } from "@/lib/leads/create-lead";
+import { TURNSTILE_FAILED_MESSAGE, verifyTurnstile } from "@/lib/turnstile";
 import {
   SUBMIT_ERROR_MESSAGE,
   contactFormSchema,
@@ -19,6 +20,9 @@ export async function submitContactForm(input: unknown): Promise<SubmitResult> {
   if (!parsed.success)
     return { ok: false, error: "Please check the form and try again." };
   if (parsed.data.website) return { ok: false, error: genericError }; // honeypot tripped
+  if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
+    return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
+  }
 
   const result = await createLead({
     source: "contact_form",
@@ -40,6 +44,9 @@ export async function submitProjectEstimator(input: unknown): Promise<SubmitResu
   if (!parsed.success)
     return { ok: false, error: "Please check the form and try again." };
   if (parsed.data.website) return { ok: false, error: genericError };
+  if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
+    return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
+  }
 
   const result = await createLead({
     source: "estimator_project",
@@ -76,6 +83,9 @@ export async function submitTokenEstimator(input: unknown): Promise<SubmitResult
   if (!parsed.success)
     return { ok: false, error: "Please check the form and try again." };
   if (parsed.data.website) return { ok: false, error: genericError };
+  if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
+    return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
+  }
 
   const result = await createLead({
     source: "estimator_tokens",

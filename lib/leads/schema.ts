@@ -10,6 +10,8 @@ export const SUBMIT_ERROR_MESSAGE =
 // gap) — this is a lightweight stand-in, not a replacement for it.
 export const honeypotSchema = z.object({
   website: z.string().max(0, "Leave this field empty."),
+  // Cloudflare Turnstile token, added at submit time (not a form field).
+  turnstileToken: z.string().max(2048).optional(),
 });
 
 // Offer slugs from config/offers.ts, plus an explicit "not sure" so nobody

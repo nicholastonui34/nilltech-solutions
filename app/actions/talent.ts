@@ -3,6 +3,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { SUBMIT_ERROR_MESSAGE } from "@/lib/leads/schema";
 import { talentApplicationSchema } from "@/lib/talent/schema";
+import { TURNSTILE_FAILED_MESSAGE, verifyTurnstile } from "@/lib/turnstile";
 
 export type TalentSubmitResult = { ok: true } | { ok: false; error: string };
 
@@ -24,6 +25,9 @@ export async function submitTalentApplication(
   }
   const data = parsed.data;
   if (data.website) return { ok: false, error: SUBMIT_ERROR_MESSAGE }; // honeypot
+  if (!(await verifyTurnstile(data.turnstileToken))) {
+    return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
+  }
 
   const admin = getSupabaseAdmin();
   if (!admin) return { ok: false, error: SUBMIT_ERROR_MESSAGE };
