@@ -247,14 +247,21 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] Browser-tested end-to-end (all three forms, all paths) — one real bug caught and fixed in the process: React Hook Form's `trigger(['field'])` against a single combined Zod schema re-validates the _whole_ form, not just the named field, which silently blocked the project estimator from advancing past step 1. Fixed with explicit per-step validation instead of `trigger()`.
   - [x] **Post-launch fix:** `@hookform/resolvers` v3 doesn't understand Zod 4 errors (it looks for `.errors`; Zod 4 uses `.issues`), so any invalid input threw instead of showing field errors — "Send message" looked dead. Upgraded to resolvers v5; schemas avoid `.default()` so input/output types match, and every form catches a thrown server action and shows the fallback message.
   - Real gaps, not placeholders to swap later: no Turnstile site key yet (rate-limiting/spam protection is a honeypot field only — §18), and email/SMS nurture sequences aren't built (both vendors deferred, §3).
-- [~] **Phase 4 — Admin core.** Built; awaiting the owner's first signed-in test before it's marked done.
+- [x] **Phase 4 — Admin core.** Done — owner signed in on the live site 2026-10-25 (`info@nilltechsolutions.com`, super_admin).
   - [x] Auth (ADR 0003): Supabase Auth email + password via `@supabase/ssr`, `proxy.ts` session refresh + `/portal` gate, `lib/auth/dal.ts` as the single session/role lookup, re-checked in every page and server action, with RLS as the backstop. No public sign-up — super admins create accounts with a one-time password. `/portal/login`, sign-out, `/portal/account` password change.
   - [x] Main Admin (`/portal/admin`): system health (integration status from env, failed `automation_runs`, DB size vs the 400 MB trigger via the `admin_database_size_bytes()` RPC), Users & roles (create, grant, revoke; self-revoke of `super_admin` blocked), audit log.
   - [x] Sales (`/portal/sales`): lead list with tier/status filters, lead detail with contact links, pipeline status updates.
   - [x] Marketing + Analytics: lead-derived stats (by form, service interest, week; funnel, tiers, qualification rate) as server-rendered bars, no chart library. Traffic, UTM, newsletter, podcast, conversion events and CWV shown honestly as "not connected".
   - [x] RLS verified in SQL as a temporary test user (no role → only own profile; sales → leads read/update, can't grant roles or read DB size; super_admin → full admin). Signed-in browser testing wasn't possible from the cloud session (its network policy blocks `*.supabase.co`) — the owner tests on the live site.
   - Follow-ups flagged, not built: UTM capture into `leads.metadata`; an analytics provider (Cloudflare Web Analytics) for traffic + CWV; deactivating users; invite/reset emails once Resend exists.
-- [ ] **Phase 5 — Finance & docs.** Invoicing, receipts, PDF generation, eTIMS adapter.
+- [~] **Phase 5 — Finance & docs.** Built (ADR 0004); awaiting the owner's first real invoice before it's marked done.
+  - [x] Schema (`20261025000004_finance.sql` + `…05` fix): `clients`, `invoices`, `invoice_items`, `payments`, `finance_settings`, `document_sequences`. Integer minor units, KES or USD, no VAT (not VAT-registered). Drafts editable by RLS; `issue_invoice` / `void_invoice` / `record_payment` SECURITY DEFINER RPCs enforce the lifecycle, gapless `NTS-YYYY-NNNN` / `NTS-RCT-YYYY-NNNN` numbering, seller/client snapshots and audit logging.
+  - [x] Seller + bank + M-Pesa details live in `finance_settings` (seeded via SQL, **not in the repo**), editable at `/portal/finance/settings`, finance/super_admin only.
+  - [x] Finance dashboard (`/portal/finance`): per-currency outstanding/collected, overdue, drafts; invoices (draft editor → issue → payments → receipts; void); clients (with optional portal-login link); settings.
+  - [x] PDFs: `pdf-lib`, generated on demand from the immutable snapshot (`/portal/documents/invoices/[id]`, `/portal/documents/receipts/[id]`), RLS-gated. Client portal at `/portal/invoices`.
+  - [x] eTIMS: `EtimsProvider` interface + stub (`not_configured`, logged to `automation_runs`).
+  - [x] Verified in rolled-back SQL transactions (no real numbers consumed): totals, issue/lock, overpay + void guards, direct-insert blocks, client/director RLS. One real bug caught and fixed (`record_payment` status cast).
+  - Not built: emailing documents (Resend deferred), credit notes/refunds, client KRA PIN capture (waits for the eTIMS integrator + encryption).
 - [ ] **Phase 6 — Talent.** Freelancer onboarding, Persona, tax info, Quality dashboard.
 - [ ] **Phase 7 — Content.** Podcast, Academy (free courses first; paid later), Careers.
 
@@ -275,4 +282,5 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - YouTube channel + episode list.
 - Academy course list & pricing.
 - eTIMS integration route.
+- **KES bank account?** The I&M account on invoices is USD-denominated; KES payments get converted. Add a KES account in `/portal/finance/settings` if there is one.
 - Current hosting provider & cost breakdown (if the live nilltechsolutions.com site is ever folded into this repo's scope — currently out of scope, see Conflicts).

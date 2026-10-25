@@ -47,6 +47,18 @@ export const portalDashboards: readonly PortalDashboard[] = [
     roles: ["marketing", "super_admin"],
   },
   {
+    href: "/portal/finance",
+    label: "Finance",
+    description: "Invoices, receipts, payments and clients.",
+    roles: ["finance", "super_admin"],
+  },
+  {
+    href: "/portal/invoices",
+    label: "My invoices",
+    description: "Your invoices and receipts.",
+    roles: ["client"],
+  },
+  {
     href: "/portal/analytics",
     label: "Analytics",
     description: "Lead funnel and conversion data.",
