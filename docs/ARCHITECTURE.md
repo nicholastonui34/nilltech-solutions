@@ -179,6 +179,22 @@ React context doesn't work in Server Components, so automatic heading-level nest
 - Blocks state their heading level in their props (`Section` takes `headingLevel`), defaulting to 2.
 - A Playwright test (Phase 5) crawls every registry route. It fails if a page has anything other than one `h1` or skips a heading level.
 
+### 5.5 Visual direction (owner input, feeds Phase 3)
+
+**Direction from the owner:**
+- **Light theme with generous white space**, carrying over the feel of the current nilltechsolutions.com.
+- **Typography** inspired by Moringa School's course pages (the Certified Data Protection Officer course page was the reference).
+- **Explicitly not** the dark-purple, gradient-heavy look that reads as AI-generated.
+
+**What that means for the design system:**
+- **Background:** white or near-white surfaces as the base. Dark sections are used sparingly, if at all. No purple-to-blue gradients, glows or glassmorphism.
+- **Colour:** brand colours come from the current site's palette, extracted from its CSS, not guessed. Every text and background pair must meet WCAG AA contrast, and every token is checked for contrast in the styleguide.
+- **White space as a token, not a habit:** a spacing scale with large section rhythm (e.g. 96–128 px vertical between sections on desktop, scaling down on mobile) and a constrained reading width (about 65–75 characters). Pages get their air from the tokens, not from ad-hoc margins.
+- **Type:** the heading and body families are identified from the Moringa reference and self-hosted through `next/font`, capped at 2 font files (§9.1). If its fonts are commercial or licensed, I'll propose the closest open-licence match instead of copying a paid font.
+- **Light mode only at launch.** A dark mode doubles the design-QA surface, and the brief doesn't ask for one. The token structure would allow it later.
+
+**Status:** the exact fonts and colours are **pending**. This environment's network policy blocks `moringaschool.com` and `nilltechsolutions.com`, so I couldn't inspect either site (§13 Q3).
+
 ---
 
 ## 6. SEO and AI-search infrastructure
@@ -450,7 +466,7 @@ Once this proposal is approved, its decisions are summarised into the `CLAUDE.md
    - `/qa`: ? (Model evaluation could also belong here.)
    - `/academy`: ?
 2. **What is `/academy`, and who is it for?** (blocks Phase 4 nav placement). Corporate training sold to the buyer (primary nav), or courses for individual learners (a supply-side audience, which should be isolated like `/talent`)? Putting a learner offer in the buyer nav would repeat the job-board-reading mistake.
-3. **Brand assets** (blocks Phase 3). An existing logo, colours, typefaces? If there are none, I'll build the design system on a clearly neutral placeholder palette and type pairing, structured so swapping in the brand later is a token-file change.
+3. **Brand assets** (blocks Phase 3). Direction is now set (§5.5): light theme, lots of white space, Moringa-inspired type, the current site's colours. Still needed: the logo file (SVG preferably), plus either network access to the two reference sites or the font names and brand hex codes directly.
 
 **Not blocking; needed before launch:**
 
