@@ -95,7 +95,7 @@ export function PricingTiers() {
             key={tier.name}
             className="border-border bg-card flex flex-col gap-5 rounded-lg border p-6"
           >
-            <h3 className="text-lg font-semibold">{tier.name}</h3>
+            <h2 className="text-lg font-semibold">{tier.name}</h2>
             <p className="text-2xl font-semibold">
               <span className="text-muted-foreground text-sm font-normal">
                 Starting from{" "}

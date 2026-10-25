@@ -91,7 +91,10 @@ export default async function FinanceOverviewPage() {
         ) : (
           <p className="text-muted-foreground text-sm">
             No invoices yet.{" "}
-            <Link href="/portal/finance/clients" className="text-primary hover:underline">
+            <Link
+              href="/portal/finance/clients"
+              className="text-primary underline underline-offset-2"
+            >
               Add a client
             </Link>{" "}
             first, then create an invoice.

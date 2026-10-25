@@ -6,12 +6,29 @@ export const SUBMIT_ERROR_MESSAGE =
   "Something went wrong submitting that. Please email info@nilltechsolutions.com or WhatsApp us instead.";
 
 // Honeypot field: real users never fill it in (it's visually hidden), bots
-// filling every field do. No Turnstile site key yet (CLAUDE.md §18 open
-// gap) — this is a lightweight stand-in, not a replacement for it.
+// filling every field do. Works alongside Turnstile and the per-IP rate
+// limit (lib/rate-limit.ts).
+const attributionField = z.string().trim().max(200).optional();
+
+// First-touch attribution captured on landing (components/analytics/
+// attribution-capture.tsx) and attached at submit time, not a form field.
+export const attributionSchema = z.object({
+  utmSource: attributionField,
+  utmMedium: attributionField,
+  utmCampaign: attributionField,
+  utmTerm: attributionField,
+  utmContent: attributionField,
+  referrer: attributionField,
+  landingPage: attributionField,
+});
+
+export type Attribution = z.infer<typeof attributionSchema>;
+
 export const honeypotSchema = z.object({
   website: z.string().max(0, "Leave this field empty."),
   // Cloudflare Turnstile token, added at submit time (not a form field).
   turnstileToken: z.string().max(2048).optional(),
+  attribution: attributionSchema.optional(),
 });
 
 // Offer slugs from config/offers.ts, plus an explicit "not sure" so nobody

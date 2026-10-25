@@ -97,8 +97,18 @@ export const privacyNotice: LegalDocument = {
             ],
             [
               "Submit any form",
-              "Technical information about your browser and connection, checked by Cloudflare Turnstile",
+              "Technical information about your browser and connection, checked by Cloudflare Turnstile, and a one-way scrambled (hashed) version of your IP address that can’t be turned back into it, to limit repeated submissions",
               "To block spam and automated abuse (our legitimate interest in protecting the site)",
+            ],
+            [
+              "Send an enquiry or use an estimator",
+              "How you found us: campaign tags in the link you followed, the website that referred you, and the first page you visited",
+              "To understand which of our marketing works (our legitimate interest in improving our marketing)",
+            ],
+            [
+              "Browse the website",
+              "Anonymous page views, the referring website, device type and page speed, measured by Cloudflare Web Analytics without cookies and without identifying you",
+              "To see how the site is used and keep it fast (our legitimate interest in running the site)",
             ],
           ],
         },
@@ -142,7 +152,7 @@ export const privacyNotice: LegalDocument = {
             ],
             [
               "Cloudflare",
-              "Turnstile spam and bot protection on our forms",
+              "Turnstile spam and bot protection on our forms, and cookieless website analytics",
               "Global network",
             ],
             [
@@ -192,6 +202,7 @@ export const privacyNotice: LegalDocument = {
               "Invoices, receipts and payment records",
               "5 years from the end of the relevant tax period (Tax Procedures Act, s. 23), longer if a proceeding is open",
             ],
+            ["Hashed IP records used to limit repeated form submissions", "24 hours"],
             [
               "Portal accounts",
               "While your account is active; audit records up to 5 years",
@@ -217,7 +228,7 @@ export const privacyNotice: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "We don’t use advertising or analytics cookies. The portal sets the cookies needed to keep you signed in, and only when you sign in. Embedded videos load from YouTube’s privacy-enhanced domain only when you press play; YouTube may then set its own cookies.",
+          text: "We don’t use advertising or analytics cookies; our website analytics are cookieless. The portal sets the cookies needed to keep you signed in, and only when you sign in. Embedded videos load from YouTube’s privacy-enhanced domain only when you press play; YouTube may then set its own cookies.",
         },
       ],
     },

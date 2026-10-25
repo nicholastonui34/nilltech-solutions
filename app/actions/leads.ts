@@ -6,9 +6,11 @@ import {
   formatTimeline,
 } from "@/config/pricing-rules";
 import { createLead } from "@/lib/leads/create-lead";
+import { RATE_LIMITED_MESSAGE, checkRateLimit } from "@/lib/rate-limit";
 import { TURNSTILE_FAILED_MESSAGE, verifyTurnstile } from "@/lib/turnstile";
 import {
   SUBMIT_ERROR_MESSAGE,
+  type Attribution,
   contactFormSchema,
   projectEstimatorSchema,
   tokenEstimatorSchema,
@@ -19,6 +21,12 @@ export type SubmitResult =
 
 const genericError = SUBMIT_ERROR_MESSAGE;
 
+// Where the visitor came from (UTM tags, referrer, landing page), stored on
+// the lead so Sales and Marketing can see which campaigns bring enquiries.
+function attributionMetadata(attribution: Attribution | undefined) {
+  return attribution && Object.keys(attribution).length ? { attribution } : {};
+}
+
 export async function submitContactForm(input: unknown): Promise<SubmitResult> {
   const parsed = contactFormSchema.safeParse(input);
   if (!parsed.success)
@@ -26,6 +34,9 @@ export async function submitContactForm(input: unknown): Promise<SubmitResult> {
   if (parsed.data.website) return { ok: false, error: genericError }; // honeypot tripped
   if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
     return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
+  }
+  if (!(await checkRateLimit("contact_form"))) {
+    return { ok: false, error: RATE_LIMITED_MESSAGE };
   }
 
   const result = await createLead({
@@ -37,6 +48,7 @@ export async function submitContactForm(input: unknown): Promise<SubmitResult> {
     message: parsed.data.message,
     serviceInterest: parsed.data.serviceInterest,
     timelineUrgency: parsed.data.timelineUrgency,
+    metadata: attributionMetadata(parsed.data.attribution),
   });
 
   if (!result.ok) return { ok: false, error: genericError };
@@ -51,6 +63,9 @@ export async function submitProjectEstimator(input: unknown): Promise<SubmitResu
   if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
     return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
   }
+  if (!(await checkRateLimit("estimator_project"))) {
+    return { ok: false, error: RATE_LIMITED_MESSAGE };
+  }
 
   const result = await createLead({
     source: "estimator_project",
@@ -62,6 +77,7 @@ export async function submitProjectEstimator(input: unknown): Promise<SubmitResu
     timelineUrgency: parsed.data.timelineUrgency,
     region: parsed.data.region,
     metadata: {
+      ...attributionMetadata(parsed.data.attribution),
       projectType: parsed.data.projectType,
       features: parsed.data.features,
       integrations: parsed.data.integrations,
@@ -90,6 +106,9 @@ export async function submitTokenEstimator(input: unknown): Promise<SubmitResult
   if (!(await verifyTurnstile(parsed.data.turnstileToken))) {
     return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
   }
+  if (!(await checkRateLimit("estimator_tokens"))) {
+    return { ok: false, error: RATE_LIMITED_MESSAGE };
+  }
 
   const result = await createLead({
     source: "estimator_tokens",
@@ -97,7 +116,11 @@ export async function submitTokenEstimator(input: unknown): Promise<SubmitResult
     email: parsed.data.email,
     company: parsed.data.company,
     serviceInterest: "ai-solutions",
-    metadata: { task: parsed.data.task, monthlyVolume: parsed.data.monthlyVolume },
+    metadata: {
+      ...attributionMetadata(parsed.data.attribution),
+      task: parsed.data.task,
+      monthlyVolume: parsed.data.monthlyVolume,
+    },
   });
 
   if (!result.ok) return { ok: false, error: genericError };

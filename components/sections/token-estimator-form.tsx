@@ -18,6 +18,7 @@ import {
 import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { PrivacyLine } from "@/components/legal/privacy-line";
 import { trackEvent } from "@/lib/analytics";
+import { readAttribution } from "@/lib/attribution";
 import {
   SUBMIT_ERROR_MESSAGE,
   tokenEstimatorSchema,
@@ -84,6 +85,7 @@ export function TokenEstimatorForm() {
       result = await submitTokenEstimator({
         ...values,
         turnstileToken: turnstileToken ?? undefined,
+        attribution: readAttribution(),
       });
     } catch {
       setStatus("error");

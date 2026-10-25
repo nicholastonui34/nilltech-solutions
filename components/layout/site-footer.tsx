@@ -42,7 +42,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <p className="border-t border-white/10 pt-6 text-xs text-white/40">
+        <p className="border-t border-white/10 pt-6 text-xs text-white/60">
           {/* Static, not Date.now() — Next 16 Cache Components rejects non-deterministic values at prerender. Bump yearly. */}
           &copy; 2026 {siteConfig.legalName}. All rights reserved.
         </p>

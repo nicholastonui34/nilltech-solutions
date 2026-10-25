@@ -283,7 +283,12 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - [~] **Phase 8 — Launch readiness.** In progress (owner, 2026-10-25: "Begin launch").
   - [x] Real copy on every public page (home, services, AI solutions, managed teams, academy, partnerships, pricing, estimate, contact, about, careers, podcast, work, blog), written from known facts only: offers, published prices and timelines, process, terms. No invented stats, clients or credentials. Offer cards use action-specific link labels instead of "Learn more". `llms.txt` now lists starting prices.
   - [x] `docs/seo-map.md` (primary term + intent per page) and `docs/content-placeholders.md` (hidden sections waiting on owner content, and policy statements for the owner to confirm).
-  - [ ] Per-IP rate limit on the public forms. [ ] Cloudflare Web Analytics (traffic + CWV). [ ] UTM capture into `leads.metadata`. [ ] Mobile Lighthouse pass against §15 targets.
+  - [x] Founders on `/about` (Nicholas Tonui, Wendy Achieng, Fumbwe Hamisi) from `lib/content/founders.ts`, also in the Organization schema with `foundingDate`. Bios and photos to follow; an initials badge stands in until then.
+  - [x] Per-IP rate limit on all four public forms (`lib/rate-limit.ts` + `check_rate_limit` RPC, migration `…08`): 5 per 10 minutes and 20 per day, per form, per visitor. Only a daily-salted SHA-256 of the IP is stored, deleted after 24 hours. Fails open if Supabase is unreachable (Turnstile and the honeypot still apply). **The migration needs applying to the live project** (the Supabase MCP prompt timed out waiting for approval); until then the limiter allows everything.
+  - [x] First-touch attribution (`lib/attribution.ts`, session storage, no cookies): UTM tags, external referrer origin and landing page, attached to contact/estimator submissions and stored in `leads.metadata.attribution`. Marketing dashboard shows leads by source and by campaign.
+  - [x] Cloudflare Web Analytics beacon (`components/analytics/cloudflare-web-analytics.tsx`), public pages only, `lazyOnload`, off until `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN` is set in Vercel. Privacy notice updated for the hashed IP, attribution and cookieless analytics.
+  - [x] Mobile Lighthouse pass (local production build, simulated mobile): 13 public pages at Performance 95 to 100, Accessibility 100, Best Practices 100, SEO 100, CLS 0. Fixes: hero glow uses a soft-edged gradient instead of a `blur-3xl` filter (LCP down from ~2.7s to ~2.0 to 2.5s), footer contrast, pricing heading order, underlined links inside text.
+  - [ ] Owner: apply migration `…08`, add the Cloudflare Web Analytics token, then sign off Phase 8.
 
 ## 18. Open Inputs (keep updated)
 

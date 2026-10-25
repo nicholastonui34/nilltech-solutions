@@ -27,10 +27,10 @@ export function Hero({
     <section className="bg-nilltech-navy relative overflow-hidden">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-64 right-0 h-[700px] w-[700px] rounded-full opacity-70 blur-3xl"
+        className="pointer-events-none absolute -top-64 right-0 h-[700px] w-[700px] opacity-70"
         style={{
           background:
-            "radial-gradient(circle, rgba(91,45,142,0.55) 0%, rgba(56,189,248,0.22) 55%, rgba(6,11,31,0) 100%)",
+            "radial-gradient(circle closest-side, rgba(91,45,142,0.55) 0%, rgba(56,189,248,0.22) 55%, rgba(6,11,31,0) 100%)",
         }}
       />
       <Container className="relative py-24 lg:py-32">
