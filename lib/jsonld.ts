@@ -106,3 +106,42 @@ export function breadcrumbSchema(items: { name: string; path: string }[]) {
     })),
   };
 }
+
+/**
+ * JobPosting (CLAUDE.md §14) — only for real, open roles in lib/content/jobs.ts.
+ * No salary, employment type or closing date: none were published, and
+ * schema must match visible content.
+ */
+export function jobPostingSchema(job: {
+  slug: string;
+  title: string;
+  summary: string;
+  responsibilities: string[];
+  requirements: string[];
+  datePosted: string;
+}) {
+  const list = (items: string[]) =>
+    `<ul>${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    description: `<p>${job.summary}</p><p>What you'll own:</p>${list(job.responsibilities)}<p>Who you are:</p>${list(job.requirements)}`,
+    datePosted: job.datePosted,
+    url: `${siteConfig.url}/careers/${job.slug}`,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      sameAs: siteConfig.url,
+      logo: `${siteConfig.url}/brand/nilltech-logo.jpg`,
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: siteConfig.address.locality,
+        addressCountry: "KE",
+      },
+    },
+  };
+}
