@@ -33,6 +33,7 @@ This file is the single source of truth for Claude Code when working in this rep
 - Flag refactor opportunities, don't silently perform them.
 - Proof-layer components (testimonials, logo wall, case studies) render nothing when empty — never fake placeholder proof.
 - Never ship a link to nothing.
+- **No em dashes or en dashes in anything a visitor sees** (owner rule, 2026-10-25). Use a comma, colon, full stop or brackets, and "to" for ranges ("1 to 7 days", "KES 500,000 to 2,000,000"). Use "n/a" for empty table cells and " | " in page titles. `scripts/check-dashes.mjs` runs before every build and in `npm run lint`, and an ESLint rule flags dashes in the editor, so a dash fails the deploy instead of reaching the site. Code comments are exempt.
 
 ## 3. Cost ceiling — infrastructure ≤ KES 30,000/year
 

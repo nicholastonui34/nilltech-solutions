@@ -13,6 +13,6 @@ export async function getClientOptions() {
     .order("name");
   return (data ?? []).map((client) => ({
     id: client.id,
-    label: client.company ? `${client.company} — ${client.name}` : client.name,
+    label: client.company ? `${client.company} · ${client.name}` : client.name,
   }));
 }

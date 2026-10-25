@@ -23,7 +23,8 @@ const tiers: Tier[] = [
     name: "AI-Powered Software Development",
     priceKes: "KES 45,000",
     priceUsd: "USD 500",
-    timeline: "Websites in 1–7 days · online stores 1–2 weeks · custom systems 2–4 weeks",
+    timeline:
+      "Websites in 1 to 7 days · online stores 1 to 2 weeks · custom systems 2 to 4 weeks",
     driversUp: [
       "More pages, features and custom integrations",
       "Online payments, user accounts and admin dashboards",
@@ -38,7 +39,7 @@ const tiers: Tier[] = [
     name: "AI Solutions for SMEs",
     priceKes: "KES 40,000",
     priceUsd: "USD 450",
-    timeline: "Live in 4–10 days · running costs from KES 5,000 / USD 60 a month",
+    timeline: "Live in 4 to 10 days · running costs from KES 5,000 / USD 60 a month",
     driversUp: [
       "Connecting to M-Pesa, your CRM or internal systems",
       "Multiple channels (WhatsApp, web, email)",
@@ -50,7 +51,7 @@ const tiers: Tier[] = [
     name: "Managed Tech Delivery Teams",
     priceKes: "KES 180,000",
     priceUsd: "USD 1,800",
-    timeline: "Per developer, per month · team in place in 1–2 weeks",
+    timeline: "Per developer, per month · team in place in 1 to 2 weeks",
     driversUp: ["Senior specialists (AI/ML, DevOps)", "Larger teams and extended hours"],
     driversDown: [
       "Longer engagements",

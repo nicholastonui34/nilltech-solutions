@@ -19,7 +19,7 @@ export default function EstimatePage() {
           <h1 className="text-4xl font-semibold">Get an estimate</h1>
           <p className="text-muted-foreground mt-4">
             Two ways to get a number: a project quote for custom build work, or a monthly
-            cost estimate for running AI in production. Both are indicative — a real quote
+            cost estimate for running AI in production. Both are indicative: a real quote
             follows a discovery call.
           </p>
         </div>

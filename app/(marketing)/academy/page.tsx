@@ -26,7 +26,7 @@ const data: OfferPageData = {
   headline: "{{PLACEHOLDER: /academy hero headline}}",
   subheadline: "{{PLACEHOLDER: /academy hero subheadline}}",
   primaryCta: "contact-sales",
-  summary: "{{PLACEHOLDER: answer-first summary of this offer — 2-3 sentences}}",
+  summary: "{{PLACEHOLDER: answer-first summary of this offer, 2 to 3 sentences}}",
   audience: [
     "{{PLACEHOLDER: audience 1}}",
     "{{PLACEHOLDER: audience 2}}",

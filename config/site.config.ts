@@ -9,7 +9,7 @@ export const siteConfig = {
   legalName: "NillTech Solutions Ltd",
   tagline: "We Build the Team. You Own the Outcome.",
   description:
-    "Managed technology delivery — AI-powered software development, AI solutions for SMEs, and managed delivery teams. Nairobi, Kenya.",
+    "Managed technology delivery: AI-powered software development, AI solutions for SMEs, and managed delivery teams. Nairobi, Kenya.",
   url: "https://nilltechsolutions.com",
 
   contact: {

@@ -49,15 +49,15 @@ export function InvoiceTable({
                 </Link>
               </td>
               <td className="py-3 pr-4">
-                {invoice.clients?.company ?? invoice.clients?.name ?? "—"}
+                {invoice.clients?.company ?? invoice.clients?.name ?? "n/a"}
               </td>
-              <td className="py-3 pr-4 whitespace-nowrap">{invoice.due_date ?? "—"}</td>
+              <td className="py-3 pr-4 whitespace-nowrap">{invoice.due_date ?? "n/a"}</td>
               <td className="py-3 pr-4 text-right whitespace-nowrap tabular-nums">
                 {formatMoney(invoice.total_minor, invoice.currency)}
               </td>
               <td className="py-3 pr-4 text-right whitespace-nowrap tabular-nums">
                 {invoice.status === "void" || invoice.status === "draft"
-                  ? "—"
+                  ? "n/a"
                   : formatMoney(
                       invoice.total_minor - invoice.paid_minor,
                       invoice.currency,

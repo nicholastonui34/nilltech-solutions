@@ -29,8 +29,8 @@ export type ServiceInterest = (typeof SERVICE_INTEREST_VALUES)[number];
 
 export const TIMELINE_URGENCY_OPTIONS = [
   { value: "asap", label: "ASAP" },
-  { value: "1-3-months", label: "1–3 months" },
-  { value: "3-6-months", label: "3–6 months" },
+  { value: "1-3-months", label: "1 to 3 months" },
+  { value: "3-6-months", label: "3 to 6 months" },
   { value: "exploring", label: "Just exploring" },
 ] as const;
 

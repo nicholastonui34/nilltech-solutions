@@ -70,7 +70,7 @@ export async function submitProjectEstimator(input: unknown): Promise<SubmitResu
         ? (() => {
             const estimate = computeProjectEstimate(parsed.data);
             return {
-              estimateKes: `${estimate.price.minKes}–${estimate.price.maxKes}`,
+              estimateKes: `${estimate.price.minKes} to ${estimate.price.maxKes}`,
               estimateTimeline: formatTimeline(estimate.timeline),
             };
           })()

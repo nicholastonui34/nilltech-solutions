@@ -40,7 +40,7 @@ const projectTypes: { value: ProjectType; label: string }[] = [
 
 const budgetOptions = [
   { value: "under-500k", label: "Under KES 500,000" },
-  { value: "500k-2m", label: "KES 500,000 – 2,000,000" },
+  { value: "500k-2m", label: "KES 500,000 to 2,000,000" },
   { value: "2m-plus", label: "KES 2,000,000+" },
   { value: "unsure", label: "Not sure yet" },
 ] as const;
@@ -163,15 +163,15 @@ export function ProjectEstimatorForm() {
     return (
       <div className="border-border bg-card rounded-lg border p-8 text-center">
         <p className="text-lg font-semibold">
-          Thanks — that&rsquo;s enough to get started.
+          Thanks, that&rsquo;s enough to get started.
         </p>
         {PRICING_FINALIZED && estimate ? (
           <div className="bg-muted/50 mx-auto mt-6 max-w-md rounded-lg p-5">
             <p className="text-muted-foreground text-sm">Indicative range</p>
             <p className="mt-1 text-2xl font-semibold tabular-nums">
               {estimate.international
-                ? `USD ${kesToUsd(estimate.result.price.minKes).toLocaleString()} – ${kesToUsd(estimate.result.price.maxKes).toLocaleString()}`
-                : `KES ${roundKes(estimate.result.price.minKes).toLocaleString()} – ${roundKes(estimate.result.price.maxKes).toLocaleString()}`}
+                ? `USD ${kesToUsd(estimate.result.price.minKes).toLocaleString()} to ${kesToUsd(estimate.result.price.maxKes).toLocaleString()}`
+                : `KES ${roundKes(estimate.result.price.minKes).toLocaleString()} to ${roundKes(estimate.result.price.maxKes).toLocaleString()}`}
             </p>
             <p className="text-muted-foreground mt-1 text-sm">
               Typical timeline: {formatTimeline(estimate.result.timeline)}
@@ -182,7 +182,7 @@ export function ProjectEstimatorForm() {
           </div>
         ) : (
           <p className="text-muted-foreground mt-2">
-            Our pricing tables are being finalized — we&rsquo;ll follow up with a real
+            Our pricing tables are being finalized, and we&rsquo;ll follow up with a real
             range shortly.
           </p>
         )}

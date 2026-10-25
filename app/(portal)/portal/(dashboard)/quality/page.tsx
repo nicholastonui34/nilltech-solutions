@@ -112,7 +112,7 @@ export default async function QualityPage() {
 
       <Panel
         title="Freelancer performance"
-        description="Approved talent pool, with delivery-review ratings (1–5)."
+        description="Approved talent pool, with delivery-review ratings (1 to 5)."
         className="mt-6"
       >
         {performance.length ? (
@@ -135,7 +135,7 @@ export default async function QualityPage() {
                     <td className="py-2 pr-4 text-right">{p.projects}</td>
                     <td className="py-2 pr-4 text-right">{p.reviews}</td>
                     <td className="py-2 text-right">
-                      {p.average === null ? "—" : p.average.toFixed(1)}
+                      {p.average === null ? "n/a" : p.average.toFixed(1)}
                     </td>
                   </tr>
                 ))}

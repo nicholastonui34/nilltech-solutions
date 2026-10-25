@@ -19,7 +19,7 @@ import { podcastSeriesSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Workshift by NillTech — Podcast",
+  title: "Workshift by NillTech | Podcast",
   description: "{{PLACEHOLDER: meta description for /podcast, 150-160 characters}}",
   path: "/podcast",
 });
@@ -87,7 +87,7 @@ export default function PodcastPage() {
                 ))}
               </ul>
             ) : (
-              <EmptyState message="No episodes published yet — check back soon." />
+              <EmptyState message="No episodes published yet. Check back soon." />
             )}
           </div>
         </Container>

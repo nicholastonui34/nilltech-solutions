@@ -98,7 +98,7 @@ export function TalentApplicationForm() {
         role="status"
         className="border-border bg-card rounded-lg border p-6 text-center"
       >
-        <p className="font-semibold">Application received — thank you.</p>
+        <p className="font-semibold">Application received. Thank you.</p>
         <p className="text-muted-foreground mt-1 text-sm">
           Our recruitment team reviews every application and will contact you if
           it&rsquo;s a fit.

@@ -27,7 +27,7 @@ export async function generateMetadata({
   const episode = getEpisodeBySlug(slug);
   if (!episode) return {};
   return buildMetadata({
-    title: `${episode.title} — ${podcast.name}`,
+    title: `${episode.title} | ${podcast.name}`,
     description: episode.summary,
     path: `/podcast/${episode.slug}`,
   });
@@ -114,7 +114,7 @@ export default async function EpisodePage({
                     <span className="font-medium">{guest.name}</span>
                   )}
                   {guest.role ? (
-                    <span className="text-muted-foreground"> — {guest.role}</span>
+                    <span className="text-muted-foreground">, {guest.role}</span>
                   ) : null}
                 </li>
               ))}

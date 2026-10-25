@@ -36,7 +36,7 @@ const SOURCE_LABELS: Record<string, string> = {
 // mirror components/sections/project-estimator-form.tsx.
 const BUDGET_LABELS: Record<string, string> = {
   "under-500k": "Under KES 500,000",
-  "500k-2m": "KES 500,000 – 2,000,000",
+  "500k-2m": "KES 500,000 to 2,000,000",
   "2m-plus": "KES 2,000,000+",
   unsure: "Not sure yet",
 };
@@ -57,7 +57,7 @@ const TIMELINE_LABELS: Record<string, string> = Object.fromEntries(
 );
 
 const label = (map: Record<string, string>) => (value: string | null) =>
-  value ? (map[value] ?? value) : "—";
+  value ? (map[value] ?? value) : "n/a";
 
 export const sourceLabel = label(SOURCE_LABELS);
 export const budgetLabel = label(BUDGET_LABELS);

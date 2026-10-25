@@ -68,37 +68,37 @@ export const privacyNotice: LegalDocument = {
             [
               "Send an enquiry (contact form)",
               "Name, email, phone (optional), company (optional), the service you’re interested in, your timeline, your message",
-              "To reply and discuss your project — steps taken at your request before a contract",
+              "To reply and discuss your project (steps taken at your request before a contract)",
             ],
             [
               "Use the project or AI cost estimator",
               "Name, email, company (optional), your project or usage details, budget band, region, and the estimate shown to you",
-              "To give you an indicative estimate and follow up — steps taken at your request before a contract",
+              "To give you an indicative estimate and follow up (steps taken at your request before a contract)",
             ],
             [
               "Apply to join our delivery teams",
               "Name, email, phone (optional), country, role, skills, years of experience, portfolio and profile links, availability, your message, and when you agreed to this notice. Our recruiters add screening and test-task notes",
-              "To assess your application — your consent, and steps taken at your request before an engagement",
+              "To assess your application (your consent, and steps taken at your request before an engagement)",
             ],
             [
               "Are hired full-time in Kenya",
               "Your KRA PIN (stored encrypted)",
-              "To meet our tax obligations as an employer — legal obligation",
+              "To meet our tax obligations as an employer (legal obligation)",
             ],
             [
               "Become a client",
               "Contact and billing details, invoices, payments and payment references (e.g. M-Pesa or bank reference)",
-              "To deliver and bill for our services — performance of a contract; and to keep tax records — legal obligation",
+              "To deliver and bill for our services (performance of a contract), and to keep tax records (legal obligation)",
             ],
             [
               "Sign in to the portal",
               "Email, name, role, sign-in activity, and a record of key actions (such as role changes and financial actions)",
-              "To give you secure access and keep an audit trail — performance of a contract and our legitimate interest in security",
+              "To give you secure access and keep an audit trail (performance of a contract and our legitimate interest in security)",
             ],
             [
               "Submit any form",
               "Technical information about your browser and connection, checked by Cloudflare Turnstile",
-              "To block spam and automated abuse — our legitimate interest in protecting the site",
+              "To block spam and automated abuse (our legitimate interest in protecting the site)",
             ],
           ],
         },
@@ -114,7 +114,7 @@ export const privacyNotice: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "Enquiries are given an automatic priority score (for example from your timeline and the service you choose) so our team can respond to urgent requests first. The score never decides on its own whether we work with you — a person reviews every enquiry and application.",
+          text: "Enquiries are given an automatic priority score (for example from your timeline and the service you choose) so our team can respond to urgent requests first. The score never decides on its own whether we work with you. A person reviews every enquiry and application.",
         },
       ],
     },
@@ -124,7 +124,7 @@ export const privacyNotice: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "We don’t sell your personal data. Only NillTech staff who need it for their role can see it — access in our portal is restricted by role. We use these service providers to run the website and portal:",
+          text: "We don’t sell your personal data. Only NillTech staff who need it for their role can see it, and access in our portal is restricted by role. We use these service providers to run the website and portal:",
         },
         {
           type: "table",
@@ -148,7 +148,7 @@ export const privacyNotice: LegalDocument = {
             [
               "Google (YouTube)",
               "Only if you choose to play an embedded video",
-              "Global — under Google’s own privacy policy",
+              "Global, under Google’s own privacy policy",
             ],
           ],
         },
@@ -164,7 +164,7 @@ export const privacyNotice: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "Because our providers operate outside Kenya, your data is processed abroad — mainly in Germany, which has data protection law at least as strong as Kenya’s. We rely on our providers’ contractual data protection commitments as appropriate safeguards, as section 48 of the Act requires, and we only transfer what is needed for the purposes above.",
+          text: "Because our providers operate outside Kenya, your data is processed abroad, mainly in Germany, which has data protection law at least as strong as Kenya’s. We rely on our providers’ contractual data protection commitments as appropriate safeguards, as section 48 of the Act requires, and we only transfer what is needed for the purposes above.",
         },
       ],
     },
@@ -284,7 +284,7 @@ export const termsOfService: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "The information on this site is general and may change. You agree not to misuse the site — for example by trying to break its security, overload it, or submit false or automated enquiries. Links to other websites are for convenience; we aren’t responsible for their content.",
+          text: "The information on this site is general and may change. You agree not to misuse the site, for example by trying to break its security, overload it, or submit false or automated enquiries. Links to other websites are for convenience; we aren’t responsible for their content.",
         },
       ],
     },
@@ -312,7 +312,7 @@ export const termsOfService: LegalDocument = {
         },
         {
           type: "p",
-          text: "Changes to the agreed scope are welcome — we’ll confirm any effect on price or timeline in writing before doing the extra work.",
+          text: "Changes to the agreed scope are welcome. We’ll confirm any effect on price or timeline in writing before doing the extra work.",
         },
       ],
     },
@@ -332,7 +332,7 @@ export const termsOfService: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "Every project includes free fixes for bugs in the work we delivered — meaning it doesn’t work as described in the agreed scope — for the bug-fix period stated in your proposal. New features, design changes and work caused by changes made by others are quoted separately.",
+          text: "Every project includes free fixes for bugs in the work we delivered (meaning it doesn’t work as described in the agreed scope) for the bug-fix period stated in your proposal. New features, design changes and work caused by changes made by others are quoted separately.",
         },
       ],
     },
@@ -366,7 +366,7 @@ export const termsOfService: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "Projects often rely on services we don’t control — such as hosting, domains, payment providers, WhatsApp and AI models. Their running costs are billed at cost or paid by you directly, and they’re provided under their own terms. We aren’t responsible for their outages or changes, but we’ll help you deal with them.",
+          text: "Projects often rely on services we don’t control, such as hosting, domains, payment providers, WhatsApp and AI models. Their running costs are billed at cost or paid by you directly, and they’re provided under their own terms. We aren’t responsible for their outages or changes, but we’ll help you deal with them.",
         },
       ],
     },

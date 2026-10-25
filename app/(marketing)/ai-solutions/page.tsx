@@ -22,7 +22,7 @@ const data: OfferPageData = {
   headline: "{{PLACEHOLDER: /ai-solutions hero headline}}",
   subheadline: "{{PLACEHOLDER: /ai-solutions hero subheadline}}",
   primaryCta: "demo",
-  summary: "{{PLACEHOLDER: answer-first summary of this offer — 2-3 sentences}}",
+  summary: "{{PLACEHOLDER: answer-first summary of this offer, 2 to 3 sentences}}",
   audience: [
     "{{PLACEHOLDER: audience 1}}",
     "{{PLACEHOLDER: audience 2}}",

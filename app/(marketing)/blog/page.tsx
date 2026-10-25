@@ -17,7 +17,7 @@ export default function BlogPage() {
       <Container>
         <h1 className="mb-10 text-4xl font-semibold">Insights</h1>
         {blogPosts.length === 0 ? (
-          <EmptyState message="No posts published yet — check back soon." />
+          <EmptyState message="No posts published yet. Check back soon." />
         ) : null}
       </Container>
     </section>
