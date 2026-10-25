@@ -17,11 +17,19 @@ import {
   contactFormSchema,
   type ContactFormValues,
 } from "@/lib/leads/schema";
+import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { trackEvent } from "@/lib/analytics";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  // Remounting the widget (new key) issues a fresh, single-use token.
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const resetTurnstile = () => {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  };
 
   const {
     register,
@@ -42,12 +50,23 @@ export function ContactForm() {
 
   const onSubmit = async (values: ContactFormValues) => {
     trackEvent("form_start");
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setStatus("error");
+      setErrorMessage(
+        "Please wait a moment for the security check to finish, then try again.",
+      );
+      return;
+    }
     let result: Awaited<ReturnType<typeof submitContactForm>>;
     try {
-      result = await submitContactForm(values);
+      result = await submitContactForm({
+        ...values,
+        turnstileToken: turnstileToken ?? undefined,
+      });
     } catch {
       setStatus("error");
       setErrorMessage(SUBMIT_ERROR_MESSAGE);
+      resetTurnstile();
       return;
     }
     if (result.ok) {
@@ -57,6 +76,7 @@ export function ContactForm() {
     } else {
       setStatus("error");
       setErrorMessage(result.error);
+      resetTurnstile();
     }
   };
 
@@ -182,6 +202,7 @@ export function ContactForm() {
         ) : null}
       </div>
 
+      <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
       {status === "error" ? (
         <p className="text-destructive text-sm">{errorMessage}</p>
       ) : null}

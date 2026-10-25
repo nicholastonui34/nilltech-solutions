@@ -20,6 +20,7 @@ import {
   type ProjectType,
   type Region,
 } from "@/config/pricing-rules";
+import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { trackEvent } from "@/lib/analytics";
 import {
   SUBMIT_ERROR_MESSAGE,
@@ -54,6 +55,13 @@ export function ProjectEstimatorForm() {
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  // Remounting the widget (new key) issues a fresh, single-use token.
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const resetTurnstile = () => {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  };
 
   const [stepError, setStepError] = useState(false);
   const [estimate, setEstimate] = useState<{
@@ -116,12 +124,23 @@ export function ProjectEstimatorForm() {
 
   const onSubmit = async (values: ProjectEstimatorValues) => {
     trackEvent("quote_generated");
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setStatus("error");
+      setErrorMessage(
+        "Please wait a moment for the security check to finish, then try again.",
+      );
+      return;
+    }
     let result: Awaited<ReturnType<typeof submitProjectEstimator>>;
     try {
-      result = await submitProjectEstimator(values);
+      result = await submitProjectEstimator({
+        ...values,
+        turnstileToken: turnstileToken ?? undefined,
+      });
     } catch {
       setStatus("error");
       setErrorMessage(SUBMIT_ERROR_MESSAGE);
+      resetTurnstile();
       return;
     }
     if (result.ok) {
@@ -134,6 +153,7 @@ export function ProjectEstimatorForm() {
     } else {
       setStatus("error");
       setErrorMessage(result.error);
+      resetTurnstile();
     }
   };
 
@@ -334,6 +354,7 @@ export function ProjectEstimatorForm() {
               <Label htmlFor="pe-company">Company (optional)</Label>
               <Input id="pe-company" className="mt-1.5" {...register("company")} />
             </div>
+            <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
             {status === "error" ? (
               <p className="text-destructive text-sm">{errorMessage}</p>
             ) : null}

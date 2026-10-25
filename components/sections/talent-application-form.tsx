@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
+import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { trackEvent } from "@/lib/analytics";
 import { SUBMIT_ERROR_MESSAGE } from "@/lib/leads/schema";
 import {
@@ -31,6 +32,13 @@ function FieldError({ message }: { message?: string }) {
 export function TalentApplicationForm() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  // Remounting the widget (new key) issues a fresh, single-use token.
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const resetTurnstile = () => {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  };
 
   const {
     register,
@@ -55,12 +63,23 @@ export function TalentApplicationForm() {
 
   const onSubmit = async (values: TalentApplicationValues) => {
     trackEvent("form_start", { form: "talent_application" });
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setStatus("error");
+      setErrorMessage(
+        "Please wait a moment for the security check to finish, then try again.",
+      );
+      return;
+    }
     let result: Awaited<ReturnType<typeof submitTalentApplication>>;
     try {
-      result = await submitTalentApplication(values);
+      result = await submitTalentApplication({
+        ...values,
+        turnstileToken: turnstileToken ?? undefined,
+      });
     } catch {
       setStatus("error");
       setErrorMessage(SUBMIT_ERROR_MESSAGE);
+      resetTurnstile();
       return;
     }
     if (result.ok) {
@@ -69,6 +88,7 @@ export function TalentApplicationForm() {
     } else {
       setStatus("error");
       setErrorMessage(result.error);
+      resetTurnstile();
     }
   };
 
@@ -290,6 +310,7 @@ export function TalentApplicationForm() {
         <FieldError message={errors.consent?.message} />
       </div>
 
+      <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
       {status === "error" ? (
         <p role="alert" className="text-destructive text-sm">
           {errorMessage}
