@@ -106,3 +106,130 @@ export function breadcrumbSchema(items: { name: string; path: string }[]) {
     })),
   };
 }
+
+/**
+ * JobPosting (CLAUDE.md §14) — only for real, open roles in lib/content/jobs.ts.
+ * No salary, employment type or closing date: none were published, and
+ * schema must match visible content.
+ */
+export function jobPostingSchema(job: {
+  slug: string;
+  title: string;
+  summary: string;
+  responsibilities: string[];
+  requirements: string[];
+  datePosted: string;
+}) {
+  const list = (items: string[]) =>
+    `<ul>${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    description: `<p>${job.summary}</p><p>What you'll own:</p>${list(job.responsibilities)}<p>Who you are:</p>${list(job.requirements)}`,
+    datePosted: job.datePosted,
+    url: `${siteConfig.url}/careers/${job.slug}`,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      sameAs: siteConfig.url,
+      logo: `${siteConfig.url}/brand/nilltech-logo.jpg`,
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: siteConfig.address.locality,
+        addressCountry: "KE",
+      },
+    },
+  };
+}
+
+/** PodcastSeries (CLAUDE.md §12) for /podcast. */
+export function podcastSeriesSchema(series: {
+  name: string;
+  description: string;
+  channelUrl: string | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "PodcastSeries",
+    name: series.name,
+    description: series.description,
+    url: `${siteConfig.url}/podcast`,
+    ...(series.channelUrl ? { sameAs: series.channelUrl } : {}),
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      url: siteConfig.url,
+    },
+  };
+}
+
+/** PodcastEpisode with its YouTube VideoObject (CLAUDE.md §12). */
+export function podcastEpisodeSchema(
+  episode: {
+    slug: string;
+    number: number;
+    title: string;
+    summary: string;
+    publishedAt: string;
+    youtubeId: string;
+    duration?: string;
+  },
+  seriesName: string,
+) {
+  const url = `${siteConfig.url}/podcast/${episode.slug}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "PodcastEpisode",
+    name: episode.title,
+    episodeNumber: episode.number,
+    description: episode.summary,
+    datePublished: episode.publishedAt,
+    url,
+    partOfSeries: {
+      "@type": "PodcastSeries",
+      name: seriesName,
+      url: `${siteConfig.url}/podcast`,
+    },
+    associatedMedia: {
+      "@type": "VideoObject",
+      name: episode.title,
+      description: episode.summary,
+      uploadDate: episode.publishedAt,
+      thumbnailUrl: `https://i.ytimg.com/vi/${episode.youtubeId}/hqdefault.jpg`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${episode.youtubeId}`,
+      contentUrl: `https://www.youtube.com/watch?v=${episode.youtubeId}`,
+      ...(episode.duration ? { duration: episode.duration } : {}),
+    },
+  };
+}
+
+/** Course schema for an individual Academy course page. */
+export function academyCourseSchema(course: {
+  slug: string;
+  title: string;
+  summary: string;
+  level: string;
+  isFree: boolean;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description: course.summary,
+    url: `${siteConfig.url}/academy/${course.slug}`,
+    educationalLevel: course.level,
+    isAccessibleForFree: course.isFree,
+    provider: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      sameAs: siteConfig.url,
+    },
+    ...(course.isFree
+      ? { offers: { "@type": "Offer", price: 0, priceCurrency: "KES", category: "Free" } }
+      : {}),
+  };
+}

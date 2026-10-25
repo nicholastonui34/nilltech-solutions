@@ -5,6 +5,7 @@ import {
   OfferPageContent,
   type OfferPageData,
 } from "@/components/sections/offer-page-content";
+import { CourseList } from "@/components/sections/course-list";
 import { JsonLd } from "@/components/seo/json-ld";
 import { courseSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
@@ -18,8 +19,8 @@ export const metadata: Metadata = buildMetadata({
 });
 
 // "Start Free / Enrol" (CLAUDE.md §4) isn't one of the five standard CTA
-// intents in §5 — Academy has no enrollment flow yet (that's Phase 7), so
-// this reuses "contact-sales" with a label override until then.
+// intents in §5. Free courses need no sign-up (see the Courses section);
+// paid enrolment comes later, so the main CTA stays "contact-sales".
 const data: OfferPageData = {
   eyebrow: "NillTech Academy",
   headline: "{{PLACEHOLDER: /academy hero headline}}",
@@ -37,7 +38,7 @@ const data: OfferPageData = {
       icon: BookOpen,
       title: "Free Courses",
       description: "{{PLACEHOLDER: deliverable description}}",
-      href: "/contact",
+      href: "/academy#courses",
     },
     {
       icon: GraduationCap,
@@ -84,6 +85,7 @@ export default function AcademyPage() {
         data={courseSchema({ name: title, description: data.summary, path: "/academy" })}
       />
       <OfferPageContent data={data} />
+      <CourseList />
     </>
   );
 }

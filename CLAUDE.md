@@ -263,7 +263,7 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] eTIMS: `EtimsProvider` interface + stub (`not_configured`, logged to `automation_runs`).
   - [x] Verified in rolled-back SQL transactions (no real numbers consumed): totals, issue/lock, overpay + void guards, direct-insert blocks, client/director RLS. One real bug caught and fixed (`record_payment` status cast).
   - Not built: emailing documents (Resend deferred), credit notes/refunds, client KRA PIN capture (waits for the eTIMS integrator + encryption).
-- [~] **Phase 6 — Talent.** Built (ADR 0005); awaiting owner sign-off.
+- [x] **Phase 6 — Talent.** Done (ADR 0005) — merged 2026-10-25.
   - [x] `recruitment` role + `talent_applications` (`…06`, `…07` migrations): EAC-only countries (DB CHECK), owner's 8 hiring roles, manual stage pipeline with audit-logged transitions, approval requires engagement type, rejection requires a reason, `verification_status = 'pending_setup'`.
   - [x] Public `/careers/apply` (RHF + Zod + honeypot + privacy consent), linked from `/careers`; service-role insert; ack email logged as skipped (Resend deferred).
   - [x] Recruitment dashboard (`/portal/recruitment`): stage filters with counts, applicant detail, stage/notes/test-task tracking, freelancer portal-account creation.
@@ -272,7 +272,12 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] Quality dashboard (`/portal/quality`): projects (optional client link), auto-seeded QA checklist (code review, testing, client sign-off), assignments (approved talent only, RLS), 1–5 delivery reviews, freelancer performance table. Freelancer portal at `/portal/talent`.
   - [x] Verified in a rolled-back SQL transaction (EAC + stage constraints, column privileges, PIN encrypt/decrypt + role limits, checklist seeding, assignment RLS, freelancer visibility) and the public form in a browser.
   - Not built: applicant status emails (Resend deferred), a real ID-verification vendor.
-- [ ] **Phase 7 — Content.** Podcast, Academy (free courses first; paid later), Careers.
+- [~] **Phase 7 — Content.** Careers live; Podcast and Academy structure built and empty, waiting on owner content (owner, 2026-10-25: "build structure though and leave empty").
+  - [x] Careers: the three real founding-team roles (Finance Lead 01, Marketing Lead 02, Sales Lead 03) from the owner's posters, verbatim, in `lib/content/jobs.ts` → `/careers` list + static `/careers/[slug]` pages with `JobPosting` + `BreadcrumbList` JSON-LD and sitemap entries. Apply by email (CV + note), as on the posters. No salary/employment type/closing date in schema — none were published. Remove a role from `jobs.ts` when it closes.
+  - [x] Podcast structure: `lib/content/podcast-episodes.ts` (episodes with answer-first summary, takeaways, chapters, guests, transcript; Shorts; `podcast.youtubeChannelUrl` — subscribe links stay hidden while it's `null`). `/podcast` grid + Shorts grid (renders nothing when empty) + `PodcastSeries`; `/podcast/[slug]` with click-to-load YouTube (`youtube-nocookie`), native share links, `PodcastEpisode`/`VideoObject`. **Empty — add entries to publish.**
+  - [x] Academy structure: `lib/content/courses.ts` (free courses with lessons), "Free courses" section on `/academy`, `/academy/[course]` (Course schema, "Start free"), `/academy/[course]/[lesson]` (optional video, prev/next). No sign-up for free courses; paid enrolment later. **Empty — add entries to publish.**
+  - Layouts verified locally with throwaway sample data (not committed). The dynamic routes use `instant = false` while empty; switch to `generateStaticParams` once the first entries exist.
+  - Not built: newsletter capture (blocked on Resend), paid course enrolment.
 
 ## 18. Open Inputs (keep updated)
 
