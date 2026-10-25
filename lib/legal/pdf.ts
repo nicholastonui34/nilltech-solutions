@@ -146,7 +146,7 @@ function drawBlock(flow: Flow, block: LegalBlock) {
 
 export async function buildLegalPdf(doc: LegalDocument) {
   const pdf = await PDFDocument.create();
-  pdf.setTitle(`${doc.title} — ${siteConfig.legalName}`);
+  pdf.setTitle(`${doc.title} | ${siteConfig.legalName}`);
   pdf.setAuthor(siteConfig.legalName);
   pdf.setSubject(doc.title);
   pdf.setProducer(siteHost);

@@ -62,13 +62,13 @@ export const STAGE_LABELS: Record<TalentStage, string> = {
   screening: "Screening",
   test_task: "Test task sent",
   test_review: "Test under review",
-  approved: "Approved — in talent pool",
+  approved: "Approved, in talent pool",
   rejected: "Not progressed",
 };
 
 const lookup = (entries: readonly (readonly [string, string])[]) => {
   const map = new Map(entries);
-  return (value: string | null) => (value ? (map.get(value) ?? value) : "—");
+  return (value: string | null) => (value ? (map.get(value) ?? value) : "n/a");
 };
 
 export const countryLabel = lookup(EAC_COUNTRIES.map((c) => [c.code, c.label] as const));

@@ -170,7 +170,7 @@ export function DeliveryReviewForm({
           className="h-8 w-auto"
         >
           <option value="" disabled>
-            1–5
+            1 to 5
           </option>
           {[5, 4, 3, 2, 1].map((n) => (
             <option key={n} value={n}>

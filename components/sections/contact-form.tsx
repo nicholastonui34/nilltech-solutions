@@ -84,7 +84,7 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div className="border-border bg-card rounded-lg border p-6 text-center">
-        <p className="font-semibold">Thanks — we got it.</p>
+        <p className="font-semibold">Thanks, we got it.</p>
         <p className="text-muted-foreground mt-1 text-sm">
           We&rsquo;ll follow up shortly.
         </p>

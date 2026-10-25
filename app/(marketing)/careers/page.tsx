@@ -52,7 +52,7 @@ export default function CareersPage() {
             </>
           ) : (
             <div className="mt-4">
-              <EmptyState message="No open roles right now — check back soon." />
+              <EmptyState message="No open roles right now. Check back soon." />
             </div>
           )}
         </div>

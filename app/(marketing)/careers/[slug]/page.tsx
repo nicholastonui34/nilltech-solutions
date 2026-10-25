@@ -24,7 +24,7 @@ export async function generateMetadata({
   const job = getJobBySlug(slug);
   if (!job) return {};
   return buildMetadata({
-    title: `${job.title} — Careers`,
+    title: `${job.title} | Careers`,
     description: job.summary,
     path: `/careers/${job.slug}`,
   });

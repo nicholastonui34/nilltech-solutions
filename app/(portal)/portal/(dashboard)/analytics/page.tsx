@@ -11,7 +11,7 @@ import { LEAD_TIERS, sourceLabel, TIER_LABELS } from "@/lib/leads/labels";
 import { countBy, getLeadStatRows } from "@/lib/leads/stats";
 
 function percent(part: number, whole: number) {
-  return whole ? `${Math.round((part / whole) * 100)}%` : "—";
+  return whole ? `${Math.round((part / whole) * 100)}%` : "n/a";
 }
 
 export default async function AnalyticsPage() {
@@ -102,7 +102,7 @@ export default async function AnalyticsPage() {
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <NotConnected
           title="Conversion events"
-          reason="CTA clicks, form starts, WhatsApp and call clicks fire through lib/analytics.ts, but it has no destination yet — events aren't stored anywhere."
+          reason="CTA clicks, form starts, WhatsApp and call clicks fire through lib/analytics.ts, but it has no destination yet, so events aren't stored anywhere."
         />
         <NotConnected
           title="Core Web Vitals (field data)"

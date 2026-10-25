@@ -92,10 +92,10 @@ export function roundKes(value: number) {
 
 /** "1–7 days", or whole weeks ("1–2 weeks") once the range reaches two weeks. */
 export function formatTimeline({ minDays, maxDays }: TimelineRange) {
-  if (maxDays < 14) return `${minDays}–${maxDays} days`;
+  if (maxDays < 14) return `${minDays} to ${maxDays} days`;
   const minWeeks = Math.max(1, Math.round(minDays / 7));
   const maxWeeks = Math.max(minWeeks, Math.round(maxDays / 7));
-  return minWeeks === maxWeeks ? `${maxWeeks} weeks` : `${minWeeks}–${maxWeeks} weeks`;
+  return minWeeks === maxWeeks ? `${maxWeeks} weeks` : `${minWeeks} to ${maxWeeks} weeks`;
 }
 
 /** KES → USD for display, rounded to the nearest 50. */

@@ -23,7 +23,7 @@ export async function generateMetadata({
   const course = getCourseBySlug(slug);
   if (!course) return {};
   return buildMetadata({
-    title: `${course.title} — NillTech Academy`,
+    title: `${course.title} | NillTech Academy`,
     description: course.summary,
     path: `/academy/${course.slug}`,
   });

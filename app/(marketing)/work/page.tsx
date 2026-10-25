@@ -17,7 +17,7 @@ export default function WorkPage() {
       <Container>
         <h1 className="mb-10 text-4xl font-semibold">Case Studies</h1>
         {caseStudies.length === 0 ? (
-          <EmptyState message="No case studies published yet — check back soon." />
+          <EmptyState message="No case studies published yet. Check back soon." />
         ) : null}
       </Container>
     </section>

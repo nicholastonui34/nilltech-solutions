@@ -74,7 +74,7 @@ export default async function AdminAuditPage() {
                       {ACTION_LABELS[entry.action] ?? entry.action}
                     </td>
                     <td className="py-2 pr-4">
-                      {metadataSummary(entry.metadata) ?? "—"}
+                      {metadataSummary(entry.metadata) ?? "n/a"}
                     </td>
                     <td className="py-2">{who(entry.entity_id)}</td>
                   </tr>

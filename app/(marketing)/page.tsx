@@ -18,7 +18,7 @@ export default function HomePage() {
   return (
     <>
       <Hero
-        eyebrow="Managed Tech Delivery — Nairobi, Kenya"
+        eyebrow="Managed Tech Delivery in Nairobi, Kenya"
         headline={siteConfig.tagline}
         subheadline="{{PLACEHOLDER: one-sentence summary of the company's core promise for a buyer who lands here cold.}}"
         primaryCta="quote"

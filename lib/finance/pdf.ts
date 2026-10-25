@@ -205,7 +205,7 @@ function drawPaymentDetails(w: Writer, seller: SellerSnapshot, currency: Currenc
   const mpesa: [string, string][] = seller.mpesa_paybill
     ? [
         ["Paybill", seller.mpesa_paybill],
-        ["Account number", seller.mpesa_account ?? "—"],
+        ["Account number", seller.mpesa_account ?? "n/a"],
       ]
     : [];
   const bank: [string, string][] = seller.bank_account_number
@@ -386,7 +386,7 @@ export async function buildReceiptPdf(data: ReceiptPdfData) {
 
   const rows: [string, string][] = [
     ["Payment method", PAYMENT_METHOD_LABELS[data.method]],
-    ["Reference", data.reference ?? "—"],
+    ["Reference", data.reference ?? "n/a"],
     ["Invoice total", `${data.currency} ${formatAmount(data.invoiceTotalMinor)}`],
     ["Paid to date", `${data.currency} ${formatAmount(data.paidToDateMinor)}`],
     ["Balance remaining", `${data.currency} ${formatAmount(balance)}`],
@@ -398,7 +398,7 @@ export async function buildReceiptPdf(data: ReceiptPdfData) {
   }
 
   w.y -= 10;
-  w.text("Thank you — this receipt confirms the payment above.", MARGIN, {
+  w.text("Thank you. This receipt confirms the payment above.", MARGIN, {
     size: 9,
     color: MUTED,
   });

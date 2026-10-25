@@ -20,7 +20,7 @@ export function BookingFacade() {
       <div className="border-border bg-muted/40 rounded-lg border p-6 text-center">
         <p className="font-medium">Prefer to talk it through?</p>
         <p className="text-muted-foreground mt-1 text-sm">
-          Online booking is coming soon — message us on WhatsApp in the meantime.
+          Online booking is coming soon. Message us on WhatsApp in the meantime.
         </p>
         <a
           href={ctaConfig.whatsapp.href}

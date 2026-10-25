@@ -26,7 +26,7 @@ import { VERIFICATION_LABELS, type VerificationStatus } from "@/lib/verification
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function ExternalUrl({ url }: { url: string | null }) {
-  if (!url) return <>—</>;
+  if (!url) return <>n/a</>;
   return (
     <a
       href={url}
@@ -77,13 +77,13 @@ export default async function ApplicationDetailPage({
         {app.email}
       </a>,
     ],
-    ["Phone", app.phone ?? "—"],
+    ["Phone", app.phone ?? "n/a"],
     ["Country", countryLabel(app.country)],
     ["Main role", roleLabel(app.primary_role)],
     ["Experience", `${app.years_experience} years`],
     ["Prefers", preferenceLabel(app.engagement_preference)],
-    ["Skills", app.skills.length ? app.skills.join(", ") : "—"],
-    ["Availability", app.availability ?? "—"],
+    ["Skills", app.skills.length ? app.skills.join(", ") : "n/a"],
+    ["Availability", app.availability ?? "n/a"],
     ["Portfolio", <ExternalUrl key="p" url={app.portfolio_url} />],
     ["LinkedIn / GitHub", <ExternalUrl key="l" url={app.profile_url} />],
     ["Applied", formatDateTime(app.created_at)],
@@ -151,7 +151,7 @@ export default async function ApplicationDetailPage({
                 <p className="text-sm">
                   {app.tax_pin_recorded_at
                     ? `KRA PIN on file (encrypted), saved ${formatDateTime(app.tax_pin_recorded_at)}.`
-                    : "Full-time hire in Kenya — a KRA PIN is required."}
+                    : "Full-time hire in Kenya, so a KRA PIN is required."}
                 </p>
                 <TaxPinForm id={app.id} hasPin={Boolean(app.tax_pin_recorded_at)} />
                 {app.tax_pin_recorded_at &&
@@ -162,7 +162,7 @@ export default async function ApplicationDetailPage({
             ) : (
               <p className="text-muted-foreground text-sm">
                 {app.engagement_type === "freelance"
-                  ? "Freelancers handle their own tax filing — nothing to collect."
+                  ? "Freelancers handle their own tax filing, so there's nothing to collect."
                   : app.engagement_type === "full_time"
                     ? "A KRA PIN is collected for full-time hires in Kenya only."
                     : "Decided once the applicant is approved as freelance or full-time."}

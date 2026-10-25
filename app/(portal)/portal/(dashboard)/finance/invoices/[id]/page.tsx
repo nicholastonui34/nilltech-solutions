@@ -25,7 +25,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 const ETIMS_LABELS: Record<string, string> = {
   not_submitted: "Not submitted",
-  not_configured: "Not sent — no eTIMS integrator connected yet",
+  not_configured: "Not sent: no eTIMS integrator connected yet",
   submitted: "Submitted",
   failed: "Submission failed",
 };
@@ -62,7 +62,7 @@ export default async function InvoiceDetailPage({
   );
   const today = nairobiDateIso();
   const balance = invoice.total_minor - invoice.paid_minor;
-  const clientName = invoice.clients?.company ?? invoice.clients?.name ?? "—";
+  const clientName = invoice.clients?.company ?? invoice.clients?.name ?? "n/a";
 
   const back = (
     <Link
@@ -207,7 +207,7 @@ export default async function InvoiceDetailPage({
                     </td>
                     <td className="text-right font-semibold whitespace-nowrap">
                       {invoice.status === "void"
-                        ? "—"
+                        ? "n/a"
                         : formatMoney(balance, invoice.currency)}
                     </td>
                   </tr>

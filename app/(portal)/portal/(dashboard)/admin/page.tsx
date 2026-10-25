@@ -37,7 +37,7 @@ function integrations(): Integration[] {
     {
       name: "Resend email",
       status: has("RESEND_API_KEY") ? "configured" : "deferred",
-      note: "Deferred by owner decision — no lead alerts or auto-replies yet.",
+      note: "Deferred by owner decision. No lead alerts or auto-replies yet.",
     },
     {
       name: "SMS (Africa's Talking)",
@@ -47,7 +47,7 @@ function integrations(): Integration[] {
     {
       name: "ID verification",
       status: has("PERSONA_API_KEY") ? "configured" : "deferred",
-      note: "Deferred — no vendor chosen yet.",
+      note: "Deferred. No vendor chosen yet.",
     },
   ];
 }
@@ -96,7 +96,7 @@ export default async function AdminHealthPage() {
           role="alert"
           className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
         >
-          The database has passed 400 MB — the Supabase Pro upgrade trigger in CLAUDE.md
+          The database has passed 400 MB, the Supabase Pro upgrade trigger in CLAUDE.md
           §3. The free tier stops at 500 MB.
         </p>
       ) : null}
@@ -107,8 +107,8 @@ export default async function AdminHealthPage() {
           value={dbBytes !== null ? formatBytes(dbBytes) : "Unavailable"}
           hint={`Free tier limit ${formatBytes(DB_LIMIT_BYTES)} · upgrade trigger ${formatBytes(DB_TRIGGER_BYTES)}`}
         />
-        <StatCard label="Leads, all time" value={leadsTotal.count ?? "—"} />
-        <StatCard label="Leads, last 7 days" value={leadsWeek.count ?? "—"} />
+        <StatCard label="Leads, all time" value={leadsTotal.count ?? "n/a"} />
+        <StatCard label="Leads, last 7 days" value={leadsWeek.count ?? "n/a"} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

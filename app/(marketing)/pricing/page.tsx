@@ -26,8 +26,8 @@ export default function PricingPage() {
           </div>
           <PricingTiers />
           <p className="text-muted-foreground mt-10 text-center text-xs">
-            Every project includes free bug fixes after launch. Estimates are indicative —
-            final quote after a discovery call.
+            Every project includes free bug fixes after launch. Estimates are indicative,
+            with a final quote after a discovery call.
           </p>
         </Container>
       </section>

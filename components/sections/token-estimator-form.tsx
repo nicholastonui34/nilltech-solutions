@@ -33,8 +33,8 @@ const taskOptions = [
 
 const volumeOptions = [
   { value: "under-1k", label: "Under 1,000 / month" },
-  { value: "1k-10k", label: "1,000 – 10,000 / month" },
-  { value: "10k-100k", label: "10,000 – 100,000 / month" },
+  { value: "1k-10k", label: "1,000 to 10,000 a month" },
+  { value: "10k-100k", label: "10,000 to 100,000 a month" },
   { value: "100k-plus", label: "100,000+ / month" },
 ] as const;
 
@@ -104,7 +104,7 @@ export function TokenEstimatorForm() {
   if (status === "success") {
     return (
       <div className="border-border bg-card rounded-lg border p-8 text-center">
-        <p className="text-lg font-semibold">Thanks — we&rsquo;ll follow up.</p>
+        <p className="text-lg font-semibold">Thanks, we&rsquo;ll follow up.</p>
         <p className="text-muted-foreground mt-2">
           We&rsquo;ll confirm whether this estimate fits your actual usage pattern.
         </p>
@@ -198,8 +198,8 @@ export function TokenEstimatorForm() {
         <div className="bg-muted/50 mt-6 rounded-lg p-4 text-sm">
           <p className="font-semibold">Estimated: ${estimate.toFixed(2)}/month</p>
           <p className="text-muted-foreground mt-1">
-            Based on public model pricing, verified {lastVerified}. Indicative only — your
-            actual prompt/response lengths will shift this.
+            Based on public model pricing, verified {lastVerified}. Indicative only, as
+            your actual prompt/response lengths will shift this.
           </p>
           {selectedModel.note ? (
             <p className="text-muted-foreground mt-1">{selectedModel.note}</p>

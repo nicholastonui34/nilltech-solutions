@@ -64,7 +64,7 @@ export default async function LeadDetailPage({
     ["Timeline", timelineLabel(lead.timeline_urgency)],
     ["Budget", budgetLabel(lead.budget_band)],
     ["Region", regionLabel(lead.region)],
-    ["Company", lead.company ?? "—"],
+    ["Company", lead.company ?? "n/a"],
   ];
 
   return (
@@ -96,7 +96,7 @@ export default async function LeadDetailPage({
               <p className="text-sm whitespace-pre-wrap">{lead.message}</p>
             ) : (
               <p className="text-muted-foreground text-sm">
-                No message — this lead came from an estimator.
+                No message. This lead came from an estimator.
               </p>
             )}
           </Panel>

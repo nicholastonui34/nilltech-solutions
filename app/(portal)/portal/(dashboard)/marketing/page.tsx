@@ -36,7 +36,7 @@ export default async function MarketingPage() {
               ? serviceLabel(
                   countBy(last30, (r) => r.service_interest ?? "unknown")[0][0],
                 )
-              : "—"
+              : "n/a"
           }
         />
       </div>
@@ -52,7 +52,7 @@ export default async function MarketingPage() {
         </Panel>
         <Panel
           title="Leads by service interest"
-          description="All time. “—” means the form didn't ask."
+          description="All time. “n/a” means the form didn't ask."
         >
           <BarList
             rows={countBy(rows, (r) => serviceLabel(r.service_interest)).map(

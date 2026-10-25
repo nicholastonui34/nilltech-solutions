@@ -11,7 +11,7 @@ export function CourseList() {
       <Container>
         <h2 className="text-2xl font-semibold">Free courses</h2>
         <p className="text-muted-foreground mt-1 text-sm">
-          Start learning straight away — no sign-up needed.
+          Start learning straight away, no sign-up needed.
         </p>
         <div className="mt-8">
           {courses.length ? (
@@ -35,7 +35,7 @@ export function CourseList() {
               ))}
             </ul>
           ) : (
-            <EmptyState message="Our first free courses are on the way — check back soon." />
+            <EmptyState message="Our first free courses are on the way. Check back soon." />
           )}
         </div>
       </Container>

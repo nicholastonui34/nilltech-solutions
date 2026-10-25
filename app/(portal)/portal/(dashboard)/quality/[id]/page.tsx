@@ -62,7 +62,7 @@ export default async function ProjectDetailPage({
   const assignedIds = new Set(project.project_assignments.map((a) => a.talent_id));
   const assignable = (pool ?? [])
     .filter((t) => !assignedIds.has(t.id))
-    .map((t) => ({ id: t.id, label: `${t.full_name} — ${roleLabel(t.primary_role)}` }));
+    .map((t) => ({ id: t.id, label: `${t.full_name} · ${roleLabel(t.primary_role)}` }));
   const reviewFor = (talentId: string) =>
     project.delivery_reviews.find((r) => r.talent_id === talentId) ?? null;
   const allDone = checklist.length > 0 && checklist.every((item) => item.done);
@@ -114,7 +114,7 @@ export default async function ProjectDetailPage({
           title="QA checklist"
           description={
             allDone
-              ? "Every check is done — ready to mark as delivered."
+              ? "Every check is done, ready to mark as delivered."
               : "Tick each check as it's completed."
           }
         >

@@ -59,7 +59,7 @@ export default async function TalentProfilePage() {
           <p className="text-sm">
             {profile.engagement_type
               ? ENGAGEMENT_TYPE_LABELS[profile.engagement_type]
-              : "—"}
+              : "n/a"}
           </p>
           {profile.skills.length ? (
             <p className="text-muted-foreground mt-2 text-xs">

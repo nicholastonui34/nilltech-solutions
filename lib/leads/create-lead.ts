@@ -69,7 +69,7 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       related_entity_type: "leads",
       related_entity_id: data.id,
       payload: {
-        reason: "Resend and Africa's Talking are deferred — see CLAUDE.md §3/§18",
+        reason: "Resend and Africa's Talking are deferred, see CLAUDE.md §3/§18",
       },
     });
   }

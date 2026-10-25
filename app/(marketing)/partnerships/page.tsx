@@ -25,7 +25,7 @@ export default function PartnershipsPage() {
         <Container className="max-w-3xl">
           <p className="text-lg leading-relaxed">
             {
-              "{{PLACEHOLDER: answer-first summary of the partnerships offer for agencies/enterprises — 2-3 sentences}}"
+              "{{PLACEHOLDER: answer-first summary of the partnerships offer for agencies/enterprises, 2 to 3 sentences}}"
             }
           </p>
         </Container>

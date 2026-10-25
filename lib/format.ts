@@ -11,11 +11,11 @@ const dateFormat = new Intl.DateTimeFormat("en-KE", {
 
 /** Portal timestamps are shown in Nairobi time (EAT), the team's time zone. */
 export function formatDateTime(value: string | null | undefined) {
-  return value ? dateTimeFormat.format(new Date(value)) : "—";
+  return value ? dateTimeFormat.format(new Date(value)) : "n/a";
 }
 
 export function formatDate(value: string | null | undefined) {
-  return value ? dateFormat.format(new Date(value)) : "—";
+  return value ? dateFormat.format(new Date(value)) : "n/a";
 }
 
 export function formatBytes(bytes: number) {

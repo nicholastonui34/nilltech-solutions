@@ -24,7 +24,7 @@ export async function generateMetadata({
   const found = getLesson(course, lesson);
   if (!found) return {};
   return buildMetadata({
-    title: `${found.lesson.title} — ${found.course.title}`,
+    title: `${found.lesson.title} | ${found.course.title}`,
     description: found.lesson.summary,
     path: `/academy/${course}/${lesson}`,
   });
