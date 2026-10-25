@@ -18,6 +18,7 @@ import {
   type ContactFormValues,
 } from "@/lib/leads/schema";
 import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
+import { PrivacyLine } from "@/components/legal/privacy-line";
 import { trackEvent } from "@/lib/analytics";
 
 export function ContactForm() {
@@ -202,6 +203,7 @@ export function ContactForm() {
         ) : null}
       </div>
 
+      <PrivacyLine purpose="to respond to your enquiry" />
       <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
       {status === "error" ? (
         <p className="text-destructive text-sm">{errorMessage}</p>
