@@ -57,6 +57,7 @@ generation. Owner inputs (2026-10-25):
   app-level encryption, when the eTIMS integrator is chosen.
 - **Partial payments are supported, but refunds and credit notes aren't.**
   Add a credit-note document type if one is needed.
-- **The bank account is denominated in USD.** KES paid by M-Pesa or KES
-  bank transfer gets converted by the bank; confirm whether a KES account
-  should also be listed on KES invoices.
+- **The bank account is denominated in USD.** Owner decision (2026-10-25):
+  that's fine. KES clients are quoted in KES and pay the KES amount by
+  M-Pesa or bank transfer, and the bank handles the conversion. No separate
+  KES account is needed on invoices.

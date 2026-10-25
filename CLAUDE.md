@@ -282,5 +282,4 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 - YouTube channel + episode list.
 - Academy course list & pricing.
 - eTIMS integration route.
-- **KES bank account?** The I&M account on invoices is USD-denominated; KES payments get converted. Add a KES account in `/portal/finance/settings` if there is one.
 - Current hosting provider & cost breakdown (if the live nilltechsolutions.com site is ever folded into this repo's scope — currently out of scope, see Conflicts).
