@@ -1,0 +1,69 @@
+# Nightly encrypted Supabase backup (CLAUDE.md §3: Supabase Free has no
+# managed backups). Dumps the public and auth schemas, encrypts the dump
+# with AES-256 using BACKUP_PASSPHRASE, and keeps it as a workflow artifact
+# for 30 days. Restore steps: docs/backups.md.
+#
+# Repository secrets required (Settings > Secrets and variables > Actions):
+#   SUPABASE_DB_URL     Session pooler connection string (IPv4), with the
+#                       database password filled in.
+#   BACKUP_PASSPHRASE   Long random passphrase. Store a copy in a password
+#                       manager: without it the backups can't be opened.
+name: Nightly database backup
+
+on:
+  schedule:
+    - cron: "17 0 * * *" # 03:17 Nairobi time
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check secrets are set
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::error::Add the SUPABASE_DB_URL and BACKUP_PASSPHRASE repository secrets (see docs/backups.md)."
+            exit 1
+          fi
+
+      # pg_dump must be at least the server's major version (Postgres 17).
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Dump and encrypt
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          stamp=$(date -u +%Y-%m-%dT%H%MZ)
+          echo "STAMP=$stamp" >> "$GITHUB_ENV"
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+            --schema=public --schema=auth \
+            --format=custom --no-owner --no-privileges \
+            --file=backup.dump
+          gpg --batch --yes --pinentry-mode loopback \
+            --passphrase-fd 3 3<<<"$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 \
+            --output "nilltech-db-$stamp.dump.gpg" backup.dump
+          rm backup.dump
+          ls -lh "nilltech-db-$stamp.dump.gpg"
+
+      - name: Upload encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: nilltech-db-${{ env.STAMP }}
+          path: nilltech-db-*.dump.gpg
+          retention-days: 30
+          if-no-files-found: error

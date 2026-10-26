@@ -280,15 +280,20 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - Layouts verified locally with throwaway sample data (not committed). The dynamic routes use `instant = false` while empty; switch to `generateStaticParams` once the first entries exist.
   - Not built: newsletter capture (blocked on Resend), paid course enrolment.
 
-- [~] **Phase 8 — Launch readiness.** In progress (owner, 2026-10-25: "Begin launch").
+- [x] **Phase 8 — Launch readiness.** Done 2026-10-26 (PRs #17, #18).
   - [x] Real copy on every public page (home, services, AI solutions, managed teams, academy, partnerships, pricing, estimate, contact, about, careers, podcast, work, blog), written from known facts only: offers, published prices and timelines, process, terms. No invented stats, clients or credentials. Offer cards use action-specific link labels instead of "Learn more". `llms.txt` now lists starting prices.
   - [x] `docs/seo-map.md` (primary term + intent per page) and `docs/content-placeholders.md` (hidden sections waiting on owner content, and policy statements for the owner to confirm).
   - [x] Founders on `/about` (Nicholas Tonui, Wendy Achieng, Fumbwe Hamisi) from `lib/content/founders.ts`, also in the Organization schema with `foundingDate`. Bios and photos to follow; an initials badge stands in until then.
-  - [x] Per-IP rate limit on all four public forms (`lib/rate-limit.ts` + `check_rate_limit` RPC, migration `…08`): 5 per 10 minutes and 20 per day, per form, per visitor. Only a daily-salted SHA-256 of the IP is stored, deleted after 24 hours. Fails open if Supabase is unreachable (Turnstile and the honeypot still apply). **The migration needs applying to the live project** (the Supabase MCP prompt timed out waiting for approval); until then the limiter allows everything.
+  - [x] Per-IP rate limit on all four public forms (`lib/rate-limit.ts` + `check_rate_limit` RPC, migration `…08`, applied by the owner 2026-10-26 and verified in a rolled-back transaction: 4th hit in the window refused, anon/authenticated can't execute or read). 5 per 10 minutes and 20 per day, per form, per visitor. Only a daily-salted SHA-256 of the IP is stored, deleted after 24 hours. Fails open if Supabase is unreachable (Turnstile and the honeypot still apply).
   - [x] First-touch attribution (`lib/attribution.ts`, session storage, no cookies): UTM tags, external referrer origin and landing page, attached to contact/estimator submissions and stored in `leads.metadata.attribution`. Marketing dashboard shows leads by source and by campaign.
   - [x] Cloudflare Web Analytics beacon (`components/analytics/cloudflare-web-analytics.tsx`), public pages only, `lazyOnload`, off until `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN` is set in Vercel. Privacy notice updated for the hashed IP, attribution and cookieless analytics.
   - [x] Mobile Lighthouse pass (local production build, simulated mobile): 13 public pages at Performance 95 to 100, Accessibility 100, Best Practices 100, SEO 100, CLS 0. Fixes: hero glow uses a soft-edged gradient instead of a `blur-3xl` filter (LCP down from ~2.7s to ~2.0 to 2.5s), footer contrast, pricing heading order, underlined links inside text.
-  - [ ] Owner: apply migration `…08`, add the Cloudflare Web Analytics token, then sign off Phase 8.
+  - [x] Owner applied migration `…08` and added `NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN` (Production) 2026-10-26.
+
+- [~] **Phase 9 — Operations.** In progress (owner, 2026-10-26: "move on"). Spec items not yet built, starting with the riskiest.
+  - [x] Nightly encrypted database backup (`.github/workflows/db-backup.yml`, §3): `pg_dump` 17 of `public` + `auth`, AES-256 with `gpg --symmetric`, 30-day workflow artifact. `vault` excluded on purpose (the KRA PIN key mustn't sit next to the ciphertext). Setup and restore steps in `docs/backups.md`. **Needs owner:** `SUPABASE_DB_URL` (session pooler) and `BACKUP_PASSPHRASE` repo secrets, a first manual run, and a copy of the Vault `tax_id_key` in a password manager.
+  - [x] Director dashboard (`/portal/director`, director + super_admin, read-only via existing RLS): cash collected this month/year and outstanding invoices per currency, open and hot leads, indicative pipeline from estimator leads, revenue and new leads per month (6 months). Margins shown as not tracked (no cost data yet).
+  - [ ] Candidates, owner to prioritise: expenses + margins (finance), CSV exports for finance, IndexNow ping on publish (§14), Vercel Hobby usage warnings on the admin dashboard (§3).
 
 ## 18. Open Inputs (keep updated)
 

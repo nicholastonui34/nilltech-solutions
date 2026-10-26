@@ -45,7 +45,8 @@ export function BarList({
   rows,
   emptyLabel = "No data yet.",
 }: {
-  rows: { label: string; value: number }[];
+  // `display` overrides the number shown (e.g. a formatted amount).
+  rows: { label: string; value: number; display?: string }[];
   emptyLabel?: string;
 }) {
   const max = Math.max(0, ...rows.map((row) => row.value));
@@ -57,7 +58,9 @@ export function BarList({
         <li key={row.label}>
           <div className="flex justify-between text-sm">
             <span>{row.label}</span>
-            <span className="text-muted-foreground tabular-nums">{row.value}</span>
+            <span className="text-muted-foreground tabular-nums">
+              {row.display ?? row.value}
+            </span>
           </div>
           <div className="bg-muted mt-1 h-2 overflow-hidden rounded-full">
             <div
