@@ -30,6 +30,12 @@ export type PortalDashboard = {
  */
 export const portalDashboards: readonly PortalDashboard[] = [
   {
+    href: "/portal/director",
+    label: "Director",
+    description: "Revenue, receivables, pipeline and growth, read-only.",
+    roles: ["director", "super_admin"],
+  },
+  {
     href: "/portal/admin",
     label: "Main Admin",
     description: "Users, role assignment, audit log and system health.",
