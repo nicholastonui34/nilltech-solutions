@@ -20,6 +20,7 @@ import {
 import { TURNSTILE_SITE_KEY, TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { PrivacyLine } from "@/components/legal/privacy-line";
 import { trackEvent } from "@/lib/analytics";
+import { readAttribution } from "@/lib/attribution";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -63,6 +64,7 @@ export function ContactForm() {
       result = await submitContactForm({
         ...values,
         turnstileToken: turnstileToken ?? undefined,
+        attribution: readAttribution(),
       });
     } catch {
       setStatus("error");

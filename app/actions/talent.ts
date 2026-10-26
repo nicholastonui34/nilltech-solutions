@@ -3,6 +3,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { SUBMIT_ERROR_MESSAGE } from "@/lib/leads/schema";
 import { talentApplicationSchema } from "@/lib/talent/schema";
+import { RATE_LIMITED_MESSAGE, checkRateLimit } from "@/lib/rate-limit";
 import { TURNSTILE_FAILED_MESSAGE, verifyTurnstile } from "@/lib/turnstile";
 
 export type TalentSubmitResult = { ok: true } | { ok: false; error: string };
@@ -27,6 +28,9 @@ export async function submitTalentApplication(
   if (data.website) return { ok: false, error: SUBMIT_ERROR_MESSAGE }; // honeypot
   if (!(await verifyTurnstile(data.turnstileToken))) {
     return { ok: false, error: TURNSTILE_FAILED_MESSAGE };
+  }
+  if (!(await checkRateLimit("talent_application"))) {
+    return { ok: false, error: RATE_LIMITED_MESSAGE };
   }
 
   const admin = getSupabaseAdmin();

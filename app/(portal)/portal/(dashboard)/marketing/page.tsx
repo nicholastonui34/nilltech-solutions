@@ -23,7 +23,7 @@ export default async function MarketingPage() {
     <>
       <PageHeader
         title="Marketing"
-        description="What the site's forms are producing. Traffic and campaign data aren't connected yet."
+        description="What the site's forms are producing, and where those leads came from."
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -60,6 +60,28 @@ export default async function MarketingPage() {
             )}
           />
         </Panel>
+        <Panel
+          title="Leads by source"
+          description="Last 30 days. Campaign tags (utm_source / utm_medium) first, then the referring site. “Not recorded” means the lead came in before source tracking started."
+        >
+          <BarList
+            rows={countBy(last30, (r) => r.channel).map(([label, value]) => ({
+              label,
+              value,
+            }))}
+          />
+        </Panel>
+        <Panel
+          title="Leads by campaign"
+          description="Last 30 days, leads that arrived through a link tagged with utm_campaign."
+        >
+          <BarList
+            rows={countBy(
+              last30.filter((r) => r.campaign),
+              (r) => r.campaign ?? "",
+            ).map(([label, value]) => ({ label, value }))}
+          />
+        </Panel>
         <Panel title="Leads per week" description="Last 8 weeks, week starting Monday.">
           <BarList
             rows={weeklyCounts(rows, 8).map((b) => ({
@@ -72,12 +94,12 @@ export default async function MarketingPage() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <NotConnected
-          title="Website traffic & sources"
-          reason="No analytics provider is connected yet (CLAUDE.md §3 plans Cloudflare Web Analytics, free). Until then there's no visitor or referrer data."
-        />
-        <NotConnected
-          title="Campaign UTM tracking"
-          reason="The forms don't record utm_* parameters yet, so leads can't be attributed to campaigns. Small follow-up: save them into each lead's metadata."
+          title="Website traffic & page speed"
+          reason={
+            process.env.NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN
+              ? "Cloudflare Web Analytics is collecting visits, referrers and real-visitor page speed. View them in the Cloudflare dashboard under Analytics & Logs > Web Analytics."
+              : "Cloudflare Web Analytics (free, cookieless) is built in but switched off: add the site token as NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN in Vercel to start collecting visits and page speed."
+          }
         />
         <NotConnected
           title="Newsletter"

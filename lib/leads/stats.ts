@@ -9,7 +9,35 @@ export type LeadStatRow = {
   service_interest: string | null;
   tier: LeadTier;
   status: LeadStatus;
+  /** "utm source / medium", referring site, "Direct" or "Not recorded". */
+  channel: string;
+  campaign: string | null;
 };
+
+type StoredAttribution = {
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  referrer?: string;
+};
+
+// Leads created before attribution capture (Phase 8) have none stored.
+function channelOf(attribution: StoredAttribution | null) {
+  if (!attribution) return "Not recorded";
+  if (attribution.utmSource) {
+    return attribution.utmMedium
+      ? `${attribution.utmSource} / ${attribution.utmMedium}`
+      : attribution.utmSource;
+  }
+  if (attribution.referrer) {
+    try {
+      return new URL(attribution.referrer).hostname.replace(/^www\./, "");
+    } catch {
+      return attribution.referrer;
+    }
+  }
+  return "Direct";
+}
 
 /**
  * Lead rows for the Marketing/Analytics dashboards — only the columns the
@@ -22,10 +50,18 @@ export async function getLeadStatRows(): Promise<LeadStatRow[]> {
   if (!supabase) return [];
   const { data } = await supabase
     .from("leads")
-    .select("created_at, source, service_interest, tier, status")
+    .select(
+      "created_at, source, service_interest, tier, status, attribution:metadata->attribution",
+    )
     .order("created_at", { ascending: false })
     .limit(5000);
-  return data ?? [];
+  return (data ?? []).map(({ attribution, ...row }) => {
+    const stored =
+      attribution && typeof attribution === "object" && !Array.isArray(attribution)
+        ? (attribution as StoredAttribution)
+        : null;
+    return { ...row, channel: channelOf(stored), campaign: stored?.utmCampaign ?? null };
+  });
 }
 
 export function countBy<T>(rows: T[], key: (row: T) => string) {

@@ -24,7 +24,7 @@ export default function LegalPage() {
             <a
               key={doc.slug}
               href={`#${doc.anchor}`}
-              className="text-primary hover:underline"
+              className="text-primary underline underline-offset-2"
             >
               {doc.title}
             </a>

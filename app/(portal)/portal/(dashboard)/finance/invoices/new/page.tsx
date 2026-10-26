@@ -22,7 +22,10 @@ export default async function NewInvoicePage() {
         ) : (
           <p className="text-muted-foreground text-sm">
             You need a client first.{" "}
-            <Link href="/portal/finance/clients" className="text-primary hover:underline">
+            <Link
+              href="/portal/finance/clients"
+              className="text-primary underline underline-offset-2"
+            >
               Add one
             </Link>
             .

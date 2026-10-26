@@ -720,6 +720,15 @@ export type Database = {
     };
     Functions: {
       admin_database_size_bytes: { Args: never; Returns: number };
+      check_rate_limit: {
+        Args: {
+          p_bucket: string;
+          p_max_per_day: number;
+          p_max_per_window: number;
+          p_window_seconds: number;
+        };
+        Returns: boolean;
+      };
       get_talent_tax_pin: { Args: { _application_id: string }; Returns: string };
       has_role: {
         Args: {

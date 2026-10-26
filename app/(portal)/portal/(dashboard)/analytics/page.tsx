@@ -106,7 +106,11 @@ export default async function AnalyticsPage() {
         />
         <NotConnected
           title="Core Web Vitals (field data)"
-          reason="No real-user monitoring is connected. Cloudflare Web Analytics (free) would provide it; lab scores come from Lighthouse runs per phase."
+          reason={
+            process.env.NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN
+              ? "Cloudflare Web Analytics is collecting real-visitor Core Web Vitals (LCP, INP, CLS). View them in the Cloudflare dashboard under Analytics & Logs > Web Analytics > Core Web Vitals."
+              : "Cloudflare Web Analytics (free) is built in but switched off: add the site token as NEXT_PUBLIC_CF_WEB_ANALYTICS_TOKEN in Vercel to collect real-visitor Core Web Vitals."
+          }
         />
       </div>
     </>

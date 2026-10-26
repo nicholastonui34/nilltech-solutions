@@ -8,7 +8,7 @@ function Inline({ text }: { text: string }) {
     <>
       {parseInline(text).map((part, i) => {
         if (!("href" in part)) return <span key={i}>{part.text}</span>;
-        const className = "text-primary hover:underline";
+        const className = "text-primary underline underline-offset-2";
         if (part.href.startsWith("/")) {
           return (
             <Link key={i} href={part.href} className={className}>

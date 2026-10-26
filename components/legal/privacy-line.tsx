@@ -5,7 +5,7 @@ export function PrivacyLine({ purpose }: { purpose: string }) {
   return (
     <p className="text-muted-foreground text-xs">
       We use these details {purpose}. See our{" "}
-      <Link href="/legal#privacy" className="text-primary hover:underline">
+      <Link href="/legal#privacy" className="text-primary underline underline-offset-2">
         privacy notice
       </Link>{" "}
       for how we handle your data and your rights.

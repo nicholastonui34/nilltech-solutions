@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site.config";
+import { founders } from "@/lib/content/founders";
 
 /** JSON-LD builders — CLAUDE.md §14. Modelled as data, not hand-written per page. */
 
@@ -11,6 +12,8 @@ export function organizationSchema() {
     logo: `${siteConfig.url}/brand/nilltech-logo.jpg`,
     email: siteConfig.contact.email,
     telephone: siteConfig.contact.phone,
+    foundingDate: "2024-12-18",
+    founder: founders.map((f) => ({ "@type": "Person", name: f.name })),
   };
 }
 
