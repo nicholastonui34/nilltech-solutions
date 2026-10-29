@@ -206,6 +206,8 @@ function drawPaymentDetails(w: Writer, seller: SellerSnapshot, currency: Currenc
     ? [
         ["Paybill", seller.mpesa_paybill],
         ["Account number", seller.mpesa_account ?? "n/a"],
+        // The name M-Pesa shows the payer before they confirm.
+        ["Account name", seller.legal_name],
       ]
     : [];
   const bank: [string, string][] = seller.bank_account_number
