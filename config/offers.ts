@@ -42,6 +42,10 @@ export const offers: Offer[] = [
     cardLinkLabel: "See how our teams work",
     href: "/managed-teams",
     art: "managed-teams",
+    photo: {
+      src: "/photos/managed-teams.jpg",
+      alt: "A team working around a table with laptops and tablets",
+    },
     title: "Managed Tech Delivery Teams",
     shortDescription:
       "Dedicated engineers from East Africa, screened and managed by us, so you get a team without the overhead.",
@@ -52,6 +56,10 @@ export const offers: Offer[] = [
     cardLinkLabel: "Browse the Academy",
     href: "/academy",
     art: "academy",
+    photo: {
+      src: "/photos/academy.jpg",
+      alt: "A learner studying with a notebook and a laptop",
+    },
     title: "NillTech Academy",
     shortDescription:
       "Free, practical AI and software courses, with team training for companies on request.",
@@ -62,6 +70,10 @@ export const offers: Offer[] = [
     cardLinkLabel: "Explore partnerships",
     href: "/partnerships",
     art: "partnerships",
+    photo: {
+      src: "/photos/partnerships.jpg",
+      alt: "Two business partners shaking hands over a signed agreement",
+    },
     title: "Partnerships",
     shortDescription:
       "Delivery capacity for agencies and enterprises that need a reliable East African partner.",
