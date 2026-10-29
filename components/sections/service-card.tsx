@@ -66,6 +66,10 @@ export function ServiceCard({
               alt={photo.alt}
               fill
               sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
+              // Below the hero: keep these behind the hero's text, CSS and
+              // fonts on slow connections (LCP), and a little lighter.
+              fetchPriority="low"
+              quality={60}
               className="object-cover"
             />
           ) : art ? (

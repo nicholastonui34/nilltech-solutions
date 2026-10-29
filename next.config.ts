@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
     "/portal/documents/**": ["./public/brand/nilltech-mark-circle.png"],
     "/legal/**": ["./public/brand/nilltech-mark-circle.png"],
   },
+  // 75 is the default; 60 is for below-the-fold card photos (ServiceCard).
+  images: {
+    qualities: [60, 75],
+    formats: ["image/avif", "image/webp"],
+  },
   partialPrefetching: true,
   turbopack: {
     rules: {

@@ -19,7 +19,7 @@ hasn't supplied yet render nothing instead of fake proof.
 
 ## Photos to replace brand graphics (owner, 2026-10-29)
 
-**Stock photos in use (2026-10-29, supplied by the owner from free stock libraries):** `public/photos/managed-teams.jpg`, `academy.jpg` and `partnerships.jpg`, cropped to 5:3 at 1200x720. They are generic illustrations, not NillTech's people or clients; replace them with real photos when available. Owner to confirm each came from a free licence (Pexels or Unsplash free, not Unsplash+). An Unsplash+ image was rejected because Unsplash+ is a paid licence. Software Development and AI Solutions still use brand illustrations.
+**Stock photos in use (2026-10-29, supplied by the owner from free stock libraries):** `public/photos/services.jpg`, `managed-teams.jpg`, `academy.jpg` and `partnerships.jpg`, cropped to 5:3 at 1200x720. They are generic illustrations, not NillTech's people or clients; replace them with real photos when available. Owner to confirm each came from a free licence (Pexels or Unsplash free, not Unsplash+). An Unsplash+ image was rejected because Unsplash+ is a paid licence. AI Solutions still uses its brand illustration. Also rejected: a desk photo showing a Starbucks cup and another designer's website (implied endorsement).
 
 The five home-page offer cards show brand illustrations (`public/art/*.svg`) until real photos exist. To swap one in, put the photo in `public/photos/` (landscape, roughly 5:3, at least 1200 px wide) and set `photo: { src, alt }` on that offer in `config/offers.ts`. The "What's included" cards on the offer pages take an optional `photo` the same way (each page's `deliverables`).
 

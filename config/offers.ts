@@ -22,6 +22,10 @@ export const offers: Offer[] = [
     cardLinkLabel: "See services and prices",
     href: "/services",
     art: "services",
+    photo: {
+      src: "/photos/services.jpg",
+      alt: "A laptop showing code on a wooden desk, next to a coffee mug",
+    },
     title: "AI-Powered Software Development",
     shortDescription:
       "Websites, online stores, business systems and custom software, built and tested by one accountable team.",
