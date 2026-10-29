@@ -49,12 +49,16 @@ export function wrap(font: PDFFont, text: string, size: number, maxWidth: number
   return lines;
 }
 
+/**
+ * The circular brand mark (same as the site header): the gradient N on a
+ * white disc with a purple-to-blue ring, transparent outside the circle.
+ */
 export async function loadLogo(doc: PDFDocument) {
   try {
     const bytes = await readFile(
-      path.join(process.cwd(), "public/brand/nilltech-logo.jpg"),
+      path.join(process.cwd(), "public/brand/nilltech-mark-circle.png"),
     );
-    return await doc.embedJpg(bytes);
+    return await doc.embedPng(bytes);
   } catch {
     return null; // Documents still render without the logo.
   }
