@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Bot, MessageSquare, Puzzle, Zap } from "lucide-react";
 
 import {
   OfferPageContent,
@@ -30,35 +29,38 @@ const data: OfferPageData = {
     "SME owners answering the same customer questions every day",
     "Operations leads buried in manual admin and data entry",
     "Teams that want AI in their existing tools, not another app",
+    "Growing companies that need AI running in production, not just a pilot",
   ],
   startingFrom: "KES 40,000 setup · USD 450 (international)",
   deliverables: [
     {
-      icon: MessageSquare,
       title: "Customer assistants",
       description:
         "AI assistants on WhatsApp and your website that answer questions, take bookings and hand over to a person when needed.",
       href: "/estimate",
     },
     {
-      icon: Zap,
       title: "Workflow automation",
       description:
         "Automate follow-ups, reminders, reports and data entry between the tools you already use.",
       href: "/estimate",
     },
     {
-      icon: Bot,
       title: "Knowledge assistants",
       description:
         "Let your team ask questions of your own documents, policies and price lists, with answers that point to the source.",
       href: "/estimate",
     },
     {
-      icon: Puzzle,
       title: "AI integrations",
       description:
         "Add AI to your CRM, M-Pesa flows, email or internal systems to read documents, sort requests and draft replies.",
+      href: "/estimate",
+    },
+    {
+      title: "Monitoring and guardrails",
+      description:
+        "Safety checks and limits built in before launch, then tracking of answer quality and costs in production so the system keeps performing.",
       href: "/estimate",
     },
   ],

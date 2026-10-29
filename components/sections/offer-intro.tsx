@@ -4,10 +4,17 @@ type OfferIntroProps = {
   summary: string;
   audience: string[];
   startingFrom: string;
+  /** Label above the price, for offers quoted per project instead of from a published price. */
+  priceLabel?: string;
 };
 
 /** "Who it's for" + "Starting from" — the answer-first block every offer page needs (CLAUDE.md §4). */
-export function OfferIntro({ summary, audience, startingFrom }: OfferIntroProps) {
+export function OfferIntro({
+  summary,
+  audience,
+  startingFrom,
+  priceLabel = "Starting from",
+}: OfferIntroProps) {
   return (
     <section className="py-16">
       <Container className="grid gap-10 lg:grid-cols-3">
@@ -25,7 +32,7 @@ export function OfferIntro({ summary, audience, startingFrom }: OfferIntroProps)
           </div>
           <div>
             <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              Starting from
+              {priceLabel}
             </p>
             <p className="mt-1 text-xl font-semibold">{startingFrom}</p>
           </div>

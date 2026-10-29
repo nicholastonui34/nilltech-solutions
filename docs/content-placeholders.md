@@ -17,7 +17,23 @@ hasn't supplied yet render nothing instead of fake proof.
 | `/academy` free courses       | Course list, lessons, optional videos                                                                       | `lib/content/courses.ts`                            |
 | `/blog` posts                 | Real posts                                                                                                  | `lib/content/blog-posts.ts`                         |
 
+## Photos to replace brand graphics (owner, 2026-10-29)
+
+**Stock photos in use (2026-10-29, supplied by the owner from free stock libraries):** `public/photos/services.jpg`, `managed-teams.jpg`, `academy.jpg` and `partnerships.jpg`, cropped to 5:3 at 1200x720. They are generic illustrations, not NillTech's people or clients; replace them with real photos when available. Owner to confirm each came from a free licence (Pexels or Unsplash free, not Unsplash+). An Unsplash+ image was rejected because Unsplash+ is a paid licence. AI Solutions uses a custom workflow illustration (`public/art/ai-solutions.svg`: new order, AI assistant, check stock, create invoice, send receipt), drawn in-house so there is no licence to track. Also rejected: two more Unsplash+ chat images, a Freepik-sized AI workflow preview (attribution or paid licence, too small, cut-off labels), and a desk photo showing a Starbucks cup and another designer's website (implied endorsement).
+
+The five home-page offer cards show brand illustrations (`public/art/*.svg`) until real photos exist. To swap one in, put the photo in `public/photos/` (landscape, roughly 5:3, at least 1200 px wide) and set `photo: { src, alt }` on that offer in `config/offers.ts`. The "What's included" cards on the offer pages take an optional `photo` the same way (each page's `deliverables`).
+
+| Card                            | Suggested shot                                           |
+| ------------------------------- | -------------------------------------------------------- |
+| AI-Powered Software Development | The team building or reviewing a website or app          |
+| AI Solutions for SMEs           | A WhatsApp or website assistant in use, or a demo        |
+| Managed Tech Delivery Teams     | The team at work, a stand-up or planning session         |
+| NillTech Academy                | A training session or a learner working through a course |
+| Partnerships                    | A meeting with a partner (with their permission)         |
+
 ## Statements written as policy: owner to confirm
+
+- `/ai-data-services` (2026-10-29): every project starts with written guidelines and a pilot batch the client reviews; reviewers check the team's work in production; NDA available before data is shared; "Quoted per project" in place of a starting price.
 
 These describe how NillTech works. They aren't stats or claims about
 clients, but they are commitments, so confirm or change them:

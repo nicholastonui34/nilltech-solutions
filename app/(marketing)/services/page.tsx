@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Code2, Globe, Layers, ShoppingCart } from "lucide-react";
 
 import {
   OfferPageContent,
@@ -34,28 +33,24 @@ const data: OfferPageData = {
   startingFrom: "KES 45,000 · USD 500 (international)",
   deliverables: [
     {
-      icon: Globe,
       title: "Websites",
       description:
         "Fast, mobile-first business websites that rank on Google and turn visitors into enquiries. From KES 45,000, live in 1 to 7 days.",
       href: "/estimate",
     },
     {
-      icon: ShoppingCart,
       title: "E-commerce",
       description:
         "Online stores with M-Pesa and card checkout built in, product management and order tracking. From KES 95,000, in 1 to 2 weeks.",
       href: "/estimate",
     },
     {
-      icon: Layers,
       title: "Business Systems",
       description:
         "School management, inventory, bookings, HR and other internal tools that replace spreadsheets and paperwork. From KES 180,000.",
       href: "/estimate",
     },
     {
-      icon: Code2,
       title: "Custom Software",
       description:
         "Web apps and platforms built around how your business actually works, with integrations to M-Pesa, CRMs and accounting tools. From KES 250,000.",
@@ -99,6 +94,11 @@ const data: OfferPageData = {
       question: "Do I own the website and code?",
       answer:
         "Yes. Ownership of the code and design we create for you passes to you once the project is paid in full.",
+    },
+    {
+      question: "What do I receive at handover?",
+      answer:
+        "The finished product, deployed and tested, plus the source code with its version history, technical documentation and deployment guides, the test reports, and a handover session with your team.",
     },
     {
       question: "What happens after launch?",

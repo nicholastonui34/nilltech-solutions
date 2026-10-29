@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { FileBarChart, ShieldCheck, TrendingUp, Users } from "lucide-react";
 
 import {
   OfferPageContent,
@@ -34,28 +33,24 @@ const data: OfferPageData = {
   startingFrom: "KES 180,000 · USD 1,800 per developer / month",
   deliverables: [
     {
-      icon: Users,
       title: "Dedicated team",
       description:
         "Engineers who work on your product only, matched to your stack and time zone, screened by our recruitment team.",
       href: "/contact",
     },
     {
-      icon: ShieldCheck,
       title: "Delivery oversight",
       description:
         "We manage the day to day: code review, testing and a QA checklist on every delivery, so quality doesn't depend on you checking.",
       href: "/contact",
     },
     {
-      icon: TrendingUp,
       title: "Flexible scaling",
       description:
         "Add or reduce engineers as your roadmap changes, without recruitment cycles or long notice periods.",
       href: "/contact",
     },
     {
-      icon: FileBarChart,
       title: "Transparent reporting",
       description:
         "Regular progress updates on what shipped, what's next and what's blocked, with one accountable contact at NillTech.",
@@ -103,6 +98,16 @@ const data: OfferPageData = {
       question: "Where are your engineers based?",
       answer:
         "Across East Africa: Kenya, Uganda, Tanzania and Rwanda. Every engineer is screened by our recruitment team and completes a test task before joining a client team.",
+    },
+    {
+      question: "Can your engineers join our existing team?",
+      answer:
+        "Yes. Engineers can work inside your tools, processes and meetings while NillTech keeps responsibility for their reporting, quality and delivery standards. You get regular status reports and a clear route to raise issues.",
+    },
+    {
+      question: "What happens when the engagement ends?",
+      answer:
+        "We run a planned handover: documentation and knowledge transfer to your team, so the work continues without us.",
     },
     {
       question: "Who owns the work?",

@@ -36,6 +36,7 @@ export const honeypotSchema = z.object({
 export const SERVICE_INTEREST_VALUES = [
   "services",
   "ai-solutions",
+  "ai-data-services",
   "managed-teams",
   "academy",
   "partnerships",

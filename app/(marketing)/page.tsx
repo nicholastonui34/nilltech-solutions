@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CtaBand } from "@/components/sections/cta-band";
 import { Container } from "@/components/sections/container";
 import { Hero } from "@/components/sections/hero";
-import { ServiceCard } from "@/components/sections/service-card";
+import { accentAt, ServiceCard } from "@/components/sections/service-card";
 import { offers } from "@/config/offers";
 import { siteConfig } from "@/config/site.config";
 import { buildMetadata } from "@/lib/seo";
@@ -30,10 +30,12 @@ export default function HomePage() {
         <Container>
           <h2 className="mb-10 text-2xl font-semibold">What we deliver</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {offers.map((offer) => (
+            {offers.map((offer, i) => (
               <ServiceCard
                 key={offer.slug}
-                icon={offer.icon}
+                art={offer.art}
+                photo={offer.photo}
+                accent={accentAt(i)}
                 title={offer.title}
                 description={offer.shortDescription}
                 href={offer.href}
