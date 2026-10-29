@@ -17,7 +17,13 @@ export type CurrencyTotals = {
 
 export type ShareholderOverview = {
   totalShares: number;
-  holding: { name: string; shares: number; holderType: string } | null;
+  holding: {
+    name: string;
+    shares: number;
+    holderType: string;
+    /** Registered ownership %, when the register states one. */
+    ownershipPercent: number | null;
+  } | null;
   currencies: Record<Currency, CurrencyTotals>;
 };
 
@@ -68,20 +74,34 @@ export async function getShareholderOverview(): Promise<ShareholderOverview | nu
           name: String(holding.name),
           shares: num(holding.shares),
           holderType: String(holding.holder_type),
+          ownershipPercent:
+            holding.ownership_percent === null || holding.ownership_percent === undefined
+              ? null
+              : num(holding.ownership_percent),
         }
       : null,
     currencies,
   };
 }
 
-/** Ownership as a percentage with two decimals, from share counts only. */
-export function ownershipPercent(shares: number, totalShares: number) {
-  return totalShares > 0 ? (shares / totalShares) * 100 : 0;
+/**
+ * Ownership %: the registered figure when the register states one (it can
+ * differ from the share arithmetic by rounding, e.g. 29.34% for 352 of
+ * 1,200 shares), otherwise derived from share counts.
+ */
+export function ownershipPercent(
+  holder: { shares: number; ownershipPercent?: number | null },
+  totalShares: number,
+) {
+  if (holder.ownershipPercent !== null && holder.ownershipPercent !== undefined) {
+    return holder.ownershipPercent;
+  }
+  return totalShares > 0 ? (holder.shares / totalShares) * 100 : 0;
 }
 
-/** Value of a holding: its share of a company-level amount (minor units). */
-export function holdingValue(amountMinor: number, shares: number, totalShares: number) {
-  return totalShares > 0 ? Math.round((amountMinor * shares) / totalShares) : 0;
+/** Value of a holding: its ownership % of a company-level amount (minor units). */
+export function holdingValue(amountMinor: number, percent: number) {
+  return Math.round((amountMinor * percent) / 100);
 }
 
 export const formatPercent = (value: number) => `${value.toFixed(2)}%`;

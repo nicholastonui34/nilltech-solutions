@@ -606,6 +606,7 @@ export type Database = {
           holder_type: string;
           id: string;
           name: string;
+          ownership_percent: number | null;
           shares: number;
           updated_at: string;
           user_id: string | null;
@@ -615,6 +616,7 @@ export type Database = {
           holder_type: string;
           id?: string;
           name: string;
+          ownership_percent?: number | null;
           shares: number;
           updated_at?: string;
           user_id?: string | null;
@@ -624,6 +626,7 @@ export type Database = {
           holder_type?: string;
           id?: string;
           name?: string;
+          ownership_percent?: number | null;
           shares?: number;
           updated_at?: string;
           user_id?: string | null;
