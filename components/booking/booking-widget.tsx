@@ -237,7 +237,12 @@ export function BookingWidget() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit, onInvalid)}
-      className="flex flex-col gap-10"
+      // Keep the loaded form's height while times load (no jump), but let the
+      // page close up when there are no times to show.
+      className={cn(
+        "flex flex-col gap-10",
+        availability.state === "loading" && "min-h-[1550px] sm:min-h-[1000px]",
+      )}
       noValidate
     >
       {/* Honeypot: visually hidden, real visitors never fill it in. */}
@@ -283,7 +288,11 @@ export function BookingWidget() {
           jump down when the times arrive (CLS). */}
       <fieldset
         id="pick-a-time"
-        className="min-h-[26.5rem] min-w-0 scroll-mt-24 sm:min-h-[20.5rem]"
+        className={cn(
+          "min-w-0 scroll-mt-24",
+          (availability.state === "loading" || hasTimes) &&
+            "min-h-[26.5rem] sm:min-h-[20.5rem]",
+        )}
       >
         <legend className="text-lg font-semibold">2. Pick a time</legend>
         <p className="text-muted-foreground mt-1 text-sm">

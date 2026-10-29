@@ -24,12 +24,15 @@ export default function BookPage() {
           working on and you&rsquo;ll leave with a clear next step, whether that&rsquo;s a
           project plan, a team proposal or a demo.
         </p>
-        {/* Reserves the form's height (measured: about 1,650 px on phones,
-            1,110 px from sm up) so nothing jumps when it renders (CLS). */}
-        <div className="mt-12 min-h-[1650px] sm:min-h-[1110px]">
+        <div className="mt-12">
           <Suspense
             fallback={
-              <p className="text-muted-foreground text-sm" role="status">
+              // Reserves the form's height (measured: about 1,650 px on phones,
+              // 1,110 px from sm up) so nothing jumps when it renders (CLS).
+              <p
+                className="text-muted-foreground min-h-[1650px] text-sm sm:min-h-[1110px]"
+                role="status"
+              >
                 Loading the booking form…
               </p>
             }
