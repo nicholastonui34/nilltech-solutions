@@ -100,6 +100,16 @@ const data: OfferPageData = {
         "Across East Africa: Kenya, Uganda, Tanzania and Rwanda. Every engineer is screened by our recruitment team and completes a test task before joining a client team.",
     },
     {
+      question: "Can your engineers join our existing team?",
+      answer:
+        "Yes. Engineers can work inside your tools, processes and meetings while NillTech keeps responsibility for their reporting, quality and delivery standards. You get regular status reports and a clear route to raise issues.",
+    },
+    {
+      question: "What happens when the engagement ends?",
+      answer:
+        "We run a planned handover: documentation and knowledge transfer to your team, so the work continues without us.",
+    },
+    {
       question: "Who owns the work?",
       answer:
         "You do. Ownership of everything the team builds for you passes to you on payment, as set out in our terms.",

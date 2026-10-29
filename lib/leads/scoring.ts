@@ -31,7 +31,12 @@ const companySizePoints: Record<NonNullable<LeadScoringInput["companySize"]>, nu
   solo: 0,
 };
 
-const highPriorityServices = new Set(["services", "ai-solutions", "managed-teams"]);
+const highPriorityServices = new Set([
+  "services",
+  "ai-solutions",
+  "ai-data-services",
+  "managed-teams",
+]);
 
 const regionPoints: Record<NonNullable<LeadScoringInput["region"]>, number> = {
   "secondary-market": 2,

@@ -15,7 +15,7 @@ export type Offer = {
   primaryCta: CtaIntent;
 };
 
-/** The five offers from CLAUDE.md §4 — single source for home-page grid + nav-adjacent references. */
+/** The six offers from CLAUDE.md §4 — single source for home-page grid + nav-adjacent references. */
 export const offers: Offer[] = [
   {
     slug: "services",
@@ -40,6 +40,16 @@ export const offers: Offer[] = [
     shortDescription:
       "WhatsApp and website assistants, automations and AI integrations that save your team hours every week.",
     primaryCta: "demo",
+  },
+  {
+    slug: "ai-data-services",
+    cardLinkLabel: "See AI data services",
+    href: "/ai-data-services",
+    art: "ai-data-services",
+    title: "AI Training and Data Annotation",
+    shortDescription:
+      "Managed teams for AI companies: RLHF, model evaluation and annotation of image, text, audio and video data.",
+    primaryCta: "discovery-call",
   },
   {
     slug: "managed-teams",

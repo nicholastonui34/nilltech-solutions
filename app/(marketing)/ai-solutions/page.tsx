@@ -29,6 +29,7 @@ const data: OfferPageData = {
     "SME owners answering the same customer questions every day",
     "Operations leads buried in manual admin and data entry",
     "Teams that want AI in their existing tools, not another app",
+    "Growing companies that need AI running in production, not just a pilot",
   ],
   startingFrom: "KES 40,000 setup · USD 450 (international)",
   deliverables: [
@@ -54,6 +55,12 @@ const data: OfferPageData = {
       title: "AI integrations",
       description:
         "Add AI to your CRM, M-Pesa flows, email or internal systems to read documents, sort requests and draft replies.",
+      href: "/estimate",
+    },
+    {
+      title: "Monitoring and guardrails",
+      description:
+        "Safety checks and limits built in before launch, then tracking of answer quality and costs in production so the system keeps performing.",
       href: "/estimate",
     },
   ],

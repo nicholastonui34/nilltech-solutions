@@ -36,6 +36,7 @@ export type OfferPageData = {
   summary: string;
   audience: string[];
   startingFrom: string;
+  priceLabel?: string;
   deliverables: Deliverable[];
   process: Step[];
   faq: FaqItem[];
@@ -65,6 +66,7 @@ export function OfferPageContent({ data }: { data: OfferPageData }) {
         summary={data.summary}
         audience={data.audience}
         startingFrom={data.startingFrom}
+        priceLabel={data.priceLabel}
       />
 
       <section className="py-4">

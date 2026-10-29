@@ -13,6 +13,10 @@ Rwanda, with secondary reach into the US, UK and Canada.
   organisations.
 - [AI Solutions for SMEs](https://nilltechsolutions.com/ai-solutions): automation, chatbots and AI
   integrations for SME owners and ops leads.
+- [AI Training and Data Annotation](https://nilltechsolutions.com/ai-data-services): managed
+  human-in-the-loop teams in East Africa for AI startups and companies building AI products: RLHF,
+  preference ranking, model and chatbot evaluation, content review, and annotation and validation of
+  image, text, audio, video and document data. Quoted per project after a pilot batch.
 - [Managed Tech Delivery Teams](https://nilltechsolutions.com/managed-teams): a dedicated,
   accountable delivery team for companies outsourcing software and AI work.
 - [NillTech Academy](https://nilltechsolutions.com/academy): free AI and software courses, no sign-up needed (paid courses

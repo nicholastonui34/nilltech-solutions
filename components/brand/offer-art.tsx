@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 /**
- * Brand illustrations for the five offers (owner, 2026-10-29: custom brand
+ * Brand illustrations for the six offers (owner, 2026-10-29: custom brand
  * graphics until real photos exist). Static SVGs in public/art/ (~3 KB each),
  * lazy-loaded so they never compete with the hero for LCP; inlining them
  * nearly doubled the home page HTML. No faces, and text only as short
@@ -13,7 +13,12 @@ import Image from "next/image";
  */
 
 export type OfferArtKey =
-  "services" | "ai-solutions" | "managed-teams" | "academy" | "partnerships";
+  | "services"
+  | "ai-solutions"
+  | "ai-data-services"
+  | "managed-teams"
+  | "academy"
+  | "partnerships";
 
 export function OfferArt({ art }: { art: OfferArtKey }) {
   return (

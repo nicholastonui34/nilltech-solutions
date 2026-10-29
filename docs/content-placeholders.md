@@ -33,6 +33,8 @@ The five home-page offer cards show brand illustrations (`public/art/*.svg`) unt
 
 ## Statements written as policy: owner to confirm
 
+- `/ai-data-services` (2026-10-29): every project starts with written guidelines and a pilot batch the client reviews; reviewers check the team's work in production; NDA available before data is shared; "Quoted per project" in place of a starting price.
+
 These describe how NillTech works. They aren't stats or claims about
 clients, but they are commitments, so confirm or change them:
 

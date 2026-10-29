@@ -72,18 +72,21 @@ Verify every price on the vendor's live pricing page before committing, and reco
 
 ## 4. Information architecture & offers
 
-Primary nav (max 6): **Services · AI Solutions · Managed Teams · Academy · Pricing · Podcast** + primary CTA button. Secondary/footer: About, Partnerships, Case Studies, Blog/Insights, Careers, Contact, Legal.
+Primary nav (max 6): **Services · AI Solutions · AI Data · Managed Teams · Academy · Pricing** + primary CTA button. Secondary/footer: About, Partnerships, Case Studies, Podcast, Blog/Insights, Careers, Contact, Legal. (Podcast moved to the footer 2026-10-29 to make room for AI Data; move it back once episodes exist.)
 
-| Offer                                                                            | Route              | Primary CTA                | Audience                                           |
-| -------------------------------------------------------------------------------- | ------------------ | -------------------------- | -------------------------------------------------- |
-| AI-Powered Software Development (websites, custom software, e-commerce, systems) | `/services/*`      | Get a Quote (AI estimator) | SMEs, schools, churches, e-commerce, organisations |
-| AI Solutions for SMEs (automation, chatbots, AI integrations)                    | `/ai-solutions/*`  | Book a Demo                | SME owners/ops leads                               |
-| Managed Tech Delivery Teams                                                      | `/managed-teams/*` | Book a Discovery Call      | B2B companies outsourcing work                     |
-| NillTech Academy — free + paid AI & software courses                             | `/academy/*`       | Start Free / Enrol         | Learners, career-switchers, teams                  |
-| Partnerships — B2B outsourcing & vetted teams                                    | `/partnerships`    | Contact Sales              | Agencies, enterprises, international firms         |
+| Offer                                                                                | Route               | Primary CTA                | Audience                                           |
+| ------------------------------------------------------------------------------------ | ------------------- | -------------------------- | -------------------------------------------------- |
+| AI-Powered Software Development (websites, custom software, e-commerce, systems)     | `/services/*`       | Get a Quote (AI estimator) | SMEs, schools, churches, e-commerce, organisations |
+| AI Solutions for SMEs (automation, chatbots, AI integrations)                        | `/ai-solutions/*`   | Book a Demo                | SME owners/ops leads                               |
+| AI Training and Data Annotation (RLHF, model evaluation, content review, annotation) | `/ai-data-services` | Book a Discovery Call      | AI startups and companies building AI products     |
+| Managed Tech Delivery Teams                                                          | `/managed-teams/*`  | Book a Discovery Call      | B2B companies outsourcing work                     |
+| NillTech Academy — free + paid AI & software courses                                 | `/academy/*`        | Start Free / Enrol         | Learners, career-switchers, teams                  |
+| Partnerships — B2B outsourcing & vetted teams                                        | `/partnerships`     | Contact Sales              | Agencies, enterprises, international firms         |
 
 - Position NillTech as a **leading East African provider of localised managed software and AI delivery teams** — defensible language only, no unverifiable "first/only" claims.
-- **Out of scope for now:** LLM training, data annotation, RLHF, AI data operations. Do not mention these anywhere on the site, schema, or `llms.txt`. Keep the IA flexible enough to add an offer page later without restructuring.
+- **Strategy source:** the Where to Play workshop (`docs/strategy/where-to-play.md`). Its three focus areas are Rapid Website Development, AI Startup Support and AI for All.
+- **AI training and data annotation are in scope** (owner decision 2026-10-29, from the workshop's "AI Startup Support": chatbot training and data annotation, pursue now). This reverses the earlier out-of-scope rule. No published price yet: `/ai-data-services` says "Quoted per project" until the owner sets one.
+- **Dropped:** Delivery Rescue and Scale-Up from the previous site (not in the workshop).
 - Each service page: answer-first intro, who it's for, deliverables, process, "Starting from" price, FAQ, proof, one primary CTA repeated (hero, mid, end).
 - **Open gap, needs a decision before routing is built:** this spec doesn't name a route pattern for case studies beyond a footer "Case Studies" link. Default to `/work/[slug]` (matches the proof/case-study data model already implied elsewhere) unless told otherwise — flagged in Conflicts below.
 
@@ -322,7 +325,10 @@ Last tidied 2026-10-29. Grouped by what the owner needs to do. Resolved items ar
 - **Testimonials and case studies.** Proof sections stay hidden until real ones exist.
 - **Podcast:** YouTube channel URL and episode list (`lib/content/podcast-episodes.ts`).
 - **Academy:** course list, and pricing for paid courses (`lib/content/courses.ts`).
-- **"Where to Play" strategy doc.** Not in this repo; useful before revisiting IA and keyword targets.
+
+- **Previous site claims to confirm before reuse:** timelines (AI delivery 4 to 12 weeks, software teams 6 to 20 weeks), quote within 24 hours, 30-day post-launch support window, the 5-stage vetting process with Tier 1 to 3 placement. Left off the new site until confirmed.
+- **Boxora Containers and Nyoomba:** listed as "Proof of Work" on the previous site. Confirm whether they're client projects that can be published as case studies on `/work`.
+- **AI data services pricing:** a starting price, or keep "Quoted per project".
 
 ### Legal and compliance
 

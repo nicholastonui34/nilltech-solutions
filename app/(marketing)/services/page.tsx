@@ -96,6 +96,11 @@ const data: OfferPageData = {
         "Yes. Ownership of the code and design we create for you passes to you once the project is paid in full.",
     },
     {
+      question: "What do I receive at handover?",
+      answer:
+        "The finished product, deployed and tested, plus the source code with its version history, technical documentation and deployment guides, the test reports, and a handover session with your team.",
+    },
+    {
       question: "What happens after launch?",
       answer:
         "Bug fixes are free for the period stated in your proposal. New features and changes are quoted separately, and hosting or third-party services are billed at cost.",

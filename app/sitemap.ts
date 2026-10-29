@@ -10,6 +10,7 @@ const staticRoutes = [
   "",
   "/services",
   "/ai-solutions",
+  "/ai-data-services",
   "/managed-teams",
   "/academy",
   "/pricing",
