@@ -28,7 +28,7 @@ export default async function InvestorPage() {
   if (!overview) return <NoAccess />;
 
   const { holding, totalShares, currencies } = overview;
-  const percent = holding ? ownershipPercent(holding.shares, totalShares) : 0;
+  const percent = holding ? ownershipPercent(holding, totalShares) : 0;
   const shown = CURRENCIES.filter(
     (currency, i) => i === 0 || hasActivity(currencies[currency]),
   );
@@ -86,10 +86,7 @@ export default async function InvestorPage() {
                 label="Your shares are worth"
                 value={
                   holding
-                    ? formatMoney(
-                        holdingValue(t.netWorth, holding.shares, totalShares),
-                        currency,
-                      )
+                    ? formatMoney(holdingValue(t.netWorth, percent), currency)
                     : "n/a"
                 }
                 hint={

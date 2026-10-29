@@ -156,6 +156,14 @@ const shareholderSchema = z.object({
   name: z.string().trim().min(1, "Enter the shareholder's name.").max(200),
   shares: z.coerce.number().int().positive("Shares must be a whole number above zero."),
   holderType: z.enum(["director", "investor"]),
+  ownershipPercent: z
+    .string()
+    .trim()
+    .transform((v) => (v ? Number(v) : null))
+    .refine(
+      (v) => v === null || (Number.isFinite(v) && v > 0 && v <= 100),
+      "Registered % must be between 0 and 100.",
+    ),
   userId: z
     .string()
     .transform((v) => v || null)
@@ -170,6 +178,7 @@ function shareholderFields(formData: FormData) {
     name: formData.get("name") ?? "",
     shares: formData.get("shares") ?? "",
     holderType: formData.get("holderType") ?? "",
+    ownershipPercent: formData.get("ownershipPercent") ?? "",
     userId: formData.get("userId") ?? "",
   });
 }
@@ -188,6 +197,7 @@ export async function addShareholder(formData: FormData) {
     name: fields.name,
     shares: fields.shares,
     holder_type: fields.holderType,
+    ownership_percent: fields.ownershipPercent,
     user_id: fields.userId,
   });
   if (error) {
@@ -210,6 +220,7 @@ export async function updateShareholder(formData: FormData) {
       name: fields.name,
       shares: fields.shares,
       holder_type: fields.holderType,
+      ownership_percent: fields.ownershipPercent,
       user_id: fields.userId,
     })
     .eq("id", id);

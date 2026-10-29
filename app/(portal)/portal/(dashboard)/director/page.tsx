@@ -76,7 +76,7 @@ export default async function DirectorPage() {
   const [{ data: holders }, overview] = await Promise.all([
     supabase
       .from("shareholders")
-      .select("id, name, shares, holder_type, user_id")
+      .select("id, name, shares, holder_type, user_id, ownership_percent")
       .order("shares", { ascending: false })
       .order("name"),
     getShareholderOverview(),

@@ -8,6 +8,7 @@ type Holder = {
   shares: number;
   holder_type: string;
   user_id: string | null;
+  ownership_percent: number | null;
 };
 
 const shareCount = new Intl.NumberFormat("en-KE");
@@ -32,6 +33,8 @@ export function ShareRegister({
 }) {
   const total = holders.reduce((sum, h) => sum + h.shares, 0);
   const mine = holders.find((h) => h.user_id === currentUserId);
+  const pct = (h: Holder) =>
+    ownershipPercent({ shares: h.shares, ownershipPercent: h.ownership_percent }, total);
 
   return (
     <Panel
@@ -42,9 +45,9 @@ export function ShareRegister({
         <p className="bg-muted/60 mb-4 rounded-lg p-3 text-sm">
           You hold{" "}
           <span className="font-semibold">{shareCount.format(mine.shares)} shares</span> (
-          {formatPercent(ownershipPercent(mine.shares, total))}), worth{" "}
+          {formatPercent(pct(mine))}), worth{" "}
           <span className="font-semibold">
-            {formatMoney(holdingValue(netWorthKes, mine.shares, total), "KES")}
+            {formatMoney(holdingValue(netWorthKes, pct(mine)), "KES")}
           </span>{" "}
           at book value.
         </p>
@@ -75,10 +78,10 @@ export function ShareRegister({
                     {shareCount.format(h.shares)}
                   </td>
                   <td className="py-2 pr-4 text-right tabular-nums">
-                    {formatPercent(ownershipPercent(h.shares, total))}
+                    {formatPercent(pct(h))}
                   </td>
                   <td className="py-2 text-right tabular-nums">
-                    {formatMoney(holdingValue(netWorthKes, h.shares, total), "KES")}
+                    {formatMoney(holdingValue(netWorthKes, pct(h)), "KES")}
                   </td>
                 </tr>
               ))}

@@ -21,6 +21,7 @@ type Holder = {
   shares: number;
   holder_type: string;
   user_id: string | null;
+  ownership_percent: number | null;
 };
 
 function HolderFields({
@@ -32,7 +33,7 @@ function HolderFields({
 }) {
   const id = holder?.id ?? "new";
   return (
-    <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1.5fr_2fr]">
+    <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_1.5fr_2fr]">
       <div>
         <Label htmlFor={`name-${id}`}>Name</Label>
         <Input
@@ -53,6 +54,17 @@ function HolderFields({
           step={1}
           defaultValue={holder?.shares}
           required
+          className="mt-1.5"
+        />
+      </div>
+      <div>
+        <Label htmlFor={`pct-${id}`}>Registered %</Label>
+        <Input
+          id={`pct-${id}`}
+          name="ownershipPercent"
+          inputMode="decimal"
+          defaultValue={holder?.ownership_percent ?? ""}
+          placeholder="Auto"
           className="mt-1.5"
         />
       </div>
@@ -97,7 +109,7 @@ export default async function ShareholdersPage() {
   const [{ data }, authUsers] = await Promise.all([
     supabase
       .from("shareholders")
-      .select("id, name, shares, holder_type, user_id")
+      .select("id, name, shares, holder_type, user_id, ownership_percent")
       .order("shares", { ascending: false })
       .order("name"),
     listAuthUsers(),
@@ -105,6 +117,11 @@ export default async function ShareholdersPage() {
   const holders = data ?? [];
   const users = (authUsers ?? []).map((u) => ({ id: u.id, email: u.email }));
   const total = holders.reduce((sum, h) => sum + h.shares, 0);
+  const pct = (h: Holder) =>
+    ownershipPercent({ shares: h.shares, ownershipPercent: h.ownership_percent }, total);
+  // Registered percentages should add up to 100; flag it when they don't.
+  const pctTotal = holders.reduce((sum, h) => sum + pct(h), 0);
+  const pctOff = holders.length > 0 && Math.abs(pctTotal - 100) > 0.005;
 
   return (
     <>
@@ -116,8 +133,17 @@ export default async function ShareholdersPage() {
 
       <Panel
         title={`Shareholders · ${new Intl.NumberFormat("en-KE").format(total)} shares in issue`}
-        description="Link each holder to their portal login so their dashboard shows their shares. Investors also need the Investor role (Users & roles); directors need the Director role."
+        description="Registered % is the figure from the company's share register; leave it blank to calculate from share counts. Link each holder to their portal login so their dashboard shows their shares. Investors also need the Investor role (Users & roles); directors need the Director role."
       >
+        {pctOff ? (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+          >
+            Ownership adds up to {formatPercent(pctTotal)}, not 100%. Check the registered
+            percentages.
+          </p>
+        ) : null}
         {authUsers === null ? (
           <p className="text-muted-foreground mb-4 text-sm">
             SUPABASE_SERVICE_ROLE_KEY isn&rsquo;t set, so portal logins can&rsquo;t be
@@ -135,7 +161,7 @@ export default async function ShareholdersPage() {
                     Save
                   </Button>
                   <span className="text-muted-foreground text-sm">
-                    {formatPercent(ownershipPercent(holder.shares, total))} of the company
+                    {formatPercent(pct(holder))} of the company
                   </span>
                 </div>
               </form>
