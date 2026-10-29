@@ -1,6 +1,6 @@
 import { AdminTabs } from "@/components/portal/admin-tabs";
 import { PageHeader } from "@/components/portal/page-header";
-import { NoAccess, NotConnected, Panel, StatCard } from "@/components/portal/panel";
+import { NoAccess, Panel, StatCard } from "@/components/portal/panel";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { daysAgoIso, formatBytes, formatDateTime } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -58,6 +58,18 @@ const statusStyles: Record<Integration["status"], string> = {
   deferred: "bg-muted text-muted-foreground",
 };
 
+const triggerStyles = {
+  triggered: "bg-amber-100 text-amber-900",
+  ok: "bg-emerald-100 text-emerald-800",
+  check: "bg-muted text-muted-foreground",
+} as const;
+
+const triggerLabels = {
+  triggered: "triggered",
+  ok: "ok",
+  check: "check in Vercel",
+} as const;
+
 export default async function AdminHealthPage() {
   const user = await getUserWithRole(["super_admin"]);
   if (!user) return <NoAccess />;
@@ -67,24 +79,33 @@ export default async function AdminHealthPage() {
 
   const weekAgo = daysAgoIso(7);
 
-  const [dbSize, leadsTotal, leadsWeek, failedRuns] = await Promise.all([
-    supabase.rpc("admin_database_size_bytes"),
-    supabase.from("leads").select("id", { count: "exact", head: true }),
-    supabase
-      .from("leads")
-      .select("id", { count: "exact", head: true })
-      .gte("created_at", weekAgo),
-    supabase
-      .from("automation_runs")
-      .select("id, created_at, type, error")
-      .eq("status", "failed")
-      .gte("created_at", weekAgo)
-      .order("created_at", { ascending: false })
-      .limit(5),
-  ]);
+  const [dbSize, leadsTotal, leadsWeek, failedRuns, issuedInvoices, payments] =
+    await Promise.all([
+      supabase.rpc("admin_database_size_bytes"),
+      supabase.from("leads").select("id", { count: "exact", head: true }),
+      supabase
+        .from("leads")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo),
+      supabase
+        .from("automation_runs")
+        .select("id, created_at, type, error")
+        .eq("status", "failed")
+        .gte("created_at", weekAgo)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      supabase
+        .from("invoices")
+        .select("id", { count: "exact", head: true })
+        .neq("status", "draft"),
+      supabase.from("payments").select("id", { count: "exact", head: true }),
+    ]);
 
   const dbBytes = dbSize.data ?? null;
   const dbOverTrigger = dbBytes !== null && dbBytes >= DB_TRIGGER_BYTES;
+  // Vercel Hobby is for non-commercial use (ADR 0001). Issued invoices or
+  // recorded payments mean the business runs through this deployment.
+  const commercialUse = (issuedInvoices.count ?? 0) > 0 || (payments.count ?? 0) > 0;
 
   return (
     <>
@@ -98,6 +119,21 @@ export default async function AdminHealthPage() {
         >
           The database has passed 400 MB, the Supabase Pro upgrade trigger in CLAUDE.md
           §3. The free tier stops at 500 MB.
+        </p>
+      ) : null}
+
+      {commercialUse ? (
+        <p
+          role="alert"
+          className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          Vercel upgrade trigger: the portal has issued {issuedInvoices.count ?? 0}{" "}
+          invoice
+          {issuedInvoices.count === 1 ? "" : "s"} and recorded {payments.count ?? 0}{" "}
+          payment
+          {payments.count === 1 ? "" : "s"}. Vercel&rsquo;s Hobby plan is for
+          non-commercial use and pauses the site at its limits, so plan the move to Vercel
+          Pro (see ADR 0001).
         </p>
       ) : null}
 
@@ -154,12 +190,60 @@ export default async function AdminHealthPage() {
         </Panel>
       </div>
 
-      <div className="mt-6">
-        <NotConnected
-          title="Vercel Hobby usage"
-          reason="Vercel doesn't expose plan usage to the app without an API token. Check bandwidth, function and image-optimization usage in the Vercel dashboard; CLAUDE.md §3 lists the upgrade triggers."
-        />
-      </div>
+      <Panel
+        title="Hosting: Vercel Hobby upgrade triggers"
+        description="Any one of these means it's time for Vercel Pro (ADR 0001, CLAUDE.md §3). Hobby pauses the site at its limits instead of charging overage."
+        className="mt-6"
+      >
+        <ul className="divide-border divide-y">
+          {[
+            {
+              name: "Commercial use",
+              status: commercialUse ? "triggered" : "ok",
+              note: commercialUse
+                ? `${issuedInvoices.count ?? 0} issued invoices and ${payments.count ?? 0} payments recorded through the portal. Hobby's terms are non-commercial.`
+                : "No invoices issued or payments recorded through the portal yet.",
+            },
+            {
+              name: "Usage approaching a Hobby limit",
+              status: "check",
+              note: "Bandwidth, function, image optimization and build usage are only shown in Vercel. Check the project's Usage page at least monthly.",
+            },
+            {
+              name: "Team needs Vercel seats",
+              status: "check",
+              note: "Hobby is a single-person account. Upgrade when anyone besides the owner needs to deploy or manage hosting.",
+            },
+            {
+              name: "Notice from Vercel",
+              status: "check",
+              note: "Any Vercel email about usage, terms or the account is a trigger.",
+            },
+          ].map((item) => (
+            <li key={item.name} className="flex items-start justify-between gap-4 py-3">
+              <div>
+                <p className="text-sm font-medium">{item.name}</p>
+                <p className="text-muted-foreground text-xs">{item.note}</p>
+              </div>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${triggerStyles[item.status as keyof typeof triggerStyles]}`}
+              >
+                {triggerLabels[item.status as keyof typeof triggerLabels]}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-sm">
+          <a
+            href="https://vercel.com/nicholastonui34s-projects/~/usage"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline underline-offset-2"
+          >
+            Open Vercel usage
+          </a>
+        </p>
+      </Panel>
     </>
   );
 }
