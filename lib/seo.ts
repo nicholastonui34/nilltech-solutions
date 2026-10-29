@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 
 import { siteConfig } from "@/config/site.config";
-import { siteOrigin } from "@/lib/site-origin";
 
 // Site-wide share image (app/opengraph-image.jpg). Listed explicitly
 // because each page's own openGraph/twitter object replaces the inherited
 // one, which would otherwise drop the file-based image.
 const shareImage = {
-  url: `${siteOrigin}/opengraph-image.jpg`,
+  url: `${siteConfig.url}/opengraph-image.jpg`,
   width: 1200,
   height: 630,
   alt: "NillTech Solutions: We Build the Team. You Own the Outcome.",

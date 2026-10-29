@@ -4,7 +4,6 @@ import { Poppins } from "next/font/google";
 import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site.config";
 import { localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/jsonld";
-import { siteOrigin } from "@/lib/site-origin";
 
 import "./globals.css";
 
@@ -16,8 +15,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  // Resolves file-based metadata (share image) against the live origin.
-  metadataBase: new URL(siteOrigin),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
