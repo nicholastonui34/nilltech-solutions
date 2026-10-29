@@ -8,6 +8,8 @@ export type LeadScoringInput = {
   companySize?: "solo" | "small" | "medium" | "enterprise";
   serviceInterest?: string;
   region?: "primary-market" | "secondary-market" | "other";
+  /** Booked a call online: the strongest buying signal the site captures. */
+  bookedCall?: boolean;
 };
 
 const budgetPoints: Record<NonNullable<LeadScoringInput["budgetBand"]>, number> = {
@@ -44,7 +46,7 @@ const regionPoints: Record<NonNullable<LeadScoringInput["region"]>, number> = {
   other: 0,
 };
 
-/** Rules-based lead scoring (CLAUDE.md §9) — budget, timeline, company size, service, region. */
+/** Rules-based lead scoring (CLAUDE.md §9) — budget, timeline, company size, service, region, booked call. */
 export function scoreLead(input: LeadScoringInput): { score: number; tier: LeadTier } {
   let score = 0;
 
@@ -55,6 +57,7 @@ export function scoreLead(input: LeadScoringInput): { score: number; tier: LeadT
   if (input.serviceInterest && highPriorityServices.has(input.serviceInterest))
     score += 2;
   else if (input.serviceInterest === "partnerships") score += 1;
+  if (input.bookedCall) score += 3;
 
   const tier: LeadTier = score >= 9 ? "hot" : score >= 5 ? "warm" : "cold";
 

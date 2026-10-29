@@ -30,11 +30,6 @@ function integrations(): Integration[] {
       note: "Public forms only have a honeypot until this is set.",
     },
     {
-      name: "Cal.com booking",
-      status: has("NEXT_PUBLIC_CAL_COM_LINK") ? "configured" : "missing",
-      note: "/contact falls back to WhatsApp without it.",
-    },
-    {
       name: "Resend email",
       status: has("RESEND_API_KEY") ? "configured" : "deferred",
       note: "Deferred by owner decision. No lead alerts or auto-replies yet.",

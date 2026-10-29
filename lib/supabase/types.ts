@@ -74,6 +74,116 @@ export type Database = {
         };
         Relationships: [];
       };
+      booking_blocks: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          ends_at: string;
+          id: string;
+          reason: string | null;
+          starts_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          ends_at: string;
+          id?: string;
+          reason?: string | null;
+          starts_at: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          ends_at?: string;
+          id?: string;
+          reason?: string | null;
+          starts_at?: string;
+        };
+        Relationships: [];
+      };
+      booking_hours: {
+        Row: {
+          created_at: string;
+          end_time: string;
+          id: string;
+          start_time: string;
+          weekday: number;
+        };
+        Insert: {
+          created_at?: string;
+          end_time: string;
+          id?: string;
+          start_time: string;
+          weekday: number;
+        };
+        Update: {
+          created_at?: string;
+          end_time?: string;
+          id?: string;
+          start_time?: string;
+          weekday?: number;
+        };
+        Relationships: [];
+      };
+      bookings: {
+        Row: {
+          call_type: string;
+          company: string | null;
+          created_at: string;
+          email: string;
+          ends_at: string;
+          id: string;
+          lead_id: string | null;
+          meeting_preference: string;
+          name: string;
+          notes: string | null;
+          phone: string | null;
+          starts_at: string;
+          status: Database["public"]["Enums"]["booking_status"];
+          updated_at: string;
+        };
+        Insert: {
+          call_type: string;
+          company?: string | null;
+          created_at?: string;
+          email: string;
+          ends_at: string;
+          id?: string;
+          lead_id?: string | null;
+          meeting_preference: string;
+          name: string;
+          notes?: string | null;
+          phone?: string | null;
+          starts_at: string;
+          status?: Database["public"]["Enums"]["booking_status"];
+          updated_at?: string;
+        };
+        Update: {
+          call_type?: string;
+          company?: string | null;
+          created_at?: string;
+          email?: string;
+          ends_at?: string;
+          id?: string;
+          lead_id?: string | null;
+          meeting_preference?: string;
+          name?: string;
+          notes?: string | null;
+          phone?: string | null;
+          starts_at?: string;
+          status?: Database["public"]["Enums"]["booking_status"];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bookings_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: false;
+            referencedRelation: "leads";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       clients: {
         Row: {
           address: string | null;
@@ -875,6 +985,7 @@ export type Database = {
         | "client"
         | "recruitment"
         | "investor";
+      booking_status: "confirmed" | "cancelled" | "completed" | "no_show";
       currency_code: "KES" | "USD";
       expense_category:
         | "talent"

@@ -23,7 +23,7 @@ export default function HomePage() {
         headline={siteConfig.tagline}
         subheadline="NillTech builds software and AI for businesses in Kenya, East Africa and beyond, with one accountable team that designs, builds, tests and supports it, so you get the result without managing the work."
         primaryCta="quote"
-        secondaryCta="whatsapp"
+        secondaryCta="discovery-call"
       />
 
       <section className="py-20">

@@ -30,6 +30,7 @@ const SOURCE_LABELS: Record<string, string> = {
   contact_form: "Contact form",
   estimator_project: "Project estimator",
   estimator_tokens: "AI token estimator",
+  booking: "Booked a call",
 };
 
 // Display labels for values stored in `leads`. Budget and region labels

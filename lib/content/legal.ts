@@ -40,7 +40,7 @@ export const privacyNotice: LegalDocument = {
   slug: "privacy-notice",
   anchor: "privacy",
   title: "Privacy notice",
-  updated: "25 October 2026",
+  updated: "29 October 2026",
   intro: `This notice explains what personal data ${company} (“NillTech”, “we”) collects through this website and our client and team portal, why we collect it, who we share it with, how long we keep it, and the rights you have under the Kenya Data Protection Act, 2019.`,
   sections: [
     {
@@ -69,6 +69,11 @@ export const privacyNotice: LegalDocument = {
               "Send an enquiry (contact form)",
               "Name, email, phone (optional), company (optional), the service you’re interested in, your timeline, your message",
               "To reply and discuss your project (steps taken at your request before a contract)",
+            ],
+            [
+              "Book a call online",
+              "Name, email, phone (required for a phone call, otherwise optional), company (optional), the kind of call, what it’s about, how you’d like to meet, your chosen time and any notes",
+              "To arrange and hold the call and follow up about your enquiry (steps taken at your request before a contract)",
             ],
             [
               "Use the project or AI cost estimator",
