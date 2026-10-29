@@ -146,3 +146,87 @@ export async function createUser(
   refresh();
   return { created: { email: parsed.data.email, temporaryPassword } };
 }
+
+// --- Shareholders ------------------------------------------------------------
+// The share register (owner, 2026-10-29). RLS limits writes to super_admin
+// and a trigger audit-logs every change; ownership % is always derived
+// from share counts, never stored.
+
+const shareholderSchema = z.object({
+  name: z.string().trim().min(1, "Enter the shareholder's name.").max(200),
+  shares: z.coerce.number().int().positive("Shares must be a whole number above zero."),
+  holderType: z.enum(["director", "investor"]),
+  userId: z
+    .string()
+    .transform((v) => v || null)
+    .refine(
+      (v) => v === null || z.string().uuid().safeParse(v).success,
+      "Unknown login.",
+    ),
+});
+
+function shareholderFields(formData: FormData) {
+  return shareholderSchema.parse({
+    name: formData.get("name") ?? "",
+    shares: formData.get("shares") ?? "",
+    holderType: formData.get("holderType") ?? "",
+    userId: formData.get("userId") ?? "",
+  });
+}
+
+async function shareholderClient() {
+  await requireSuperAdmin();
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) throw new Error("Supabase isn't configured.");
+  return supabase;
+}
+
+export async function addShareholder(formData: FormData) {
+  const supabase = await shareholderClient();
+  const fields = shareholderFields(formData);
+  const { error } = await supabase.from("shareholders").insert({
+    name: fields.name,
+    shares: fields.shares,
+    holder_type: fields.holderType,
+    user_id: fields.userId,
+  });
+  if (error) {
+    throw new Error(
+      error.code === "23505"
+        ? "That login is already linked to another shareholder."
+        : error.message,
+    );
+  }
+  refresh();
+}
+
+export async function updateShareholder(formData: FormData) {
+  const supabase = await shareholderClient();
+  const id = z.string().uuid().parse(formData.get("shareholderId"));
+  const fields = shareholderFields(formData);
+  const { error } = await supabase
+    .from("shareholders")
+    .update({
+      name: fields.name,
+      shares: fields.shares,
+      holder_type: fields.holderType,
+      user_id: fields.userId,
+    })
+    .eq("id", id);
+  if (error) {
+    throw new Error(
+      error.code === "23505"
+        ? "That login is already linked to another shareholder."
+        : error.message,
+    );
+  }
+  refresh();
+}
+
+export async function deleteShareholder(formData: FormData) {
+  const supabase = await shareholderClient();
+  const id = z.string().uuid().parse(formData.get("shareholderId"));
+  const { error } = await supabase.from("shareholders").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}

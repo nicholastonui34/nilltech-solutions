@@ -600,6 +600,36 @@ export type Database = {
           },
         ];
       };
+      shareholders: {
+        Row: {
+          created_at: string;
+          holder_type: string;
+          id: string;
+          name: string;
+          shares: number;
+          updated_at: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          holder_type: string;
+          id?: string;
+          name: string;
+          shares: number;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          holder_type?: string;
+          id?: string;
+          name?: string;
+          shares?: number;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -824,6 +854,7 @@ export type Database = {
         Args: { _application_id: string; _pin: string };
         Returns: undefined;
       };
+      shareholder_overview: { Args: never; Returns: Json };
       void_invoice: {
         Args: { _invoice_id: string; _reason: string };
         Returns: undefined;
@@ -839,7 +870,8 @@ export type Database = {
         | "quality"
         | "freelancer"
         | "client"
-        | "recruitment";
+        | "recruitment"
+        | "investor";
       currency_code: "KES" | "USD";
       expense_category:
         | "talent"

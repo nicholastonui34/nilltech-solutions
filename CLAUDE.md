@@ -138,11 +138,12 @@ React Email templates in `emails/`. Verified sending domain with SPF, DKIM, DMAR
 
 ## 10. Portals & dashboards (`/portal`, auth-gated, `noindex`)
 
-Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security on every table**. RBAC roles: `super_admin`, `director`, `finance`, `marketing`, `sales`, `quality`, `recruitment` (added Phase 6 — the recruitment department screens applicants), `freelancer`, `client`.
+Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security on every table**. RBAC roles: `super_admin`, `director`, `finance`, `marketing`, `sales`, `quality`, `recruitment` (added Phase 6 — the recruitment department screens applicants), `investor` (added 2026-10-29 — shareholder investors), `freelancer`, `client`.
 
 | Dashboard            | Role(s)                          | Core views                                                                                                      |
 | -------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Director/Shareholder | director, super_admin            | Revenue, pipeline value, margins, growth KPIs, read-only                                                        |
+| Director/Shareholder | director, super_admin            | Revenue, pipeline value, margins, growth KPIs, share register + own holding, read-only                          |
+| Investor             | investor, super_admin            | Company net worth, profit/loss, own shares and their book value only (aggregates via RPC), read-only            |
 | Main Admin           | super_admin                      | Users, Role Assignment (invite, assign/revoke roles, audit log), settings, system health, budget/usage triggers |
 | Finance              | finance                          | Invoices, receipts, payments, KRA eTIMS invoice automation, expenses, exports                                   |
 | Marketing            | marketing                        | Traffic, sources, conversions, newsletter, podcast performance, campaign UTM                                    |
@@ -299,6 +300,7 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] Finance CSV exports: `/portal/finance/export/{invoices|payments|expenses}` with `?month=` or `?year=`, linked from the Finance overview and the expenses page. UTF-8 with BOM, plain decimal amounts plus currency column, drafts excluded, CSV-injection-safe (`lib/finance/csv.ts`).
   - [x] IndexNow (§14): key file `public/5b118dd2122b1d7528f9adb04f2a1eb5.txt`, `scripts/indexnow.mjs`, `.github/workflows/indexnow.yml` (on content changes to main, after a 3-minute wait for the deploy). Skips quietly until nilltechsolutions.com serves this site; `DRY_RUN=1` to preview.
   - [x] Vercel Hobby upgrade triggers on Main Admin: detects commercial use (issued invoices or recorded payments, currently **triggered**) with a banner, and lists the triggers only Vercel can show (usage, seats, notices) with a link to Vercel usage. Vercel has no usage API for Hobby, so live usage isn't read.
+  - [x] Shareholders + investor dashboard (owner, 2026-10-29; migrations `…10` investor role, `…11` shareholders, both applied): register seeded via SQL (not in the repo): Nicholas Tonui, Fumbwe Hamisi, Wendy Achieng 352 shares each (director shareholders), one investor 144 shares (name to confirm), 1,200 in issue. Ownership % derived from shares (each director shows 29.33%; the owner quoted 29.34% for Nicholas, which only works as rounding). `shareholder_overview()` SECURITY DEFINER RPC gives investors company totals only. `/portal/investor`: net worth (cash collected minus expenses plus receivables, cash basis, not a valuation), profit/loss this year and to date, value of own shares; per currency, USD shown only once there's USD activity. Director dashboard: share register with book value per holder and own holding. Main Admin → Shareholders: edit holdings, link portal logins (audit-logged). **RLS for expenses and shareholders still to verify in SQL** (approval prompts timed out).
 
 ## 18. Open Inputs (keep updated)
 

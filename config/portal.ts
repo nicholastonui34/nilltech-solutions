@@ -5,6 +5,7 @@ export type AppRole = Database["public"]["Enums"]["app_role"];
 export const ROLE_LABELS: Record<AppRole, string> = {
   super_admin: "Super admin",
   director: "Director",
+  investor: "Investor",
   finance: "Finance",
   marketing: "Marketing",
   sales: "Sales",
@@ -32,8 +33,14 @@ export const portalDashboards: readonly PortalDashboard[] = [
   {
     href: "/portal/director",
     label: "Director",
-    description: "Revenue, receivables, pipeline and growth, read-only.",
+    description: "Revenue, margins, pipeline and the share register, read-only.",
     roles: ["director", "super_admin"],
+  },
+  {
+    href: "/portal/investor",
+    label: "Investor",
+    description: "Company net worth, profit or loss, and your shareholding.",
+    roles: ["investor", "super_admin"],
   },
   {
     href: "/portal/admin",

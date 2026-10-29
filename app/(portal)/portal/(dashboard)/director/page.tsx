@@ -1,8 +1,10 @@
 import { PageHeader } from "@/components/portal/page-header";
 import { BarList, NoAccess, Panel, StatCard } from "@/components/portal/panel";
+import { ShareRegister } from "@/components/portal/share-register";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { nairobiDateIso } from "@/lib/format";
 import { CURRENCIES, formatMoney, type Currency } from "@/lib/finance/money";
+import { getShareholderOverview } from "@/lib/shareholders";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const MONTHS = 6;
@@ -70,6 +72,15 @@ export default async function DirectorPage() {
         .select("amount_minor, currency, spent_on")
         .gte("spent_on", since < yearStart ? since : yearStart),
     ]);
+
+  const [{ data: holders }, overview] = await Promise.all([
+    supabase
+      .from("shareholders")
+      .select("id, name, shares, holder_type, user_id")
+      .order("shares", { ascending: false })
+      .order("name"),
+    getShareholderOverview(),
+  ]);
 
   const paid = payments ?? [];
   const sumPaid = (currency: Currency, from: string) =>
@@ -139,6 +150,14 @@ export default async function DirectorPage() {
         title="Director"
         description="Headline numbers across finance and sales. Net is cash collected minus expenses recorded in Finance. Read-only; amounts are never converted between currencies."
       />
+
+      <div className="mb-6">
+        <ShareRegister
+          holders={holders ?? []}
+          netWorthKes={overview?.currencies.KES.netWorth ?? 0}
+          currentUserId={user.id}
+        />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CURRENCIES.map((currency) => [
