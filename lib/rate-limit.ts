@@ -24,7 +24,22 @@ const MAX_PER_DAY = 20;
  * check errors: Turnstile and the honeypot still apply, and a broken limiter
  * shouldn't cost a real lead.
  */
-export async function checkRateLimit(form: string): Promise<boolean> {
+export type RateLimits = {
+  maxPerWindow: number;
+  windowSeconds: number;
+  maxPerDay: number;
+};
+
+const FORM_LIMITS: RateLimits = {
+  maxPerWindow: MAX_PER_WINDOW,
+  windowSeconds: WINDOW_SECONDS,
+  maxPerDay: MAX_PER_DAY,
+};
+
+export async function checkRateLimit(
+  form: string,
+  limits: RateLimits = FORM_LIMITS,
+): Promise<boolean> {
   const admin = getSupabaseAdmin();
   if (!admin) return true;
 
@@ -39,9 +54,9 @@ export async function checkRateLimit(form: string): Promise<boolean> {
 
   const { data, error } = await admin.rpc("check_rate_limit", {
     p_bucket: `${form}:${hash}`,
-    p_max_per_window: MAX_PER_WINDOW,
-    p_window_seconds: WINDOW_SECONDS,
-    p_max_per_day: MAX_PER_DAY,
+    p_max_per_window: limits.maxPerWindow,
+    p_window_seconds: limits.windowSeconds,
+    p_max_per_day: limits.maxPerDay,
   });
   if (error) return true;
   return data !== false;

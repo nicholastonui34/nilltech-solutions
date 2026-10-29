@@ -112,7 +112,7 @@ export const privacyNotice: LegalDocument = {
             ],
             [
               "Browse the website",
-              "Anonymous page views, the referring website, device type and page speed, measured by Cloudflare Web Analytics without cookies and without identifying you",
+              "Anonymous page views, the referring website, device type and page speed, measured by Cloudflare Web Analytics without cookies and without identifying you. We also record, anonymously, which of our buttons and forms are used (for example “Book a call” clicked on the services page) and how the visit arrived, without cookies, names or IP addresses",
               "To see how the site is used and keep it fast (our legitimate interest in running the site)",
             ],
           ],
@@ -208,6 +208,7 @@ export const privacyNotice: LegalDocument = {
               "5 years from the end of the relevant tax period (Tax Procedures Act, s. 23), longer if a proceeding is open",
             ],
             ["Hashed IP records used to limit repeated form submissions", "24 hours"],
+            ["Anonymous button and form usage records", "13 months"],
             [
               "Portal accounts",
               "While your account is active; audit records up to 5 years",

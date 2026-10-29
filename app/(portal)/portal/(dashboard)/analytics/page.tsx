@@ -1,3 +1,4 @@
+import { ConversionPanels } from "@/components/portal/conversion-panels";
 import { PageHeader } from "@/components/portal/page-header";
 import {
   BarList,
@@ -99,11 +100,9 @@ export default async function AnalyticsPage() {
         </Panel>
       </div>
 
+      <ConversionPanels />
+
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <NotConnected
-          title="Conversion events"
-          reason="CTA clicks, form starts, WhatsApp and call clicks fire through lib/analytics.ts, but it has no destination yet, so events aren't stored anywhere."
-        />
         <NotConnected
           title="Core Web Vitals (field data)"
           reason={

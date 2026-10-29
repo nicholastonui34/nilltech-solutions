@@ -1,3 +1,4 @@
+import { ConversionPanels } from "@/components/portal/conversion-panels";
 import { PageHeader } from "@/components/portal/page-header";
 import {
   BarList,
@@ -91,6 +92,8 @@ export default async function MarketingPage() {
           />
         </Panel>
       </div>
+
+      <ConversionPanels detail />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <NotConnected
