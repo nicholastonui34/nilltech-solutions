@@ -4,7 +4,8 @@ import Image from "next/image";
  * Brand illustrations for the five offers (owner, 2026-10-29: custom brand
  * graphics until real photos exist). Static SVGs in public/art/ (~3 KB each),
  * lazy-loaded so they never compete with the hero for LCP; inlining them
- * nearly doubled the home page HTML. Shapes only, no text and no faces: they
+ * nearly doubled the home page HTML. No faces, and text only as short
+ * labels (the AI Solutions workflow, owner-approved 2026-10-29): they
  * illustrate the offer, they never pose as NillTech's people or clients
  * (CLAUDE.md §2). Decorative, so empty alt; the card title carries meaning.
  *
