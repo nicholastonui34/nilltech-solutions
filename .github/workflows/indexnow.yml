@@ -1,0 +1,31 @@
+# Tells IndexNow (Bing, Yandex, Seznam and others) about the site's pages
+# after content changes reach main (CLAUDE.md §14). See scripts/indexnow.mjs.
+name: IndexNow ping
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "lib/content/**"
+      - "config/**"
+      - "public/llms.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Give Vercel time to finish the production deploy for this commit.
+      - name: Wait for the deploy
+        run: sleep 180
+      - name: Submit sitemap URLs
+        run: node scripts/indexnow.mjs

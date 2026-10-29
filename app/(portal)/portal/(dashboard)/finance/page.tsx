@@ -101,6 +101,52 @@ export default async function FinanceOverviewPage() {
           </p>
         )}
       </Panel>
+
+      <Panel
+        title="Exports for your accountant"
+        description="CSV files that open in Excel or Google Sheets. Amounts stay in their own currency; draft invoices aren't included."
+        className="mt-6"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-muted-foreground text-left text-xs">
+              <tr>
+                <th className="py-2 pr-4 font-medium">Data</th>
+                <th className="py-2 pr-4 font-medium">This month</th>
+                <th className="py-2 pr-4 font-medium">This year</th>
+                <th className="py-2 font-medium">All time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-border divide-y">
+              {(
+                [
+                  ["invoices", "Invoices"],
+                  ["payments", "Payments and receipts"],
+                  ["expenses", "Expenses"],
+                ] as const
+              ).map(([kind, label]) => (
+                <tr key={kind}>
+                  <td className="py-2 pr-4 font-medium">{label}</td>
+                  {[
+                    [`?month=${today.slice(0, 7)}`, today.slice(0, 7)],
+                    [`?year=${today.slice(0, 4)}`, today.slice(0, 4)],
+                    ["", "Everything"],
+                  ].map(([query, text]) => (
+                    <td key={text} className="py-2 pr-4">
+                      <a
+                        href={`/portal/finance/export/${kind}${query}`}
+                        className="text-primary underline underline-offset-2"
+                      >
+                        {text}
+                      </a>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
     </>
   );
 }

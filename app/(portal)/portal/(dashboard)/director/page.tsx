@@ -1,14 +1,10 @@
 import { PageHeader } from "@/components/portal/page-header";
-import {
-  BarList,
-  NoAccess,
-  NotConnected,
-  Panel,
-  StatCard,
-} from "@/components/portal/panel";
+import { BarList, NoAccess, Panel, StatCard } from "@/components/portal/panel";
+import { ShareRegister } from "@/components/portal/share-register";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { nairobiDateIso } from "@/lib/format";
 import { CURRENCIES, formatMoney, type Currency } from "@/lib/finance/money";
+import { getShareholderOverview } from "@/lib/shareholders";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const MONTHS = 6;
@@ -57,19 +53,33 @@ export default async function DirectorPage() {
   const yearStart = `${today.slice(0, 4)}-01-01`;
   const since = `${months[0]}-01`;
 
-  const [{ data: payments }, { data: invoices }, { data: leads }] = await Promise.all([
+  const [{ data: payments }, { data: invoices }, { data: leads }, { data: expenses }] =
+    await Promise.all([
+      supabase
+        .from("payments")
+        .select("amount_minor, currency, paid_on")
+        .gte("paid_on", since < yearStart ? since : yearStart),
+      supabase
+        .from("invoices")
+        .select("currency, total_minor, paid_minor, status")
+        .in("status", ["issued", "partially_paid"]),
+      supabase
+        .from("leads")
+        .select("created_at, status, tier, estimate:metadata->estimateKes")
+        .gte("created_at", since),
+      supabase
+        .from("expenses")
+        .select("amount_minor, currency, spent_on")
+        .gte("spent_on", since < yearStart ? since : yearStart),
+    ]);
+
+  const [{ data: holders }, overview] = await Promise.all([
     supabase
-      .from("payments")
-      .select("amount_minor, currency, paid_on")
-      .gte("paid_on", since < yearStart ? since : yearStart),
-    supabase
-      .from("invoices")
-      .select("currency, total_minor, paid_minor, status")
-      .in("status", ["issued", "partially_paid"]),
-    supabase
-      .from("leads")
-      .select("created_at, status, tier, estimate:metadata->estimateKes")
-      .gte("created_at", since),
+      .from("shareholders")
+      .select("id, name, shares, holder_type, user_id")
+      .order("shares", { ascending: false })
+      .order("name"),
+    getShareholderOverview(),
   ]);
 
   const paid = payments ?? [];
@@ -77,6 +87,20 @@ export default async function DirectorPage() {
     paid
       .filter((p) => p.currency === currency && p.paid_on >= from)
       .reduce((sum, p) => sum + p.amount_minor, 0);
+  const spent = expenses ?? [];
+  const sumSpent = (currency: Currency, from: string) =>
+    spent
+      .filter((e) => e.currency === currency && e.spent_on >= from)
+      .reduce((sum, e) => sum + e.amount_minor, 0);
+  /** Net = cash collected minus expenses paid, same currency only. */
+  const margin = (currency: Currency, from: string) => {
+    const collected = sumPaid(currency, from);
+    const net = collected - sumSpent(currency, from);
+    return {
+      net,
+      percent: collected > 0 ? Math.round((net / collected) * 100) : null,
+    };
+  };
   const outstanding = (currency: Currency) =>
     (invoices ?? [])
       .filter((i) => i.currency === currency)
@@ -89,6 +113,24 @@ export default async function DirectorPage() {
     .filter((e): e is [number, number] => e !== null);
   const pipelineMin = estimates.reduce((sum, [min]) => sum + min, 0);
   const pipelineMax = estimates.reduce((sum, [, max]) => sum + max, 0);
+
+  const netByMonth = (currency: Currency) =>
+    months.map((month) => {
+      const inMonth = (date: string) => date.startsWith(month);
+      const value =
+        paid
+          .filter((p) => p.currency === currency && inMonth(p.paid_on))
+          .reduce((sum, p) => sum + p.amount_minor, 0) -
+        spent
+          .filter((e) => e.currency === currency && inMonth(e.spent_on))
+          .reduce((sum, e) => sum + e.amount_minor, 0);
+      return {
+        label: monthLabel.format(new Date(`${month}-01T00:00:00Z`)),
+        // Bars can't go negative; the label still shows the real figure.
+        value: Math.max(value, 0),
+        display: formatMoney(value, currency),
+      };
+    });
 
   const revenueByMonth = (currency: Currency) =>
     months.map((month) => {
@@ -106,8 +148,16 @@ export default async function DirectorPage() {
     <>
       <PageHeader
         title="Director"
-        description="Headline numbers across finance and sales. Read-only; amounts are never converted between currencies."
+        description="Headline numbers across finance and sales. Net is cash collected minus expenses recorded in Finance. Read-only; amounts are never converted between currencies."
       />
+
+      <div className="mb-6">
+        <ShareRegister
+          holders={holders ?? []}
+          netWorthKes={overview?.currencies.KES.netWorth ?? 0}
+          currentUserId={user.id}
+        />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CURRENCIES.map((currency) => [
@@ -127,6 +177,28 @@ export default async function DirectorPage() {
             value={formatMoney(outstanding(currency), currency)}
           />,
         ])}
+      </div>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {CURRENCIES.map((currency) => {
+          const month = margin(currency, monthStart);
+          const year = margin(currency, yearStart);
+          const pct = (p: number | null) => (p === null ? "" : ` · ${p}% margin`);
+          return [
+            <StatCard
+              key={`${currency}-net-month`}
+              label={`Net this month (${currency})`}
+              value={formatMoney(month.net, currency)}
+              hint={`Spent ${formatMoney(sumSpent(currency, monthStart), currency)}${pct(month.percent)}`}
+            />,
+            <StatCard
+              key={`${currency}-net-year`}
+              label={`Net this year (${currency})`}
+              value={formatMoney(year.net, currency)}
+              hint={`Spent ${formatMoney(sumSpent(currency, yearStart), currency)}${pct(year.percent)}`}
+            />,
+          ];
+        })}
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -168,10 +240,15 @@ export default async function DirectorPage() {
             }))}
           />
         </Panel>
-        <NotConnected
-          title="Margins"
-          reason="Needs project costs (talent pay, hosting and other expenses), which aren't tracked yet. Revenue above is cash collected, not profit."
-        />
+        {CURRENCIES.map((currency) => (
+          <Panel
+            key={`net-${currency}`}
+            title={`Net per month (${currency})`}
+            description="Cash collected minus expenses paid. A month below zero shows an empty bar with the negative figure."
+          >
+            <BarList rows={netByMonth(currency)} alwaysShow />
+          </Panel>
+        ))}
       </div>
     </>
   );

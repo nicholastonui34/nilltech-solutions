@@ -173,6 +173,65 @@ export type Database = {
         };
         Relationships: [];
       };
+      expenses: {
+        Row: {
+          amount_minor: number;
+          category: Database["public"]["Enums"]["expense_category"];
+          created_at: string;
+          created_by: string | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          description: string;
+          id: string;
+          method: Database["public"]["Enums"]["payment_method"] | null;
+          notes: string | null;
+          project_id: string | null;
+          reference: string | null;
+          spent_on: string;
+          updated_at: string;
+          vendor: string | null;
+        };
+        Insert: {
+          amount_minor: number;
+          category: Database["public"]["Enums"]["expense_category"];
+          created_at?: string;
+          created_by?: string | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          description: string;
+          id?: string;
+          method?: Database["public"]["Enums"]["payment_method"] | null;
+          notes?: string | null;
+          project_id?: string | null;
+          reference?: string | null;
+          spent_on: string;
+          updated_at?: string;
+          vendor?: string | null;
+        };
+        Update: {
+          amount_minor?: number;
+          category?: Database["public"]["Enums"]["expense_category"];
+          created_at?: string;
+          created_by?: string | null;
+          currency?: Database["public"]["Enums"]["currency_code"];
+          description?: string;
+          id?: string;
+          method?: Database["public"]["Enums"]["payment_method"] | null;
+          notes?: string | null;
+          project_id?: string | null;
+          reference?: string | null;
+          spent_on?: string;
+          updated_at?: string;
+          vendor?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "expenses_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       finance_settings: {
         Row: {
           address_lines: string[];
@@ -541,6 +600,36 @@ export type Database = {
           },
         ];
       };
+      shareholders: {
+        Row: {
+          created_at: string;
+          holder_type: string;
+          id: string;
+          name: string;
+          shares: number;
+          updated_at: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          holder_type: string;
+          id?: string;
+          name: string;
+          shares: number;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          holder_type?: string;
+          id?: string;
+          name?: string;
+          shares?: number;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -765,6 +854,7 @@ export type Database = {
         Args: { _application_id: string; _pin: string };
         Returns: undefined;
       };
+      shareholder_overview: { Args: never; Returns: Json };
       void_invoice: {
         Args: { _invoice_id: string; _reason: string };
         Returns: undefined;
@@ -780,8 +870,19 @@ export type Database = {
         | "quality"
         | "freelancer"
         | "client"
-        | "recruitment";
+        | "recruitment"
+        | "investor";
       currency_code: "KES" | "USD";
+      expense_category:
+        | "talent"
+        | "software"
+        | "hosting"
+        | "marketing"
+        | "office"
+        | "travel"
+        | "equipment"
+        | "fees_taxes"
+        | "other";
       engagement_type: "freelance" | "full_time";
       invoice_status: "draft" | "issued" | "partially_paid" | "paid" | "void";
       lead_status: "new" | "contacted" | "qualified" | "disqualified";
