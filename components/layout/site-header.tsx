@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu } from "lucide-react";
 
+import { BrandMark } from "@/components/brand/brand-mark";
 import { CtaButton } from "@/components/cta/cta-button";
 import { Container } from "@/components/sections/container";
 import { Button } from "@/components/ui/button";
@@ -19,14 +19,7 @@ export function SiteHeader() {
     <header className="border-border bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2" aria-label={siteConfig.name}>
-          <Image
-            src="/brand/nilltech-logo.jpg"
-            alt={siteConfig.name}
-            width={32}
-            height={32}
-            className="rounded-sm"
-            priority
-          />
+          <BrandMark size={36} priority />
           <span className="hidden text-sm font-semibold sm:inline">
             {siteConfig.name}
           </span>

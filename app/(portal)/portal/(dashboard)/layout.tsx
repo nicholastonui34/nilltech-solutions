@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { signOut } from "@/app/actions/auth";
+import { BrandMark } from "@/components/brand/brand-mark";
 import { PortalNav } from "@/components/portal/portal-nav";
 import { Button } from "@/components/ui/button";
 import { canAccess, portalDashboards } from "@/config/portal";
@@ -20,13 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="border-border bg-background border-b">
         <div className="flex h-14 items-center justify-between gap-4 px-4 lg:px-6">
           <Link href="/portal" className="flex items-center gap-2">
-            <Image
-              src="/brand/nilltech-logo.jpg"
-              alt=""
-              width={28}
-              height={28}
-              className="rounded-sm"
-            />
+            <BrandMark size={32} />
             <span className="text-sm font-semibold">{siteConfig.name} · Portal</span>
           </Link>
           <Suspense fallback={null}>

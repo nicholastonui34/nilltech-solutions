@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BrandMark } from "@/components/brand/brand-mark";
 import { Container } from "@/components/sections/container";
 import { footerNav } from "@/config/nav";
 import { siteConfig } from "@/config/site.config";
@@ -10,7 +11,10 @@ export function SiteFooter() {
       <Container className="flex flex-col gap-10 py-16 text-white/70">
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-xs">
-            <p className="text-base font-semibold text-white">{siteConfig.name}</p>
+            <div className="flex items-center gap-3">
+              <BrandMark size={44} />
+              <p className="text-base font-semibold text-white">{siteConfig.name}</p>
+            </div>
             <p className="mt-2 text-sm">{siteConfig.tagline}</p>
           </div>
 
