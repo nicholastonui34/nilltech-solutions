@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarCheck, Download } from "lucide-react";
 
@@ -216,10 +216,30 @@ export function BookingWidget() {
     }
   };
 
+  // Never let the button fail silently: say what's missing next to it, and
+  // bring the time picker into view when that's the problem (the other
+  // fields get focus from React Hook Form).
+  const onInvalid = (invalid: FieldErrors<BookingValues>) => {
+    if (invalid.startsAt) {
+      setFormError("Choose a time above before confirming.");
+      document
+        .getElementById("pick-a-time")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      setFormError("Please check the highlighted details above.");
+    }
+  };
+
+  const hasTimes = availability.state === "ready" && days.length > 0;
+
   if (confirmed) return <Confirmation booking={confirmed} timeZone={timeZone} />;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-10" noValidate>
+    <form
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
+      className="flex flex-col gap-10"
+      noValidate
+    >
       {/* Honeypot: visually hidden, real visitors never fill it in. */}
       <div className="hidden" aria-hidden="true">
         <Label htmlFor="website">Website</Label>
@@ -261,7 +281,10 @@ export function BookingWidget() {
 
       {/* Min height matches the loaded picker, so the details below don't
           jump down when the times arrive (CLS). */}
-      <fieldset className="min-h-[26.5rem] min-w-0 sm:min-h-[20.5rem]">
+      <fieldset
+        id="pick-a-time"
+        className="min-h-[26.5rem] min-w-0 scroll-mt-24 sm:min-h-[20.5rem]"
+      >
         <legend className="text-lg font-semibold">2. Pick a time</legend>
         <p className="text-muted-foreground mt-1 text-sm">
           Times are shown in your time zone ({timeZone}).
@@ -337,115 +360,119 @@ export function BookingWidget() {
         )}
       </fieldset>
 
-      <fieldset className="flex min-w-0 flex-col gap-4">
-        <legend className="text-lg font-semibold">3. Your details</legend>
+      {/* No times to book: the picker above offers a message instead, so the
+          details and the button would only lead nowhere. */}
+      {availability.state === "loading" || hasTimes ? (
+        <fieldset className="flex min-w-0 flex-col gap-4">
+          <legend className="text-lg font-semibold">3. Your details</legend>
 
-        <div>
-          <Label htmlFor="serviceInterest">What would you like to talk about?</Label>
-          <NativeSelect
-            id="serviceInterest"
-            className="mt-1.5"
-            {...register("serviceInterest")}
-            aria-invalid={!!errors.serviceInterest}
-          >
-            {offers.map((offer) => (
-              <option key={offer.slug} value={offer.slug}>
-                {offer.title}
-              </option>
-            ))}
-            <option value="not-sure">Not sure yet</option>
-          </NativeSelect>
-        </div>
-
-        <div role="radiogroup" aria-labelledby="meeting-label">
-          <p id="meeting-label" className="text-sm font-medium">
-            How should we meet?
-          </p>
-          <div className="mt-2 flex flex-wrap gap-4">
-            {MEETING_PREFERENCE_VALUES.map((pref) => (
-              <label key={pref} className="flex items-center gap-2 text-sm">
-                <input
-                  type="radio"
-                  value={pref}
-                  {...register("meetingPreference")}
-                  className="accent-primary size-4"
-                />
-                {MEETING_PREFERENCES[pref]}
-              </label>
-            ))}
+          <div>
+            <Label htmlFor="serviceInterest">What would you like to talk about?</Label>
+            <NativeSelect
+              id="serviceInterest"
+              className="mt-1.5"
+              {...register("serviceInterest")}
+              aria-invalid={!!errors.serviceInterest}
+            >
+              {offers.map((offer) => (
+                <option key={offer.slug} value={offer.slug}>
+                  {offer.title}
+                </option>
+              ))}
+              <option value="not-sure">Not sure yet</option>
+            </NativeSelect>
           </div>
-        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Name" error={errors.name?.message}>
-            <Input
-              id="name"
-              autoComplete="name"
-              className="mt-1.5"
-              {...register("name")}
-              aria-invalid={!!errors.name}
-            />
-          </Field>
-          <Field label="Email" error={errors.email?.message}>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              className="mt-1.5"
-              {...register("email")}
-              aria-invalid={!!errors.email}
-            />
-          </Field>
-          <Field
-            label={meetingPreference === "phone" ? "Phone" : "Phone (optional)"}
-            id="phone"
-            error={errors.phone?.message}
-          >
-            <Input
+          <div role="radiogroup" aria-labelledby="meeting-label">
+            <p id="meeting-label" className="text-sm font-medium">
+              How should we meet?
+            </p>
+            <div className="mt-2 flex flex-wrap gap-4">
+              {MEETING_PREFERENCE_VALUES.map((pref) => (
+                <label key={pref} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    value={pref}
+                    {...register("meetingPreference")}
+                    className="accent-primary size-4"
+                  />
+                  {MEETING_PREFERENCES[pref]}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Name" error={errors.name?.message}>
+              <Input
+                id="name"
+                autoComplete="name"
+                className="mt-1.5"
+                {...register("name")}
+                aria-invalid={!!errors.name}
+              />
+            </Field>
+            <Field label="Email" error={errors.email?.message}>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="mt-1.5"
+                {...register("email")}
+                aria-invalid={!!errors.email}
+              />
+            </Field>
+            <Field
+              label={meetingPreference === "phone" ? "Phone" : "Phone (optional)"}
               id="phone"
-              type="tel"
-              autoComplete="tel"
-              className="mt-1.5"
-              {...register("phone")}
-              aria-invalid={!!errors.phone}
-            />
+              error={errors.phone?.message}
+            >
+              <Input
+                id="phone"
+                type="tel"
+                autoComplete="tel"
+                className="mt-1.5"
+                {...register("phone")}
+                aria-invalid={!!errors.phone}
+              />
+            </Field>
+            <Field label="Company (optional)" id="company">
+              <Input
+                id="company"
+                autoComplete="organization"
+                className="mt-1.5"
+                {...register("company")}
+              />
+            </Field>
+          </div>
+
+          <Field
+            label="Anything we should know before the call? (optional)"
+            id="notes"
+            error={errors.notes?.message}
+          >
+            <Textarea id="notes" rows={3} className="mt-1.5" {...register("notes")} />
           </Field>
-          <Field label="Company (optional)" id="company">
-            <Input
-              id="company"
-              autoComplete="organization"
-              className="mt-1.5"
-              {...register("company")}
-            />
-          </Field>
-        </div>
 
-        <Field
-          label="Anything we should know before the call? (optional)"
-          id="notes"
-          error={errors.notes?.message}
-        >
-          <Textarea id="notes" rows={3} className="mt-1.5" {...register("notes")} />
-        </Field>
+          <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
+          <PrivacyLine purpose="to arrange and hold your call, and to follow up about your enquiry" />
 
-        <TurnstileWidget key={turnstileKey} onToken={setTurnstileToken} />
-        <PrivacyLine purpose="to arrange and hold your call, and to follow up about your enquiry" />
+          {formError ? (
+            <p className="text-destructive text-sm" role="alert">
+              {formError}
+            </p>
+          ) : null}
 
-        {formError ? (
-          <p className="text-destructive text-sm" role="alert">
-            {formError}
-          </p>
-        ) : null}
-
-        <Button
-          type="submit"
-          size="lg"
-          disabled={isSubmitting || availability.state !== "ready"}
-          className="sm:self-start"
-        >
-          {isSubmitting ? "Booking…" : "Confirm booking"}
-        </Button>
-      </fieldset>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={isSubmitting || !hasTimes}
+            className="sm:self-start"
+          >
+            {isSubmitting ? "Booking…" : "Confirm booking"}
+          </Button>
+        </fieldset>
+      ) : null}
     </form>
   );
 }
