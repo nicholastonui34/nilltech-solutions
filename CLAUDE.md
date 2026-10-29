@@ -94,15 +94,15 @@ Primary nav (max 6): **Services · AI Solutions · AI Data · Managed Teams · A
 
 Action-specific CTAs mapped by intent — never generic "Submit" or "Learn more":
 
-| CTA                   | Used for                                            |
-| --------------------- | --------------------------------------------------- |
-| Book a Discovery Call | Managed teams, custom software                      |
-| Book a Demo           | AI solutions, products with live demos              |
-| Get a Free Quote      | Services (feeds AI quote estimator)                 |
-| Contact Sales         | Partnerships, enterprise                            |
-| Talk on WhatsApp      | Sticky mobile secondary CTA (`wa.me` click-to-chat) |
+| CTA                   | Used for                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| Book a Discovery Call | Managed teams, custom software                                                     |
+| Book a Demo           | AI solutions, products with live demos                                             |
+| Get a Free Quote      | Services (feeds AI quote estimator)                                                |
+| Contact Sales         | Partnerships, enterprise                                                           |
+| Talk on WhatsApp      | Secondary channel only: a link on `/contact` and in the footer (owner, 2026-10-29) |
 
-- Booking: embed Cal.com (free tier) behind a click-to-load facade so it never blocks LCP.
+- **Booking: our own system at `/book`** (owner decision 2026-10-29, replacing the Cal.com plan). "Book a Discovery Call", "Book a Demo" and "Contact Sales" open `/book` with the call type preselected; the sticky mobile button is "Book a call". Every booking is also a lead (source `booking`, +3 score). Hours and blocked dates are set in the portal (Sales → Availability); slot length, notice and horizon live in `config/booking.ts`. Confirmation emails wait on Resend: the visitor gets an on-screen confirmation, a calendar file and an "Add to Google Calendar" link, and the team confirms manually.
 - Every CTA fires a tracked conversion event: `cta_click`, `form_start`, `form_submit`, `booking_complete`, `whatsapp_click`, `call_click`, `quote_generated`.
 
 ## 6. Pricing page (`/pricing`)
@@ -150,7 +150,7 @@ Single Next.js app, route group `(portal)`, Supabase Auth + **Row Level Security
 | Main Admin           | super_admin                      | Users, Role Assignment (invite, assign/revoke roles, audit log), settings, system health, budget/usage triggers |
 | Finance              | finance                          | Invoices, receipts, payments, KRA eTIMS invoice automation, expenses, exports                                   |
 | Marketing            | marketing                        | Traffic, sources, conversions, newsletter, podcast performance, campaign UTM                                    |
-| Sales                | sales                            | Leads, scoring, pipeline stages, bookings, follow-ups, quotes                                                   |
+| Sales                | sales                            | Leads, scoring, pipeline stages, bookings (list + status) and booking availability, follow-ups, quotes          |
 | Quality              | quality                          | Project QA checklists, delivery reviews, freelancer performance                                                 |
 | Recruitment          | recruitment                      | Applications, screening stages, test tasks (tracked), approvals, KRA PIN capture, freelancer portal accounts    |
 | Analytics            | director, super_admin, marketing | Funnel, CWV field data, conversion events                                                                       |
@@ -198,7 +198,7 @@ Footer link only, not in primary nav. Keep "Join as Freelancer" entry point, rou
 LCP ≤ 2.5s · INP ≤ 200ms · CLS ≤ 0.1 · Lighthouse Performance ≥ 90, SEO 100, Accessibility ≥ 95, Best Practices ≥ 95.
 
 - Framer Motion only on transform/opacity, respects `prefers-reduced-motion`, never on the LCP element.
-- Third-party scripts lazy (Cal.com, YouTube, Persona, analytics).
+- Third-party scripts lazy (YouTube, Persona, analytics).
 - Forms: short, inline validation (Zod + React Hook Form), Turnstile spam protection, clear confirmation state.
 
 ## 16. Architecture conventions
@@ -305,6 +305,8 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
   - [x] Vercel Hobby upgrade triggers on Main Admin: detects commercial use (issued invoices or recorded payments, currently **triggered**) with a banner, and lists the triggers only Vercel can show (usage, seats, notices) with a link to Vercel usage. Vercel has no usage API for Hobby, so live usage isn't read.
   - [x] Shareholders + investor dashboard (owner, 2026-10-29; migrations `…10` investor role, `…11` shareholders, both applied): register seeded via SQL (not in the repo): Nicholas Tonui, Fumbwe Hamisi, Wendy Achieng 352 shares each (director shareholders), investor Angela Matthes (Switzerland) 144 shares, 1,200 in issue. Registered ownership % stored per holder (migration `…12`, owner 2026-10-29): Nicholas Tonui 29.34%, Fumbwe Hamisi and Wendy Achieng 29.33%, Angela Matthes 12.00% (total 100%); dashboards show and value holdings by the registered figure, falling back to shares / total when it's blank. Main Admin warns if the percentages don't add up to 100. `shareholder_overview()` SECURITY DEFINER RPC gives investors company totals only. `/portal/investor`: net worth (cash collected minus expenses plus receivables, cash basis, not a valuation), profit/loss this year and to date, value of own shares; per currency, USD shown only once there's USD activity. Director dashboard: share register with book value per holder and own holding. Main Admin → Shareholders: edit holdings, link portal logins (audit-logged). RLS verified 2026-10-29 with the same test: directors see all 4 holders and can't edit shares; the investor sees only her own row (144/1,200 at 12.00%) and no invoices, payments, clients or expenses; sales can't call the overview.
 
+  - [x] Online call booking (owner, 2026-10-29: build our own, WhatsApp secondary). Migration `…13` (applied 2026-10-29): `booking_hours`, `booking_blocks`, `bookings` with a no-overlap exclusion constraint on confirmed calls, RLS (sales + super_admin manage; marketing/director read bookings), status changes audit-logged by trigger. Public `/book` (call type, day and time in the visitor's time zone with the Nairobi time, details form with Turnstile, honeypot and rate limit; server re-checks the slot and the database blocks double booking). Portal: Sales → Bookings and Sales → Availability. All call CTAs point to `/book`; the WhatsApp bubble became a "Book a call" button; WhatsApp stays on `/contact` and in the footer. Cal.com facade and `NEXT_PUBLIC_CAL_COM_LINK` removed. Slot logic tested with a script (notice, split hours, blocks, bookings, Sunday closed, horizon); the form tested in a browser with stubbed times (live Supabase isn't reachable from the cloud session).
+
 ## 18. Open Inputs (keep updated)
 
 Last tidied 2026-10-29. Grouped by what the owner needs to do. Resolved items are removed from here; their history stays in §17.
@@ -315,7 +317,8 @@ Last tidied 2026-10-29. Grouped by what the owner needs to do. Resolved items ar
 - **Vercel Pro.** The commercial-use upgrade trigger has fired (issued invoices and recorded payments; Main Admin shows the banner). Hobby can pause the site at its limits (§3, ADR 0001).
 - **Shareholder portal logins.** Create logins for Angela Matthes (`investor`), Fumbwe Hamisi and Wendy Achieng (`director`) under Main Admin → Users, then link each one under Main Admin → Shareholders.
 - **M-Pesa reference.** Confirm with I&M Bank whether clients enter account 27386 alone or add a reference (such as the invoice number), then update the payment instructions in `finance_settings` if needed.
-- **Cal.com link** (`NEXT_PUBLIC_CAL_COM_LINK`). The booking facade on `/contact` falls back to a WhatsApp prompt until this is set.
+- **Booking hours (do this first after the booking release).** Portal → Sales → Availability: add your weekly hours. Until hours exist, `/book` shows "No open times" and a message link, and the Bookings tab shows a warning.
+- **Booking follow-up routine.** Until Resend exists, nobody is emailed automatically: check Sales → Bookings daily, confirm each call by email and send the video link for video calls. Confirm the default rules in `config/booking.ts` (30-minute calls, 4 hours' notice, 21 days ahead).
 - **Turnstile on Preview (optional).** Keys are in Vercel for Production only. Add them to Preview if preview deployments should be protected; without them a preview falls back to the honeypot only.
 
 ### Owner content

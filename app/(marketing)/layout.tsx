@@ -2,7 +2,7 @@ import { AttributionCapture } from "@/components/analytics/attribution-capture";
 import { CloudflareWebAnalytics } from "@/components/analytics/cloudflare-web-analytics";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { WhatsappFab } from "@/components/layout/whatsapp-fab";
+import { BookingFab } from "@/components/layout/booking-fab";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +10,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <SiteHeader />
       <main>{children}</main>
       <SiteFooter />
-      <WhatsappFab />
+      <BookingFab />
       <AttributionCapture />
       <CloudflareWebAnalytics />
     </>

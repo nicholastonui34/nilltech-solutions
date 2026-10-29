@@ -41,7 +41,7 @@ export default function PodcastPage() {
         eyebrow={podcast.name}
         headline="Conversations on how work is changing."
         subheadline="Remote work, managed teams and AI at work, with the people building the future of work in Africa and beyond."
-        primaryCta="whatsapp"
+        primaryCta="discovery-call"
       />
 
       <section className="py-16">

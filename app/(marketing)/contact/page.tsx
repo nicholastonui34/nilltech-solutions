@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Mail, Phone } from "lucide-react";
+import Link from "next/link";
+import { CalendarClock, Mail, MessageCircle, Phone } from "lucide-react";
 
-import { BookingFacade } from "@/components/sections/booking-facade";
 import { ContactForm } from "@/components/sections/contact-form";
 import { Container } from "@/components/sections/container";
 import { TrackedLink } from "@/components/sections/tracked-link";
+import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site.config";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Contact",
   description:
-    "Contact NillTech Solutions in Nairobi: email info@nilltechsolutions.com, call or WhatsApp +254 725 830 334, or send us your project details.",
+    "Contact NillTech Solutions in Nairobi: book a free call online, send us your project details, email info@nilltechsolutions.com or call +254 725 830 334.",
   path: "/contact",
 });
 
@@ -19,8 +20,8 @@ export const metadata: Metadata = buildMetadata({
 // server action. It degrades gracefully — on-screen success/error either
 // way — if SUPABASE_SERVICE_ROLE_KEY isn't configured yet. Direct contact
 // methods stay alongside it as a redundant, always-working fallback.
-// WhatsApp isn't repeated here: the booking card below and the floating
-// button already offer it (owner, 2026-10-25).
+// Booking a call is the main route (owner, 2026-10-29); WhatsApp stays here
+// as a secondary channel for visitors who'd rather message.
 const methods = [
   {
     icon: Mail,
@@ -35,6 +36,13 @@ const methods = [
     value: siteConfig.contact.phoneDisplay,
     href: `tel:${siteConfig.contact.phone}`,
     event: "call_click" as const,
+  },
+  {
+    icon: MessageCircle,
+    label: "WhatsApp",
+    value: "Message us on WhatsApp",
+    href: siteConfig.contact.whatsapp,
+    event: "whatsapp_click" as const,
   },
 ];
 
@@ -54,6 +62,17 @@ export default function ContactPage() {
           </div>
 
           <div className="flex flex-col gap-6 lg:col-span-2">
+            <div className="border-primary bg-primary/5 rounded-lg border-2 p-6">
+              <CalendarClock className="text-nilltech-purple size-7" aria-hidden />
+              <p className="mt-3 font-semibold">Prefer to talk it through?</p>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Book a free 30-minute call at a time that suits you.
+              </p>
+              <Button asChild className="mt-4">
+                <Link href="/book">Book a call</Link>
+              </Button>
+            </div>
+
             {methods.map((m) => (
               <TrackedLink
                 key={m.label}
@@ -70,8 +89,6 @@ export default function ContactPage() {
                 </span>
               </TrackedLink>
             ))}
-
-            <BookingFacade />
           </div>
         </div>
       </Container>

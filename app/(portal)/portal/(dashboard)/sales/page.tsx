@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LeadStatusForm } from "@/components/portal/lead-status-form";
 import { StatusBadge, TierBadge } from "@/components/portal/lead-badges";
 import { PageHeader } from "@/components/portal/page-header";
+import { SalesTabs } from "@/components/portal/sales/sales-tabs";
 import { NoAccess, Panel, StatCard } from "@/components/portal/panel";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { formatDate } from "@/lib/format";
@@ -98,6 +99,7 @@ export default async function SalesPage({
         title="Sales"
         description="Every lead from the site's forms, newest first."
       />
+      <SalesTabs current="/portal/sales" />
 
       <div className="grid gap-4 sm:grid-cols-4">
         <StatCard

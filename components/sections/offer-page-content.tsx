@@ -59,7 +59,8 @@ export function OfferPageContent({ data }: { data: OfferPageData }) {
         headline={data.headline}
         subheadline={data.subheadline}
         primaryCta={data.primaryCta}
-        secondaryCta="whatsapp"
+        // Quote pages offer a call as the alternative; call pages offer a message.
+        secondaryCta={data.primaryCta === "quote" ? "discovery-call" : "message"}
       />
 
       <OfferIntro
