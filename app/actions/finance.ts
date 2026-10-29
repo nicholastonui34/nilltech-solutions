@@ -7,7 +7,12 @@ import { z } from "zod";
 import { getEtimsProvider } from "@/lib/etims/provider";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { CURRENCIES, parseAmountToMinor, type Currency } from "@/lib/finance/money";
-import { PAYMENT_METHODS, type PaymentMethod } from "@/lib/finance/labels";
+import {
+  EXPENSE_CATEGORIES,
+  PAYMENT_METHODS,
+  type ExpenseCategory,
+  type PaymentMethod,
+} from "@/lib/finance/labels";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -431,4 +436,98 @@ export async function updateFinanceSettings(
   return {
     success: "Saved. New invoices will use these details; issued ones keep theirs.",
   };
+}
+
+// --- Expenses --------------------------------------------------------------
+
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose a date.");
+
+const expenseSchema = z.object({
+  spent_on: isoDate,
+  description: z.string().trim().min(1, "Describe the expense.").max(300),
+  category: z.enum(EXPENSE_CATEGORIES as [ExpenseCategory, ...ExpenseCategory[]], {
+    error: "Choose a category.",
+  }),
+  amount: z.string(),
+  currency: currencySchema,
+  vendor: optionalText,
+  method: z
+    .enum(["", ...PAYMENT_METHODS] as [string, ...string[]])
+    .transform((v) => (v ? (v as PaymentMethod) : null)),
+  reference: optionalText,
+  project_id: z
+    .string()
+    .transform((v) => v || null)
+    .refine((v) => v === null || uuid.safeParse(v).success, "Unknown project."),
+  notes: z
+    .string()
+    .trim()
+    .max(2000)
+    .transform((v) => v || null),
+});
+
+function parseExpense(formData: FormData) {
+  const parsed = expenseSchema.safeParse({
+    spent_on: formData.get("spent_on") ?? "",
+    description: formData.get("description") ?? "",
+    category: formData.get("category") ?? "",
+    amount: formData.get("amount") ?? "",
+    currency: formData.get("currency") ?? "",
+    vendor: formData.get("vendor") ?? "",
+    method: formData.get("method") ?? "",
+    reference: formData.get("reference") ?? "",
+    project_id: formData.get("project_id") ?? "",
+    notes: formData.get("notes") ?? "",
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message } as const;
+  const { amount, ...rest } = parsed.data;
+  const amountMinor = parseAmountToMinor(amount);
+  if (!amountMinor) return { error: "Enter an amount above zero." } as const;
+  return { values: { ...rest, amount_minor: amountMinor } } as const;
+}
+
+export async function createExpense(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { user, supabase } = await financeContext();
+  const result = parseExpense(formData);
+  if ("error" in result) return { error: result.error };
+
+  const { error } = await supabase
+    .from("expenses")
+    .insert({ ...result.values, created_by: user.id });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return { success: `Added: ${result.values.description}.` };
+}
+
+export async function updateExpense(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const id = uuid.safeParse(formData.get("expenseId"));
+  if (!id.success) return { error: "Unknown expense." };
+  const result = parseExpense(formData);
+  if ("error" in result) return { error: result.error };
+
+  const { error } = await supabase
+    .from("expenses")
+    .update(result.values)
+    .eq("id", id.data);
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return { success: "Expense saved." };
+}
+
+export async function deleteExpense(formData: FormData) {
+  const { supabase } = await financeContext();
+  const id = uuid.safeParse(formData.get("expenseId"));
+  if (!id.success) throw new Error("Unknown expense.");
+  const { error } = await supabase.from("expenses").delete().eq("id", id.data);
+  if (error) throw new Error(dbMessage(error));
+  redirect("/portal/finance/expenses");
 }

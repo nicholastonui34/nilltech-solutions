@@ -44,13 +44,18 @@ export function StatCard({
 export function BarList({
   rows,
   emptyLabel = "No data yet.",
+  alwaysShow = false,
 }: {
   // `display` overrides the number shown (e.g. a formatted amount).
   rows: { label: string; value: number; display?: string }[];
   emptyLabel?: string;
+  // Show the rows even when every bar is empty (e.g. months at a loss).
+  alwaysShow?: boolean;
 }) {
   const max = Math.max(0, ...rows.map((row) => row.value));
-  if (max === 0) return <p className="text-muted-foreground text-sm">{emptyLabel}</p>;
+  if (max === 0 && !alwaysShow) {
+    return <p className="text-muted-foreground text-sm">{emptyLabel}</p>;
+  }
 
   return (
     <ul className="flex flex-col gap-2.5">
@@ -65,7 +70,7 @@ export function BarList({
           <div className="bg-muted mt-1 h-2 overflow-hidden rounded-full">
             <div
               className="bg-primary h-full rounded-full"
-              style={{ width: `${(row.value / max) * 100}%` }}
+              style={{ width: max ? `${(row.value / max) * 100}%` : 0 }}
             />
           </div>
         </li>

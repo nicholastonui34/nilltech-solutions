@@ -42,3 +42,29 @@ export function isOverdue(
     invoice.due_date < today
   );
 }
+
+export type ExpenseCategory = Database["public"]["Enums"]["expense_category"];
+
+export const EXPENSE_CATEGORIES: readonly ExpenseCategory[] = [
+  "talent",
+  "software",
+  "hosting",
+  "marketing",
+  "office",
+  "travel",
+  "equipment",
+  "fees_taxes",
+  "other",
+];
+
+export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
+  talent: "Talent and contractors",
+  software: "Software and subscriptions",
+  hosting: "Hosting and infrastructure",
+  marketing: "Marketing and ads",
+  office: "Office and admin",
+  travel: "Travel and transport",
+  equipment: "Equipment",
+  fees_taxes: "Fees, charges and taxes",
+  other: "Other",
+};

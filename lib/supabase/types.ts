@@ -173,6 +173,65 @@ export type Database = {
         };
         Relationships: [];
       };
+      expenses: {
+        Row: {
+          amount_minor: number;
+          category: Database["public"]["Enums"]["expense_category"];
+          created_at: string;
+          created_by: string | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          description: string;
+          id: string;
+          method: Database["public"]["Enums"]["payment_method"] | null;
+          notes: string | null;
+          project_id: string | null;
+          reference: string | null;
+          spent_on: string;
+          updated_at: string;
+          vendor: string | null;
+        };
+        Insert: {
+          amount_minor: number;
+          category: Database["public"]["Enums"]["expense_category"];
+          created_at?: string;
+          created_by?: string | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          description: string;
+          id?: string;
+          method?: Database["public"]["Enums"]["payment_method"] | null;
+          notes?: string | null;
+          project_id?: string | null;
+          reference?: string | null;
+          spent_on: string;
+          updated_at?: string;
+          vendor?: string | null;
+        };
+        Update: {
+          amount_minor?: number;
+          category?: Database["public"]["Enums"]["expense_category"];
+          created_at?: string;
+          created_by?: string | null;
+          currency?: Database["public"]["Enums"]["currency_code"];
+          description?: string;
+          id?: string;
+          method?: Database["public"]["Enums"]["payment_method"] | null;
+          notes?: string | null;
+          project_id?: string | null;
+          reference?: string | null;
+          spent_on?: string;
+          updated_at?: string;
+          vendor?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "expenses_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       finance_settings: {
         Row: {
           address_lines: string[];
@@ -782,6 +841,16 @@ export type Database = {
         | "client"
         | "recruitment";
       currency_code: "KES" | "USD";
+      expense_category:
+        | "talent"
+        | "software"
+        | "hosting"
+        | "marketing"
+        | "office"
+        | "travel"
+        | "equipment"
+        | "fees_taxes"
+        | "other";
       engagement_type: "freelance" | "full_time";
       invoice_status: "draft" | "issued" | "partially_paid" | "paid" | "void";
       lead_status: "new" | "contacted" | "qualified" | "disqualified";
