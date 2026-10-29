@@ -4,11 +4,20 @@ import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
 import { OfferIntro } from "@/components/sections/offer-intro";
 import { ProcessSteps } from "@/components/sections/process-steps";
-import { ServiceCard } from "@/components/sections/service-card";
+import {
+  accentAt,
+  ServiceCard,
+  type CardPhoto,
+} from "@/components/sections/service-card";
 import type { CtaIntent } from "@/config/cta";
-import type { LucideIcon } from "lucide-react";
 
-type Deliverable = { icon: LucideIcon; title: string; description: string; href: string };
+// `photo` is optional: cards show text only until a real photo exists.
+type Deliverable = {
+  title: string;
+  description: string;
+  href: string;
+  photo?: CardPhoto;
+};
 // Link text follows where the card goes (CLAUDE.md §5: no generic "Learn more").
 function deliverableLinkLabel(href: string) {
   if (href.startsWith("/estimate")) return "Get an estimate";
@@ -62,10 +71,11 @@ export function OfferPageContent({ data }: { data: OfferPageData }) {
         <Container>
           <h2 className="mb-10 text-2xl font-semibold">What&rsquo;s included</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {data.deliverables.map((d) => (
+            {data.deliverables.map((d, i) => (
               <ServiceCard
                 key={d.title}
-                icon={d.icon}
+                photo={d.photo}
+                accent={accentAt(i)}
                 title={d.title}
                 description={d.description}
                 href={d.href}

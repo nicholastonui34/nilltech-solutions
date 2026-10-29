@@ -17,6 +17,18 @@ hasn't supplied yet render nothing instead of fake proof.
 | `/academy` free courses       | Course list, lessons, optional videos                                                                       | `lib/content/courses.ts`                            |
 | `/blog` posts                 | Real posts                                                                                                  | `lib/content/blog-posts.ts`                         |
 
+## Photos to replace brand graphics (owner, 2026-10-29)
+
+The five home-page offer cards show brand illustrations (`public/art/*.svg`) until real photos exist. To swap one in, put the photo in `public/photos/` (landscape, roughly 5:3, at least 1200 px wide) and set `photo: { src, alt }` on that offer in `config/offers.ts`. The "What's included" cards on the offer pages take an optional `photo` the same way (each page's `deliverables`).
+
+| Card                            | Suggested shot                                           |
+| ------------------------------- | -------------------------------------------------------- |
+| AI-Powered Software Development | The team building or reviewing a website or app          |
+| AI Solutions for SMEs           | A WhatsApp or website assistant in use, or a demo        |
+| Managed Tech Delivery Teams     | The team at work, a stand-up or planning session         |
+| NillTech Academy                | A training session or a learner working through a course |
+| Partnerships                    | A meeting with a partner (with their permission)         |
+
 ## Statements written as policy: owner to confirm
 
 These describe how NillTech works. They aren't stats or claims about

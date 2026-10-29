@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { BookOpen, GraduationCap, Users } from "lucide-react";
 
 import {
   OfferPageContent,
@@ -38,21 +37,18 @@ const data: OfferPageData = {
   startingFrom: "Free",
   deliverables: [
     {
-      icon: BookOpen,
       title: "Free courses",
       description:
         "Short, practical courses you can start right now, with no account or payment needed.",
       href: "/academy#courses",
     },
     {
-      icon: GraduationCap,
       title: "Paid courses",
       description:
         "In-depth courses with projects, coming soon. Get in touch to hear when enrolment opens.",
       href: "/contact",
     },
     {
-      icon: Users,
       title: "Team training",
       description:
         "AI and software training for your company's team, built around your tools and work. Contact us to plan it.",
