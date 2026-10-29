@@ -47,9 +47,12 @@ jobs:
           BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
           set -euo pipefail
+          # Secrets pasted from a web page often carry a trailing newline or
+          # spaces; a connection URI never contains whitespace, so drop it.
+          db_url="${SUPABASE_DB_URL//[$' \t\r\n']/}"
           stamp=$(date -u +%Y-%m-%dT%H%MZ)
           echo "STAMP=$stamp" >> "$GITHUB_ENV"
-          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+          /usr/lib/postgresql/17/bin/pg_dump "$db_url" \
             --schema=public --schema=auth \
             --format=custom --no-owner --no-privileges \
             --file=backup.dump
