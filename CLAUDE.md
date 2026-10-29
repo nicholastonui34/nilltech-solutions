@@ -304,23 +304,48 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 
 ## 18. Open Inputs (keep updated)
 
-- **ID verification vendor — deferred, coming soon (owner decision 2026-10-24).** Persona's cheapest confirmed plan ($250/mo, 12-month minimum) is ~13x the entire infra budget, so freelancer verification ships as a placeholder until a vendor is picked (iDenfy/Didit mentioned as having free tiers, both unverified). Not blocking current phases.
-- **SMS vendor — deferred, coming soon (owner decision 2026-10-24).** Africa's Talking likely has a one-off sender ID fee (~KES 5,000–15,000) not yet budgeted. SMS automation ships behind a swappable interface, not wired to a real vendor, until confirmed. Not blocking current phases.
-- **Resend account — deferred, coming soon (owner decision 2026-10-24).** Owner will provide credentials when ready; email sending is stubbed until then. Not blocking current phases.
-- **`SUPABASE_SERVICE_ROLE_KEY`** — owner needs to pull this from the Supabase dashboard (Project Settings → API, `nilltech-solutions` project) and add it to `.env.local`/Vercel env vars. Until then, every lead-capture form (`/contact`, `/estimate`) degrades gracefully to an honest error message instead of silently failing — verified in a browser.
-- **Portal bootstrap (Phase 4):** (1) disable public sign-up in Supabase (Authentication → Sign In / Providers); (2) owner creates their own user in Supabase → Authentication → Users → Add user (auto-confirm); (3) grant `super_admin` with one SQL insert into `user_roles`. See ADR 0003.
-- **Cal.com link** (`NEXT_PUBLIC_CAL_COM_LINK`) — the booking facade on `/contact` falls back to a WhatsApp prompt until this is set.
-- **Cloudflare Turnstile** — keys added to Vercel (Production only) 2026-10-25 and wired into all four public forms (`components/forms/turnstile-widget.tsx`, server check in `lib/turnstile.ts`). Add the keys to **Preview** too if previews should be protected; without them a deployment falls back to the honeypot only.
-- "Where to Play" strategy doc — not found in this repo; needed before finalizing IA/keyword targets.
-- Figma design system: [Jk7ESTZ2R2XMppy2Uw6R25](https://www.figma.com/design/Jk7ESTZ2R2XMppy2Uw6R25) — built from scratch in Phase 2 (owner decision 2026-10-24), not imported from an existing file. Scope was foundations + three signature components, not an exhaustive library — extend it there first before adding new one-off visual treatments in code.
-- Logo master file — `public/brand/nilltech-logo.jpg` is a flat JPEG with a baked-in white background. Since 2026-10-29 the site uses a circular mark instead (`components/brand/brand-mark.tsx` + `public/brand/nilltech-mark.png`: the N cropped from the master, white disc, purple-to-blue gradient ring) in the header, footer, portal and login, and a print version (`public/brand/nilltech-mark-circle.png`, transparent outside the ring) on invoices, receipts and the legal PDFs. Only the JSON-LD `logo` still points at the full JPEG. An SVG master would still be better for print and large sizes.
-- **Starting prices** — set 2026-10-25 from market research (ADR 0006: website from KES 45k, store 95k, business systems 180k, custom software 250k, AI from 40k setup, developer from KES 180k/month; international ×1.5 in USD). Review every 6 months or when the shilling moves (`USD_KES_RATE`).
-- **Privacy notice (Kenya DPA 2019)** — drafted 2026-10-25 at the owner's request from public sources (the Act, ODPC guidance notes, Tax Procedures Act s. 23) in `lib/content/legal.ts`, live at `/legal#privacy` and as a PDF at `/legal/privacy-notice.pdf`, linked at every form. **Not legal advice — have a Kenyan advocate review it.** Update it whenever a form, vendor or data use changes.
-- **Terms of service** — drafted 2026-10-25 at the owner's request (`lib/content/legal.ts`, `/legal#terms`, PDF at `/legal/terms-of-service.pdf`): estimates indicative, KES/USD invoicing without VAT, M-Pesa/bank payment, free post-launch bug fixes for the period in each proposal, IP assigned to the client on full payment, liability capped at fees paid, Kenyan law. **Not legal advice — have a Kenyan advocate review it.** Every proposal should state its bug-fix period, payment schedule and validity.
-- **ODPC registration** — check whether NillTech must register as a data controller: exemption needs BOTH annual turnover under KES 5M AND fewer than 10 employees, and is lost for some purposes (e.g. direct marketing) regardless of size. The privacy notice deliberately makes no registration claim.
-- **Founders for `/about`** — names, roles, short bios (photo optional). The section stays hidden until supplied. Also confirm the policy statements listed in `docs/content-placeholders.md` (reply time, white-label, NDA, meeting engineers before they start).
-- Testimonials/case studies.
-- YouTube channel + episode list.
-- Academy course list & pricing.
-- eTIMS integration route.
-- Current hosting provider & cost breakdown (if the live nilltechsolutions.com site is ever folded into this repo's scope — currently out of scope, see Conflicts).
+Last tidied 2026-10-29. Grouped by what the owner needs to do. Resolved items are removed from here; their history stays in §17.
+
+### Owner actions (site and accounts)
+
+- **Domain: last step, owner decision 2026-10-29.** Attach nilltechsolutions.com to this Vercel project (Settings → Domains) and update DNS. Canonical URLs, the share image, sitemap and IndexNow already point at nilltechsolutions.com, so they only start working once the domain moves. Until then the site runs at nilltech-solutions.vercel.app. Check the old site's URLs and add 301 redirects before the cutover (§14).
+- **Vercel Pro.** The commercial-use upgrade trigger has fired (issued invoices and recorded payments; Main Admin shows the banner). Hobby can pause the site at its limits (§3, ADR 0001).
+- **Shareholder portal logins.** Create logins for Angela Matthes (`investor`), Fumbwe Hamisi and Wendy Achieng (`director`) under Main Admin → Users, then link each one under Main Admin → Shareholders.
+- **M-Pesa reference.** Confirm with I&M Bank whether clients enter account 27386 alone or add a reference (such as the invoice number), then update the payment instructions in `finance_settings` if needed.
+- **Cal.com link** (`NEXT_PUBLIC_CAL_COM_LINK`). The booking facade on `/contact` falls back to a WhatsApp prompt until this is set.
+- **Turnstile on Preview (optional).** Keys are in Vercel for Production only. Add them to Preview if preview deployments should be protected; without them a preview falls back to the honeypot only.
+
+### Owner content
+
+- **Founder bios and photos** for Nicholas Tonui, Wendy Achieng and Fumbwe Hamisi (`lib/content/founders.ts`). Names and roles are live on `/about`; an initials badge shows until photos arrive.
+- **Policy statements** listed in `docs/content-placeholders.md` (reply time, white-label, NDA, meeting engineers before they start).
+- **Testimonials and case studies.** Proof sections stay hidden until real ones exist.
+- **Podcast:** YouTube channel URL and episode list (`lib/content/podcast-episodes.ts`).
+- **Academy:** course list, and pricing for paid courses (`lib/content/courses.ts`).
+- **"Where to Play" strategy doc.** Not in this repo; useful before revisiting IA and keyword targets.
+
+### Legal and compliance
+
+- **Privacy notice (Kenya DPA 2019):** drafted 2026-10-25 from public sources (the Act, ODPC guidance notes, Tax Procedures Act s. 23) in `lib/content/legal.ts`, live at `/legal#privacy` and as a PDF at `/legal/privacy-notice.pdf`, linked at every form. **Not legal advice: have a Kenyan advocate review it.** Update it whenever a form, vendor or data use changes.
+- **Terms of service:** drafted 2026-10-25 (`lib/content/legal.ts`, `/legal#terms`, PDF at `/legal/terms-of-service.pdf`): estimates indicative, KES/USD invoicing without VAT, M-Pesa/bank payment, free post-launch bug fixes for the period in each proposal, IP assigned to the client on full payment, liability capped at fees paid, Kenyan law. **Not legal advice: have a Kenyan advocate review it.** Every proposal should state its bug-fix period, payment schedule and validity.
+- **ODPC registration:** check whether NillTech must register as a data controller. Exemption needs BOTH annual turnover under KES 5M AND fewer than 10 employees, and is lost for some purposes (e.g. direct marketing) regardless of size. The privacy notice deliberately makes no registration claim.
+- **eTIMS integration route** (certified integrator or KRA OSCU/VSCU). The `EtimsProvider` stub waits on it, as does client KRA PIN capture.
+
+### Deferred vendors (owner decision 2026-10-24, not blocking)
+
+- **Resend (email):** owner will provide an account and domain when ready; sending is stubbed and logged as skipped until then. Unblocks lead/applicant emails, emailing invoices, invite and reset emails, and the newsletter.
+- **ID verification:** Persona's cheapest confirmed plan ($250/mo, 12-month minimum) is ~13x the whole infra budget. Verification ships as "Coming soon" behind `IdVerificationProvider` until a vendor is picked (iDenfy/Didit mentioned as having free tiers, both unverified).
+- **SMS (Africa's Talking):** likely has a one-off sender ID fee (~KES 5,000 to 15,000) not yet budgeted. Ships behind a swappable `SmsProvider` interface until confirmed.
+
+### Reference (no action needed now)
+
+- **Starting prices:** set 2026-10-25 from market research (ADR 0006: website from KES 45k, store 95k, business systems 180k, custom software 250k, AI from 40k setup, developer from KES 180k/month; international ×1.5 in USD). Review every 6 months or when the shilling moves (`USD_KES_RATE`).
+- **Figma design system:** [Jk7ESTZ2R2XMppy2Uw6R25](https://www.figma.com/design/Jk7ESTZ2R2XMppy2Uw6R25), built from scratch in Phase 2 (owner decision 2026-10-24). Foundations plus three signature components, not an exhaustive library: extend it there first before adding new one-off visual treatments in code.
+- **Logo master file:** `public/brand/nilltech-logo.jpg` is a flat JPEG with a baked-in white background. Since 2026-10-29 the site uses a circular mark instead (`components/brand/brand-mark.tsx` + `public/brand/nilltech-mark.png`) in the header, footer, portal and login, and a print version (`public/brand/nilltech-mark-circle.png`) on invoices, receipts and the legal PDFs. Only the JSON-LD `logo` still points at the full JPEG. An SVG master would still be better for print and large sizes.
+- **Old live site:** the current nilltechsolutions.com hosting and its cost breakdown are out of scope until the domain move (see Conflicts).
+
+### Resolved (2026-10-29 tidy)
+
+- `SUPABASE_SERVICE_ROLE_KEY` is set in Vercel (Production and Preview).
+- Portal bootstrap is done: the owner signs in as `super_admin` (Phase 4).
+- Founder names and roles are on `/about` (Phase 8); only bios and photos remain (above).
