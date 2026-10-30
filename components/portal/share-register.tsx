@@ -18,9 +18,9 @@ const HOLDER_TYPE_LABELS: Record<string, string> = {
 };
 
 /**
- * Share register for the Director dashboard: every holder, their shares,
- * ownership % (derived from share counts) and the book value of their
- * holding in KES. The signed-in director's own row is highlighted.
+ * Share register: every holder, their shares, ownership % and the book
+ * value of their holding in KES. The signed-in holder's own row is bold;
+ * their personal view is My shareholding (/portal/shares).
  */
 export function ShareRegister({
   holders,
@@ -32,7 +32,6 @@ export function ShareRegister({
   currentUserId: string;
 }) {
   const total = holders.reduce((sum, h) => sum + h.shares, 0);
-  const mine = holders.find((h) => h.user_id === currentUserId);
   const pct = (h: Holder) =>
     ownershipPercent({ shares: h.shares, ownershipPercent: h.ownership_percent }, total);
 
@@ -41,17 +40,6 @@ export function ShareRegister({
       title="Shareholding"
       description={`${shareCount.format(total)} shares in issue. Value is each holder's share of the company's book net worth (KES, cash basis), not a market valuation.`}
     >
-      {mine ? (
-        <p className="bg-muted/60 mb-4 rounded-lg p-3 text-sm">
-          You hold{" "}
-          <span className="font-semibold">{shareCount.format(mine.shares)} shares</span> (
-          {formatPercent(pct(mine))}), worth{" "}
-          <span className="font-semibold">
-            {formatMoney(holdingValue(netWorthKes, pct(mine)), "KES")}
-          </span>{" "}
-          at book value.
-        </p>
-      ) : null}
       {holders.length ? (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
