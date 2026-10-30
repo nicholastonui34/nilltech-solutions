@@ -4,9 +4,11 @@ import { useActionState, useState } from "react";
 
 import {
   createFreelancerAccount,
+  createTestTask,
   recordTaxPin,
   revealTaxPin,
   updateApplication,
+  uploadTalentDocument,
   type RecruitmentFormState,
 } from "@/app/actions/recruitment";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
+import { DOCUMENT_KIND_LABELS, type TalentDocumentKind } from "@/lib/talent/labels";
 import {
   ENGAGEMENT_TYPE_LABELS,
   STAGE_LABELS,
@@ -235,8 +238,8 @@ export function FreelancerAccountForm({ id }: { id: string }) {
     <form action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="id" value={id} />
       <p className="text-muted-foreground text-xs">
-        Creates a portal login (Freelancer role) so they can see their status and
-        assignments.
+        Creates a portal login (Freelancer role) so they can read and submit test tasks,
+        update their details, and later see projects, payments and documents.
       </p>
       <Message state={state} />
       <Button
@@ -247,6 +250,99 @@ export function FreelancerAccountForm({ id }: { id: string }) {
         className="self-start"
       >
         {pending ? "Creating…" : "Give portal access"}
+      </Button>
+    </form>
+  );
+}
+
+export function CreateTestTaskForm({ id, minDate }: { id: string; minDate: string }) {
+  const [state, formAction, pending] = useActionState(createTestTask, initialState);
+  return (
+    <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="id" value={id} />
+      <div>
+        <Label htmlFor="task-title">Title</Label>
+        <Input
+          id="task-title"
+          name="title"
+          required
+          maxLength={200}
+          placeholder="For example: Build a booking form"
+          className="mt-1.5"
+        />
+      </div>
+      <div>
+        <Label htmlFor="task-brief">Brief (the applicant sees this)</Label>
+        <Textarea
+          id="task-brief"
+          name="brief"
+          required
+          rows={6}
+          maxLength={8000}
+          className="mt-1.5"
+        />
+      </div>
+      <div>
+        <Label htmlFor="task-due">Due date (optional)</Label>
+        <Input id="task-due" name="dueOn" type="date" min={minDate} className="mt-1.5" />
+      </div>
+      <Message state={state} />
+      <Button type="submit" size="sm" disabled={pending} className="self-start">
+        {pending ? "Adding…" : "Add test task"}
+      </Button>
+    </form>
+  );
+}
+
+export function UploadDocumentForm({ id }: { id: string }) {
+  const [state, formAction, pending] = useActionState(uploadTalentDocument, initialState);
+  return (
+    <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="id" value={id} />
+      <div>
+        <Label htmlFor="doc-kind">Type</Label>
+        <NativeSelect
+          id="doc-kind"
+          name="kind"
+          defaultValue="contract"
+          className="mt-1.5"
+        >
+          {(Object.keys(DOCUMENT_KIND_LABELS) as TalentDocumentKind[]).map((kind) => (
+            <option key={kind} value={kind}>
+              {DOCUMENT_KIND_LABELS[kind]}
+            </option>
+          ))}
+        </NativeSelect>
+      </div>
+      <div>
+        <Label htmlFor="doc-title">Title</Label>
+        <Input
+          id="doc-title"
+          name="title"
+          required
+          maxLength={200}
+          placeholder="For example: Freelance services agreement"
+          className="mt-1.5"
+        />
+      </div>
+      <div>
+        <Label htmlFor="doc-file">PDF file (up to 4 MB)</Label>
+        <Input
+          id="doc-file"
+          name="file"
+          type="file"
+          accept="application/pdf,.pdf"
+          required
+          className="mt-1.5"
+        />
+      </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="requiresAcceptance" className="size-4" />
+        They must accept it (they type their name to confirm)
+      </label>
+      <Message state={state} />
+      <Button type="submit" size="sm" disabled={pending} className="self-start">
+        {pending ? "Uploading…" : "Upload document"}
       </Button>
     </form>
   );

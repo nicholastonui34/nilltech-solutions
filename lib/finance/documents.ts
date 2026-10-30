@@ -3,11 +3,14 @@ import "server-only";
 import { getCurrentUser } from "@/lib/auth/dal";
 import {
   buildCreditNotePdf,
+  buildFreelancerPaymentPdf,
   buildInvoicePdf,
   buildQuotePdf,
   buildReceiptPdf,
 } from "@/lib/finance/pdf";
+import { describePayout } from "@/lib/finance/payout";
 import { parseClientSnapshot, parseSellerSnapshot } from "@/lib/finance/snapshots";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -220,4 +223,69 @@ export async function quotePdfResponse(id: string) {
   });
 
   return pdfResponse(bytes, `${quote.number}.pdf`);
+}
+
+export async function freelancerPaymentPdfResponse(id: string) {
+  if (!UUID_PATTERN.test(id)) return notFound();
+  const user = await getCurrentUser();
+  if (!user) return new Response("Sign in required", { status: 401 });
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return notFound();
+
+  const { data: payment } = await supabase
+    .from("freelancer_payments")
+    .select(
+      "number, paid_on, amount_minor, currency, method, reference, description, payee_name, voided_at, seller_snapshot, payout_snapshot, projects(name)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  const seller = parseSellerSnapshot(payment?.seller_snapshot ?? null);
+  if (!payment || !seller) return notFound();
+
+  const bytes = await buildFreelancerPaymentPdf({
+    number: payment.number,
+    paidOn: payment.paid_on,
+    amountMinor: payment.amount_minor,
+    currency: payment.currency,
+    method: payment.method,
+    reference: payment.reference,
+    description: payment.description,
+    projectName: payment.projects?.name ?? null,
+    payeeName: payment.payee_name,
+    paidTo: describePayout(payment.payout_snapshot),
+    voided: payment.voided_at !== null,
+    seller,
+  });
+
+  return pdfResponse(bytes, `${payment.number}.pdf`);
+}
+
+/**
+ * Talent documents (contracts, NDAs, letters) are uploaded PDFs, not
+ * generated. The row is read through the user's session, so RLS decides
+ * access (recruitment, or the freelancer it belongs to); only then is the
+ * file fetched with the service role from the private bucket.
+ */
+export async function talentDocumentResponse(id: string) {
+  if (!UUID_PATTERN.test(id)) return notFound();
+  const user = await getCurrentUser();
+  if (!user) return new Response("Sign in required", { status: 401 });
+  const supabase = await createSupabaseServerClient();
+  const admin = getSupabaseAdmin();
+  if (!supabase || !admin) return notFound();
+
+  const { data: doc } = await supabase
+    .from("talent_documents")
+    .select("storage_path, file_name")
+    .eq("id", id)
+    .maybeSingle();
+  if (!doc) return notFound();
+
+  const { data: file, error } = await admin.storage
+    .from("talent-documents")
+    .download(doc.storage_path);
+  if (error || !file) return notFound();
+
+  const safeName = doc.file_name.replace(/[^\w.\- ]+/g, "_");
+  return pdfResponse(new Uint8Array(await file.arrayBuffer()), safeName);
 }

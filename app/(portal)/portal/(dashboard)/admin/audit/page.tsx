@@ -19,6 +19,13 @@ const ACTION_LABELS: Record<string, string> = {
   quote_accepted: "Quote accepted",
   quote_declined: "Quote declined",
   quote_invoiced: "Invoiced quote",
+  talent_profile_updated: "Freelancer updated their profile",
+  test_task_submitted: "Test task submitted",
+  talent_document_uploaded: "Uploaded talent document",
+  talent_document_accepted: "Freelancer accepted document",
+  freelancer_payment_recorded: "Recorded freelancer payment",
+  freelancer_payment_voided: "Voided freelancer payment",
+  payout_details_updated: "Freelancer updated payout details",
   user_reactivated: "Reactivated account",
 };
 

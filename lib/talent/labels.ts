@@ -15,3 +15,15 @@ export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   delivered: "Delivered",
   on_hold: "On hold",
 };
+
+export type TalentDocumentKind = "contract" | "nda" | "onboarding_letter" | "other";
+
+export const DOCUMENT_KIND_LABELS: Record<TalentDocumentKind, string> = {
+  contract: "Contract",
+  nda: "NDA",
+  onboarding_letter: "Onboarding letter",
+  other: "Other",
+};
+
+export const documentKindLabel = (kind: string) =>
+  DOCUMENT_KIND_LABELS[kind as TalentDocumentKind] ?? kind;

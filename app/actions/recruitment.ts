@@ -1,6 +1,6 @@
 "use server";
 
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
 import { z } from "zod";
 
@@ -123,7 +123,8 @@ export async function revealTaxPin(
 }
 
 /**
- * Gives an approved applicant a portal login with the `freelancer` role,
+ * Gives an applicant a portal login with the `freelancer` role, from the
+ * test-task stage onwards (so they can read and submit test tasks),
  * or links an existing account with the same email. Uses the service role
  * (recruiters can't grant roles through RLS), so the audit entry is
  * written explicitly with the recruiter as actor.
@@ -142,7 +143,9 @@ export async function createFreelancerAccount(
     .eq("id", id.data)
     .maybeSingle();
   if (!app) return { error: "Unknown application." };
-  if (app.stage !== "approved") return { error: "Approve the applicant first." };
+  if (!["test_task", "test_review", "approved"].includes(app.stage)) {
+    return { error: "Move the applicant to the test task stage first." };
+  }
   if (app.user_id) return { error: "This applicant already has a portal account." };
 
   const admin = getSupabaseAdmin();
@@ -192,4 +195,156 @@ export async function createFreelancerAccount(
 
   refresh();
   return { account: { email: app.email, temporaryPassword } };
+}
+
+// --- Test tasks ---------------------------------------------------------------
+// The brief is shown to the applicant in their portal; they submit a link
+// there (submit_test_task). Internal review notes stay in "Test task notes".
+
+export async function createTestTask(
+  _prev: RecruitmentFormState,
+  formData: FormData,
+): Promise<RecruitmentFormState> {
+  const { supabase } = await recruitmentContext();
+  const parsed = z
+    .object({
+      id: uuid,
+      title: z.string().trim().min(3, "Give the task a short title.").max(200),
+      brief: z
+        .string()
+        .trim()
+        .min(10, "Write the brief (at least a sentence).")
+        .max(8000),
+      dueOn: z.union([z.iso.date(), z.literal("")]),
+    })
+    .safeParse({
+      id: formData.get("id"),
+      title: formData.get("title") ?? "",
+      brief: formData.get("brief") ?? "",
+      dueOn: formData.get("dueOn") ?? "",
+    });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+
+  const { error } = await supabase.from("talent_test_tasks").insert({
+    application_id: parsed.data.id,
+    title: parsed.data.title,
+    brief: parsed.data.brief,
+    due_on: parsed.data.dueOn || null,
+  });
+  if (error) return { error: error.message };
+
+  refresh();
+  return { success: "Test task added. The applicant sees it in their portal." };
+}
+
+export async function markTestTaskReviewed(formData: FormData) {
+  const { user, supabase } = await recruitmentContext();
+  const taskId = uuid.parse(formData.get("taskId"));
+  const { error } = await supabase
+    .from("talent_test_tasks")
+    .update({ reviewed_at: new Date().toISOString(), reviewed_by: user.id })
+    .eq("id", taskId);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+export async function deleteTestTask(formData: FormData) {
+  const { supabase } = await recruitmentContext();
+  const taskId = uuid.parse(formData.get("taskId"));
+  const { error } = await supabase
+    .from("talent_test_tasks")
+    .delete()
+    .eq("id", taskId)
+    .is("submitted_at", null);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+// --- Documents ----------------------------------------------------------------
+// PDFs in the private "talent-documents" bucket. Only the server touches the
+// files (service role); who may see a document is decided by RLS on the
+// talent_documents row.
+
+const DOCUMENT_BUCKET = "talent-documents";
+const MAX_DOCUMENT_BYTES = 4 * 1024 * 1024;
+const DOCUMENT_KINDS = ["contract", "nda", "onboarding_letter", "other"] as const;
+
+export async function uploadTalentDocument(
+  _prev: RecruitmentFormState,
+  formData: FormData,
+): Promise<RecruitmentFormState> {
+  const { user, supabase } = await recruitmentContext();
+  const parsed = z
+    .object({
+      id: uuid,
+      kind: z.enum(DOCUMENT_KINDS),
+      title: z.string().trim().min(3, "Give the document a title.").max(200),
+    })
+    .safeParse({
+      id: formData.get("id"),
+      kind: formData.get("kind"),
+      title: formData.get("title") ?? "",
+    });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) return { error: "Choose a PDF file." };
+  if (file.size > MAX_DOCUMENT_BYTES) return { error: "The file is over 4 MB." };
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  // Check the PDF signature, not just the name or the browser's claim.
+  if (String.fromCharCode(...bytes.slice(0, 5)) !== "%PDF-") {
+    return { error: "Only PDF files can be uploaded." };
+  }
+
+  const admin = getSupabaseAdmin();
+  if (!admin) return { error: "SUPABASE_SERVICE_ROLE_KEY isn't set on this deployment." };
+
+  const path = `${parsed.data.id}/${randomUUID()}.pdf`;
+  const { error: uploadError } = await admin.storage
+    .from(DOCUMENT_BUCKET)
+    .upload(path, bytes, { contentType: "application/pdf", upsert: false });
+  if (uploadError) return { error: uploadError.message };
+
+  const { error } = await supabase.from("talent_documents").insert({
+    talent_id: parsed.data.id,
+    kind: parsed.data.kind,
+    title: parsed.data.title,
+    storage_path: path,
+    file_name: file.name.slice(0, 200) || "document.pdf",
+    size_bytes: file.size,
+    requires_acceptance: formData.get("requiresAcceptance") === "on",
+    uploaded_by: user.id,
+  });
+  if (error) {
+    await admin.storage.from(DOCUMENT_BUCKET).remove([path]);
+    return { error: error.message };
+  }
+
+  await admin.from("audit_log").insert({
+    actor_id: user.id,
+    action: "talent_document_uploaded",
+    entity_type: "talent_applications",
+    entity_id: parsed.data.id,
+    metadata: { title: parsed.data.title, kind: parsed.data.kind },
+  });
+
+  refresh();
+  return { success: "Uploaded. It's now in the freelancer's portal." };
+}
+
+export async function deleteTalentDocument(formData: FormData) {
+  const { supabase } = await recruitmentContext();
+  const documentId = uuid.parse(formData.get("documentId"));
+  // RLS only allows deleting documents that haven't been accepted.
+  const { data, error } = await supabase
+    .from("talent_documents")
+    .delete()
+    .eq("id", documentId)
+    .select("storage_path");
+  if (error) throw new Error(error.message);
+  const admin = getSupabaseAdmin();
+  if (admin && data?.length) {
+    await admin.storage.from(DOCUMENT_BUCKET).remove(data.map((d) => d.storage_path));
+  }
+  refresh();
 }

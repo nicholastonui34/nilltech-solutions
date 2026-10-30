@@ -6,6 +6,8 @@ export type Json =
   string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.18";
   };
@@ -503,6 +505,94 @@ export type Database = {
         };
         Relationships: [];
       };
+      freelancer_payments: {
+        Row: {
+          amount_minor: number;
+          currency: Database["public"]["Enums"]["currency_code"];
+          description: string;
+          expense_id: string | null;
+          id: string;
+          method: Database["public"]["Enums"]["payment_method"];
+          number: string;
+          paid_on: string;
+          payee_name: string;
+          payout_snapshot: Json | null;
+          project_id: string | null;
+          recorded_at: string;
+          recorded_by: string | null;
+          reference: string | null;
+          seller_snapshot: Json;
+          talent_id: string;
+          void_reason: string | null;
+          voided_at: string | null;
+          voided_by: string | null;
+        };
+        Insert: {
+          amount_minor: number;
+          currency: Database["public"]["Enums"]["currency_code"];
+          description: string;
+          expense_id?: string | null;
+          id?: string;
+          method: Database["public"]["Enums"]["payment_method"];
+          number: string;
+          paid_on: string;
+          payee_name: string;
+          payout_snapshot?: Json | null;
+          project_id?: string | null;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          reference?: string | null;
+          seller_snapshot: Json;
+          talent_id: string;
+          void_reason?: string | null;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Update: {
+          amount_minor?: number;
+          currency?: Database["public"]["Enums"]["currency_code"];
+          description?: string;
+          expense_id?: string | null;
+          id?: string;
+          method?: Database["public"]["Enums"]["payment_method"];
+          number?: string;
+          paid_on?: string;
+          payee_name?: string;
+          payout_snapshot?: Json | null;
+          project_id?: string | null;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          reference?: string | null;
+          seller_snapshot?: Json;
+          talent_id?: string;
+          void_reason?: string | null;
+          voided_at?: string | null;
+          voided_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "freelancer_payments_expense_id_fkey";
+            columns: ["expense_id"];
+            isOneToOne: false;
+            referencedRelation: "expenses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "freelancer_payments_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "freelancer_payments_talent_id_fkey";
+            columns: ["talent_id"];
+            isOneToOne: false;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invoice_items: {
         Row: {
           description: string;
@@ -569,13 +659,12 @@ export type Database = {
           voided_by: string | null;
         };
         Insert: {
-          balance_minor?: never;
-          credited_minor?: number;
-          refunded_minor?: number;
+          balance_minor?: number | null;
           client_id: string;
           client_snapshot?: Json | null;
           created_at?: string;
           created_by?: string | null;
+          credited_minor?: number;
           currency: Database["public"]["Enums"]["currency_code"];
           due_date?: string | null;
           etims_reference?: string | null;
@@ -587,6 +676,7 @@ export type Database = {
           notes?: string | null;
           number?: string | null;
           paid_minor?: number;
+          refunded_minor?: number;
           seller_snapshot?: Json | null;
           status?: Database["public"]["Enums"]["invoice_status"];
           total_minor?: number;
@@ -595,13 +685,12 @@ export type Database = {
           voided_by?: string | null;
         };
         Update: {
-          balance_minor?: never;
-          credited_minor?: number;
-          refunded_minor?: number;
+          balance_minor?: number | null;
           client_id?: string;
           client_snapshot?: Json | null;
           created_at?: string;
           created_by?: string | null;
+          credited_minor?: number;
           currency?: Database["public"]["Enums"]["currency_code"];
           due_date?: string | null;
           etims_reference?: string | null;
@@ -613,6 +702,7 @@ export type Database = {
           notes?: string | null;
           number?: string | null;
           paid_minor?: number;
+          refunded_minor?: number;
           seller_snapshot?: Json | null;
           status?: Database["public"]["Enums"]["invoice_status"];
           total_minor?: number;
@@ -737,6 +827,30 @@ export type Database = {
           },
         ];
       };
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          created_at: string;
+          full_name: string | null;
+          id: string;
+          updated_at: string;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          created_at?: string;
+          full_name?: string | null;
+          id: string;
+          updated_at?: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          created_at?: string;
+          full_name?: string | null;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       project_assignments: {
         Row: {
           assigned_at: string;
@@ -783,6 +897,7 @@ export type Database = {
           created_by: string | null;
           delivered_at: string | null;
           description: string | null;
+          due_on: string | null;
           id: string;
           name: string;
           status: Database["public"]["Enums"]["project_status"];
@@ -793,6 +908,7 @@ export type Database = {
           created_by?: string | null;
           delivered_at?: string | null;
           description?: string | null;
+          due_on?: string | null;
           id?: string;
           name: string;
           status?: Database["public"]["Enums"]["project_status"];
@@ -803,6 +919,7 @@ export type Database = {
           created_by?: string | null;
           delivered_at?: string | null;
           description?: string | null;
+          due_on?: string | null;
           id?: string;
           name?: string;
           status?: Database["public"]["Enums"]["project_status"];
@@ -813,6 +930,47 @@ export type Database = {
             columns: ["client_id"];
             isOneToOne: false;
             referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      qa_checklist_items: {
+        Row: {
+          done: boolean;
+          done_at: string | null;
+          done_by: string | null;
+          id: string;
+          label: string;
+          notes: string | null;
+          position: number;
+          project_id: string;
+        };
+        Insert: {
+          done?: boolean;
+          done_at?: string | null;
+          done_by?: string | null;
+          id?: string;
+          label: string;
+          notes?: string | null;
+          position?: number;
+          project_id: string;
+        };
+        Update: {
+          done?: boolean;
+          done_at?: string | null;
+          done_by?: string | null;
+          id?: string;
+          label?: string;
+          notes?: string | null;
+          position?: number;
+          project_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "qa_checklist_items_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
             referencedColumns: ["id"];
           },
         ];
@@ -939,6 +1097,24 @@ export type Database = {
           },
         ];
       };
+      rate_limit_hits: {
+        Row: {
+          bucket: string;
+          created_at: string;
+          id: number;
+        };
+        Insert: {
+          bucket: string;
+          created_at?: string;
+          id?: never;
+        };
+        Update: {
+          bucket?: string;
+          created_at?: string;
+          id?: never;
+        };
+        Relationships: [];
+      };
       refunds: {
         Row: {
           amount_minor: number;
@@ -1021,71 +1197,6 @@ export type Database = {
           user_id?: string | null;
         };
         Relationships: [];
-      };
-      profiles: {
-        Row: {
-          avatar_url: string | null;
-          created_at: string;
-          full_name: string | null;
-          id: string;
-          updated_at: string;
-        };
-        Insert: {
-          avatar_url?: string | null;
-          created_at?: string;
-          full_name?: string | null;
-          id: string;
-          updated_at?: string;
-        };
-        Update: {
-          avatar_url?: string | null;
-          created_at?: string;
-          full_name?: string | null;
-          id?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      qa_checklist_items: {
-        Row: {
-          done: boolean;
-          done_at: string | null;
-          done_by: string | null;
-          id: string;
-          label: string;
-          notes: string | null;
-          position: number;
-          project_id: string;
-        };
-        Insert: {
-          done?: boolean;
-          done_at?: string | null;
-          done_by?: string | null;
-          id?: string;
-          label: string;
-          notes?: string | null;
-          position?: number;
-          project_id: string;
-        };
-        Update: {
-          done?: boolean;
-          done_at?: string | null;
-          done_by?: string | null;
-          id?: string;
-          label?: string;
-          notes?: string | null;
-          position?: number;
-          project_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "qa_checklist_items_project_id_fkey";
-            columns: ["project_id"];
-            isOneToOne: false;
-            referencedRelation: "projects";
-            referencedColumns: ["id"];
-          },
-        ];
       };
       talent_applications: {
         Row: {
@@ -1174,6 +1285,156 @@ export type Database = {
         };
         Relationships: [];
       };
+      talent_documents: {
+        Row: {
+          accepted_at: string | null;
+          accepted_name: string | null;
+          file_name: string;
+          id: string;
+          kind: string;
+          requires_acceptance: boolean;
+          size_bytes: number;
+          storage_path: string;
+          talent_id: string;
+          title: string;
+          uploaded_at: string;
+          uploaded_by: string | null;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          accepted_name?: string | null;
+          file_name: string;
+          id?: string;
+          kind: string;
+          requires_acceptance?: boolean;
+          size_bytes: number;
+          storage_path: string;
+          talent_id: string;
+          title: string;
+          uploaded_at?: string;
+          uploaded_by?: string | null;
+        };
+        Update: {
+          accepted_at?: string | null;
+          accepted_name?: string | null;
+          file_name?: string;
+          id?: string;
+          kind?: string;
+          requires_acceptance?: boolean;
+          size_bytes?: number;
+          storage_path?: string;
+          talent_id?: string;
+          title?: string;
+          uploaded_at?: string;
+          uploaded_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "talent_documents_talent_id_fkey";
+            columns: ["talent_id"];
+            isOneToOne: false;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      talent_payout_details: {
+        Row: {
+          bank_account_name: string | null;
+          bank_account_number: string | null;
+          bank_branch: string | null;
+          bank_name: string | null;
+          mpesa_name: string | null;
+          mpesa_number: string | null;
+          preferred_method: Database["public"]["Enums"]["payment_method"];
+          talent_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          bank_account_name?: string | null;
+          bank_account_number?: string | null;
+          bank_branch?: string | null;
+          bank_name?: string | null;
+          mpesa_name?: string | null;
+          mpesa_number?: string | null;
+          preferred_method: Database["public"]["Enums"]["payment_method"];
+          talent_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          bank_account_name?: string | null;
+          bank_account_number?: string | null;
+          bank_branch?: string | null;
+          bank_name?: string | null;
+          mpesa_name?: string | null;
+          mpesa_number?: string | null;
+          preferred_method?: Database["public"]["Enums"]["payment_method"];
+          talent_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "talent_payout_details_talent_id_fkey";
+            columns: ["talent_id"];
+            isOneToOne: true;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      talent_test_tasks: {
+        Row: {
+          application_id: string;
+          brief: string;
+          created_at: string;
+          created_by: string | null;
+          due_on: string | null;
+          id: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          submission_note: string | null;
+          submission_url: string | null;
+          submitted_at: string | null;
+          title: string;
+        };
+        Insert: {
+          application_id: string;
+          brief: string;
+          created_at?: string;
+          created_by?: string | null;
+          due_on?: string | null;
+          id?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          submission_note?: string | null;
+          submission_url?: string | null;
+          submitted_at?: string | null;
+          title: string;
+        };
+        Update: {
+          application_id?: string;
+          brief?: string;
+          created_at?: string;
+          created_by?: string | null;
+          due_on?: string | null;
+          id?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          submission_note?: string | null;
+          submission_url?: string | null;
+          submitted_at?: string | null;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "talent_test_tasks_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: false;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_roles: {
         Row: {
           granted_at: string;
@@ -1200,23 +1461,17 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_talent_document: {
+        Args: { _document_id: string; _typed_name: string };
+        Returns: undefined;
+      };
       admin_database_size_bytes: { Args: never; Returns: number };
-      delete_old_conversion_events: { Args: never; Returns: undefined };
-      end_user_sessions: { Args: { _user_id: string }; Returns: undefined };
       check_rate_limit: {
         Args: {
           p_bucket: string;
           p_max_per_day: number;
           p_max_per_window: number;
           p_window_seconds: number;
-        };
-        Returns: boolean;
-      };
-      get_talent_tax_pin: { Args: { _application_id: string }; Returns: string };
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"];
-          _user_id: string;
         };
         Returns: boolean;
       };
@@ -1229,10 +1484,39 @@ export type Database = {
         };
         Returns: undefined;
       };
-      send_quote: { Args: { _quote_id: string; _valid_until: string }; Returns: string };
+      delete_old_conversion_events: { Args: never; Returns: undefined };
+      end_user_sessions: { Args: { _user_id: string }; Returns: undefined };
+      get_talent_internal_notes: {
+        Args: { _application_id: string };
+        Returns: {
+          rejection_reason: string;
+          screening_notes: string;
+          test_task_notes: string;
+        }[];
+      };
+      get_talent_tax_pin: { Args: { _application_id: string }; Returns: string };
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
       invoice_money_status: {
-        Args: { _credited: number; _paid: number; _refunded: number; _total: number };
+        Args: {
+          _credited: number;
+          _paid: number;
+          _refunded: number;
+          _total: number;
+        };
         Returns: Database["public"]["Enums"]["invoice_status"];
+      };
+      is_any_role: {
+        Args: {
+          _roles: Database["public"]["Enums"]["app_role"][];
+          _user_id: string;
+        };
+        Returns: boolean;
       };
       issue_credit_note: {
         Args: { _amount_minor: number; _invoice_id: string; _reason: string };
@@ -1242,15 +1526,21 @@ export type Database = {
         Args: { _due_date: string; _invoice_id: string };
         Returns: string;
       };
-      is_any_role: {
-        Args: {
-          _roles: Database["public"]["Enums"]["app_role"][];
-          _user_id: string;
-        };
-        Returns: boolean;
-      };
       nairobi_today: { Args: never; Returns: string };
       next_document_number: { Args: { _doc_type: string }; Returns: string };
+      record_freelancer_payment: {
+        Args: {
+          _amount_minor: number;
+          _currency: Database["public"]["Enums"]["currency_code"];
+          _description: string;
+          _method: Database["public"]["Enums"]["payment_method"];
+          _paid_on: string;
+          _project_id: string;
+          _reference: string;
+          _talent_id: string;
+        };
+        Returns: string;
+      };
       record_payment: {
         Args: {
           _amount_minor: number;
@@ -1273,11 +1563,45 @@ export type Database = {
         };
         Returns: string;
       };
+      send_quote: {
+        Args: { _quote_id: string; _valid_until: string };
+        Returns: string;
+      };
+      set_own_payout_details: {
+        Args: {
+          _bank_account_name: string;
+          _bank_account_number: string;
+          _bank_branch: string;
+          _bank_name: string;
+          _mpesa_name: string;
+          _mpesa_number: string;
+          _preferred_method: Database["public"]["Enums"]["payment_method"];
+        };
+        Returns: undefined;
+      };
       set_talent_tax_pin: {
         Args: { _application_id: string; _pin: string };
         Returns: undefined;
       };
       shareholder_overview: { Args: never; Returns: Json };
+      submit_test_task: {
+        Args: { _note: string; _task_id: string; _url: string };
+        Returns: undefined;
+      };
+      update_own_talent_profile: {
+        Args: {
+          _availability: string;
+          _phone: string;
+          _portfolio_url: string;
+          _profile_url: string;
+          _skills: string[];
+        };
+        Returns: undefined;
+      };
+      void_freelancer_payment: {
+        Args: { _payment_id: string; _reason: string };
+        Returns: undefined;
+      };
       void_invoice: {
         Args: { _invoice_id: string; _reason: string };
         Returns: undefined;
@@ -1297,6 +1621,7 @@ export type Database = {
         | "investor";
       booking_status: "confirmed" | "cancelled" | "completed" | "no_show";
       currency_code: "KES" | "USD";
+      engagement_type: "freelance" | "full_time";
       expense_category:
         | "talent"
         | "software"
@@ -1307,14 +1632,13 @@ export type Database = {
         | "equipment"
         | "fees_taxes"
         | "other";
-      engagement_type: "freelance" | "full_time";
       invoice_status:
         "draft" | "issued" | "partially_paid" | "paid" | "void" | "credited";
       lead_status: "new" | "contacted" | "qualified" | "disqualified";
       lead_tier: "hot" | "warm" | "cold";
       payment_method: "mpesa" | "bank_transfer" | "other";
-      quote_status: "draft" | "sent" | "accepted" | "declined";
       project_status: "active" | "in_review" | "delivered" | "on_hold";
+      quote_status: "draft" | "sent" | "accepted" | "declined";
       talent_stage:
         "applied" | "screening" | "test_task" | "test_review" | "approved" | "rejected";
     };
@@ -1323,3 +1647,163 @@ export type Database = {
     };
   };
 };
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    keyof DefaultSchema["CompositeTypes"] | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: [
+        "super_admin",
+        "director",
+        "finance",
+        "marketing",
+        "sales",
+        "quality",
+        "freelancer",
+        "client",
+        "recruitment",
+        "investor",
+      ],
+      booking_status: ["confirmed", "cancelled", "completed", "no_show"],
+      currency_code: ["KES", "USD"],
+      engagement_type: ["freelance", "full_time"],
+      expense_category: [
+        "talent",
+        "software",
+        "hosting",
+        "marketing",
+        "office",
+        "travel",
+        "equipment",
+        "fees_taxes",
+        "other",
+      ],
+      invoice_status: ["draft", "issued", "partially_paid", "paid", "void", "credited"],
+      lead_status: ["new", "contacted", "qualified", "disqualified"],
+      lead_tier: ["hot", "warm", "cold"],
+      payment_method: ["mpesa", "bank_transfer", "other"],
+      project_status: ["active", "in_review", "delivered", "on_hold"],
+      quote_status: ["draft", "sent", "accepted", "declined"],
+      talent_stage: [
+        "applied",
+        "screening",
+        "test_task",
+        "test_review",
+        "approved",
+        "rejected",
+      ],
+    },
+  },
+} as const;

@@ -753,3 +753,66 @@ export async function convertQuoteToInvoice(
 
   redirect(`/portal/finance/invoices/${invoiceId}`);
 }
+
+// --- Freelancer payments -----------------------------------------------------
+// record_freelancer_payment also creates the matching "talent" expense, so
+// margins stay right; voiding removes that expense again.
+
+export async function recordFreelancerPayment(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const talentId = uuid.safeParse(formData.get("talentId"));
+  const currency = currencySchema.safeParse(formData.get("currency"));
+  const method = z
+    .enum(PAYMENT_METHODS as [PaymentMethod, ...PaymentMethod[]])
+    .safeParse(formData.get("method"));
+  const paidOn = z.iso.date().safeParse(formData.get("paidOn"));
+  const projectId = String(formData.get("projectId") ?? "");
+  const amountMinor = parseAmountToMinor(String(formData.get("amount") ?? ""));
+  if (!talentId.success) return { error: "Choose who was paid." };
+  if (amountMinor === null || amountMinor <= 0)
+    return { error: "Enter the amount paid." };
+  if (!currency.success) return { error: "Choose a currency." };
+  if (!method.success) return { error: "Choose how it was paid." };
+  if (!paidOn.success) return { error: "Choose the date it was paid." };
+  if (projectId && !uuid.safeParse(projectId).success)
+    return { error: "Unknown project." };
+
+  const { error } = await supabase.rpc("record_freelancer_payment", {
+    _talent_id: talentId.data,
+    _amount_minor: amountMinor,
+    _currency: currency.data,
+    _method: method.data,
+    _reference: String(formData.get("reference") ?? ""),
+    _paid_on: paidOn.data,
+    _description: String(formData.get("description") ?? ""),
+    // The RPC treats null as "no project"; the generated type is non-null.
+    _project_id: (projectId || null) as string,
+  });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return {
+    success: "Payment recorded, added to expenses, and visible to the freelancer.",
+  };
+}
+
+export async function voidFreelancerPayment(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const paymentId = uuid.safeParse(formData.get("paymentId"));
+  if (!paymentId.success) return { error: "Unknown payment." };
+
+  const { error } = await supabase.rpc("void_freelancer_payment", {
+    _payment_id: paymentId.data,
+    _reason: String(formData.get("reason") ?? ""),
+  });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return { success: "Payment voided and its expense removed." };
+}
