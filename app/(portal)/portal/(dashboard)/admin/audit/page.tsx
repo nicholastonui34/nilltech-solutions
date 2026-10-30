@@ -15,6 +15,10 @@ const ACTION_LABELS: Record<string, string> = {
   user_deactivated: "Deactivated account",
   credit_note_issued: "Issued credit note",
   refund_recorded: "Recorded refund",
+  quote_sent: "Finalised quote",
+  quote_accepted: "Quote accepted",
+  quote_declined: "Quote declined",
+  quote_invoiced: "Invoiced quote",
   user_reactivated: "Reactivated account",
 };
 

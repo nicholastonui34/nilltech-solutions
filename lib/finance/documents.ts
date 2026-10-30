@@ -1,7 +1,12 @@
 import "server-only";
 
 import { getCurrentUser } from "@/lib/auth/dal";
-import { buildCreditNotePdf, buildInvoicePdf, buildReceiptPdf } from "@/lib/finance/pdf";
+import {
+  buildCreditNotePdf,
+  buildInvoicePdf,
+  buildQuotePdf,
+  buildReceiptPdf,
+} from "@/lib/finance/pdf";
 import { parseClientSnapshot, parseSellerSnapshot } from "@/lib/finance/snapshots";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -163,4 +168,56 @@ export async function creditNotePdfResponse(id: string) {
   });
 
   return pdfResponse(bytes, `${note.number}.pdf`);
+}
+
+export async function quotePdfResponse(id: string) {
+  if (!UUID_PATTERN.test(id)) return notFound();
+  const user = await getCurrentUser();
+  if (!user) return new Response("Sign in required", { status: 401 });
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return notFound();
+
+  const { data: quote } = await supabase
+    .from("quotes")
+    .select(
+      "number, status, title, currency, issue_date, valid_until, total_minor, notes, seller_snapshot, client_snapshot, quote_items(position, description, quantity, unit_price_minor, line_total_minor)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  const seller = parseSellerSnapshot(quote?.seller_snapshot ?? null);
+  const client = parseClientSnapshot(quote?.client_snapshot ?? null);
+  if (
+    !quote ||
+    quote.status === "draft" ||
+    !quote.number ||
+    !quote.issue_date ||
+    !quote.valid_until ||
+    !seller ||
+    !client
+  ) {
+    return notFound();
+  }
+
+  const bytes = await buildQuotePdf({
+    number: quote.number,
+    issueDate: quote.issue_date,
+    validUntil: quote.valid_until,
+    title: quote.title,
+    currency: quote.currency,
+    seller,
+    client,
+    items: [...quote.quote_items]
+      .sort((a, b) => a.position - b.position)
+      .map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPriceMinor: item.unit_price_minor,
+        lineTotalMinor: item.line_total_minor ?? 0,
+      })),
+    totalMinor: quote.total_minor,
+    notes: quote.notes,
+  });
+
+  return pdfResponse(bytes, `${quote.number}.pdf`);
 }

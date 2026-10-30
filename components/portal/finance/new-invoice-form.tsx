@@ -2,7 +2,11 @@
 
 import { useActionState } from "react";
 
-import { createInvoiceDraft, type FinanceFormState } from "@/app/actions/finance";
+import {
+  createInvoiceDraft,
+  createQuoteDraft,
+  type FinanceFormState,
+} from "@/app/actions/finance";
 import { FormMessage } from "@/components/portal/finance/form-message";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,12 +15,18 @@ import { CURRENCIES } from "@/lib/finance/money";
 
 const initialState: FinanceFormState = {};
 
+/** Starts an invoice or quote draft for a client. */
 export function NewInvoiceForm({
+  kind = "invoice",
   clients,
 }: {
+  kind?: "invoice" | "quote";
   clients: { id: string; label: string }[];
 }) {
-  const [state, formAction, pending] = useActionState(createInvoiceDraft, initialState);
+  const [state, formAction, pending] = useActionState(
+    kind === "quote" ? createQuoteDraft : createInvoiceDraft,
+    initialState,
+  );
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
       <div>

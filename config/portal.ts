@@ -63,13 +63,13 @@ export const portalDashboards: readonly PortalDashboard[] = [
   {
     href: "/portal/finance",
     label: "Finance",
-    description: "Invoices, receipts, payments and clients.",
+    description: "Quotes, invoices, receipts, payments and clients.",
     roles: ["finance", "super_admin"],
   },
   {
     href: "/portal/invoices",
-    label: "My invoices",
-    description: "Your invoices and receipts.",
+    label: "My quotes and invoices",
+    description: "Your quotes, invoices and receipts.",
     roles: ["client"],
   },
   {

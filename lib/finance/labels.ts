@@ -70,3 +70,29 @@ export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   fees_taxes: "Fees, charges and taxes",
   other: "Other",
 };
+
+export type QuoteStatus = Database["public"]["Enums"]["quote_status"];
+
+export const QUOTE_STATUSES: readonly QuoteStatus[] = [
+  "draft",
+  "sent",
+  "accepted",
+  "declined",
+];
+
+export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
+  draft: "Draft",
+  sent: "Sent",
+  accepted: "Accepted",
+  declined: "Declined",
+};
+
+/** Expired = sent, still unanswered, and past its valid-until date (Nairobi). */
+export function isQuoteExpired(
+  quote: { status: QuoteStatus; valid_until: string | null },
+  today: string,
+) {
+  return (
+    quote.status === "sent" && quote.valid_until !== null && quote.valid_until < today
+  );
+}

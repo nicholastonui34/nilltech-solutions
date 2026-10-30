@@ -95,9 +95,9 @@ export function ClientForm({ client }: { client?: ClientValues }) {
             className="mt-1.5"
           />
           <p className="text-muted-foreground mt-1 text-xs">
-            Lets this client see their issued invoices and receipts at /portal/invoices.
-            The account must exist and have the Client role (Main Admin → Users &amp;
-            roles).
+            Lets this client see their quotes, issued invoices and receipts at
+            /portal/invoices. The account must exist and have the Client role (Main Admin
+            → Users &amp; roles).
           </p>
         </div>
       ) : null}
