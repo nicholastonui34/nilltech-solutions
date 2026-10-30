@@ -1,11 +1,12 @@
 import "server-only";
 
 /**
- * KRA eTIMS integration point (CLAUDE.md §10). Transmitting invoices to
- * KRA needs either KRA approval (OSCU/VSCU) or a certified third-party
- * integrator — not chosen yet ({{INPUT NEEDED: eTIMS integration route}}).
- * The rest of the app only talks to this interface, so a real adapter can
- * replace the stub without touching invoicing code.
+ * KRA eTIMS integration point (CLAUDE.md §10). For now Finance issues each
+ * invoice in KRA's own eTIMS and records the KRA number in the portal
+ * (owner, 2026-10-30; `record_invoice_etims`, migration …24). Sending
+ * invoices automatically needs KRA approval (OSCU/VSCU) or a certified
+ * integrator. A real adapter replaces the stub here and fills the same
+ * fields, without touching invoicing code.
  */
 export type EtimsInvoice = {
   invoiceId: string;

@@ -43,7 +43,7 @@ export async function invoicePdfResponse(id: string) {
   const { data: invoice } = await supabase
     .from("invoices")
     .select(
-      "number, status, currency, issue_date, due_date, total_minor, paid_minor, credited_minor, refunded_minor, notes, seller_snapshot, client_snapshot, invoice_items(position, description, quantity, unit_price_minor, line_total_minor)",
+      "number, status, currency, issue_date, due_date, total_minor, paid_minor, credited_minor, refunded_minor, notes, seller_snapshot, client_snapshot, etims_status, etims_reference, etims_date, etims_verify_url, invoice_items(position, description, quantity, unit_price_minor, line_total_minor)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -83,6 +83,14 @@ export async function invoicePdfResponse(id: string) {
     creditedMinor: invoice.credited_minor,
     refundedMinor: invoice.refunded_minor,
     notes: invoice.notes,
+    etims:
+      invoice.etims_status === "recorded" && invoice.etims_reference && invoice.etims_date
+        ? {
+            reference: invoice.etims_reference,
+            date: invoice.etims_date,
+            verifyUrl: invoice.etims_verify_url,
+          }
+        : null,
   });
 
   return pdfResponse(bytes, `${invoice.number}.pdf`);
@@ -150,7 +158,7 @@ export async function creditNotePdfResponse(id: string) {
   const { data: note } = await supabase
     .from("credit_notes")
     .select(
-      "number, invoice_number, amount_minor, currency, reason, issue_date, seller_snapshot, client_snapshot, invoices(total_minor)",
+      "number, invoice_number, amount_minor, currency, reason, issue_date, seller_snapshot, client_snapshot, etims_reference, etims_date, etims_verify_url, invoices(total_minor)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -168,6 +176,14 @@ export async function creditNotePdfResponse(id: string) {
     reason: note.reason,
     seller,
     client,
+    etims:
+      note.etims_reference && note.etims_date
+        ? {
+            reference: note.etims_reference,
+            date: note.etims_date,
+            verifyUrl: note.etims_verify_url,
+          }
+        : null,
   });
 
   return pdfResponse(bytes, `${note.number}.pdf`);

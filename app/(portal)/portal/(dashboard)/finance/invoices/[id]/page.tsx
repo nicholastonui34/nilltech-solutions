@@ -7,6 +7,7 @@ import { InvoiceDraftEditor } from "@/components/portal/finance/invoice-draft-ed
 import {
   IssueCreditNoteForm,
   IssueInvoiceForm,
+  RecordEtimsForm,
   RecordPaymentForm,
   RecordRefundForm,
   VoidInvoiceForm,
@@ -24,13 +25,6 @@ import { parseClientSnapshot } from "@/lib/finance/snapshots";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-const ETIMS_LABELS: Record<string, string> = {
-  not_submitted: "Not submitted",
-  not_configured: "Not sent: no eTIMS integrator connected yet",
-  submitted: "Submitted",
-  failed: "Submission failed",
-};
 
 export default async function InvoiceDetailPage({
   params,
@@ -50,7 +44,7 @@ export default async function InvoiceDetailPage({
     supabase
       .from("invoices")
       .select(
-        "*, clients(id, name, company, email), invoice_items(id, position, description, quantity, unit_price_minor, line_total_minor), payments(id, receipt_number, amount_minor, method, reference, paid_on, recorded_at), credit_notes(id, number, amount_minor, reason, issue_date, issued_at), refunds(id, number, amount_minor, method, reference, refunded_on, reason, recorded_at)",
+        "*, clients(id, name, company, email), invoice_items(id, position, description, quantity, unit_price_minor, line_total_minor), payments(id, receipt_number, amount_minor, method, reference, paid_on, recorded_at), credit_notes(id, number, amount_minor, reason, issue_date, issued_at, etims_reference, etims_date, etims_verify_url), refunds(id, number, amount_minor, method, reference, refunded_on, reason, recorded_at)",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -311,6 +305,37 @@ export default async function InvoiceDetailPage({
                       <p className="text-muted-foreground text-xs">
                         {note.number} · {note.issue_date} · {note.reason}
                       </p>
+                      <p
+                        className={
+                          note.etims_reference
+                            ? "text-muted-foreground text-xs"
+                            : "text-xs font-medium text-amber-800"
+                        }
+                      >
+                        {note.etims_reference
+                          ? `eTIMS ${note.etims_reference} (${note.etims_date})`
+                          : "Needs eTIMS: issue a credit note in KRA eTIMS and record it"}
+                      </p>
+                      <details className="mt-2">
+                        <summary className="text-primary cursor-pointer text-xs underline">
+                          {note.etims_reference
+                            ? "Edit eTIMS details"
+                            : "Record eTIMS details"}
+                        </summary>
+                        <div className="mt-2 max-w-sm">
+                          <RecordEtimsForm
+                            kind="credit_note"
+                            documentId={note.id}
+                            minDate={note.issue_date}
+                            today={today}
+                            current={{
+                              reference: note.etims_reference,
+                              date: note.etims_date,
+                              verifyUrl: note.etims_verify_url,
+                            }}
+                          />
+                        </div>
+                      </details>
                     </div>
                     <Button asChild variant="outline" size="sm">
                       <a
@@ -392,16 +417,51 @@ export default async function InvoiceDetailPage({
               <VoidInvoiceForm invoiceId={invoice.id} />
             </Panel>
           ) : null}
-          <Panel title="KRA eTIMS">
-            <p className="text-sm">
-              {ETIMS_LABELS[invoice.etims_status] ?? invoice.etims_status}
-            </p>
-            {invoice.etims_reference ? (
-              <p className="text-muted-foreground mt-1 text-xs">
-                Ref {invoice.etims_reference}
-              </p>
-            ) : null}
-          </Panel>
+          {invoice.status !== "void" && invoice.issue_date ? (
+            <Panel
+              title="KRA eTIMS"
+              description={
+                invoice.etims_status === "recorded"
+                  ? "Recorded. It prints on the invoice PDF."
+                  : "Issue this invoice in KRA eTIMS (eTIMS Lite on the KRA portal or app), then record the KRA invoice number here."
+              }
+              className={
+                invoice.etims_status === "recorded" ? undefined : "border-amber-300"
+              }
+            >
+              {invoice.etims_status === "recorded" ? (
+                <p className="mb-3 text-sm">
+                  <span className="font-medium">{invoice.etims_reference}</span>
+                  <span className="text-muted-foreground"> · {invoice.etims_date}</span>
+                  {invoice.etims_verify_url ? (
+                    <>
+                      {" · "}
+                      <a
+                        href={invoice.etims_verify_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline"
+                      >
+                        Verify on KRA
+                      </a>
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
+              <RecordEtimsForm
+                kind="invoice"
+                documentId={invoice.id}
+                minDate={invoice.issue_date}
+                today={today}
+                current={{
+                  reference:
+                    invoice.etims_status === "recorded" ? invoice.etims_reference : null,
+                  date: invoice.etims_date,
+                  verifyUrl: invoice.etims_verify_url,
+                }}
+              />
+            </Panel>
+          ) : null}
         </div>
       </div>
     </>

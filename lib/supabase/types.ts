@@ -387,6 +387,11 @@ export type Database = {
           amount_minor: number;
           client_snapshot: Json | null;
           currency: Database["public"]["Enums"]["currency_code"];
+          etims_date: string | null;
+          etims_recorded_at: string | null;
+          etims_recorded_by: string | null;
+          etims_reference: string | null;
+          etims_verify_url: string | null;
           id: string;
           invoice_id: string;
           invoice_number: string;
@@ -401,6 +406,11 @@ export type Database = {
           amount_minor: number;
           client_snapshot?: Json | null;
           currency: Database["public"]["Enums"]["currency_code"];
+          etims_date?: string | null;
+          etims_recorded_at?: string | null;
+          etims_recorded_by?: string | null;
+          etims_reference?: string | null;
+          etims_verify_url?: string | null;
           id?: string;
           invoice_id: string;
           invoice_number: string;
@@ -415,6 +425,11 @@ export type Database = {
           amount_minor?: number;
           client_snapshot?: Json | null;
           currency?: Database["public"]["Enums"]["currency_code"];
+          etims_date?: string | null;
+          etims_recorded_at?: string | null;
+          etims_recorded_by?: string | null;
+          etims_reference?: string | null;
+          etims_verify_url?: string | null;
           id?: string;
           invoice_id?: string;
           invoice_number?: string;
@@ -774,8 +789,12 @@ export type Database = {
           credited_minor: number;
           currency: Database["public"]["Enums"]["currency_code"];
           due_date: string | null;
+          etims_date: string | null;
+          etims_recorded_at: string | null;
+          etims_recorded_by: string | null;
           etims_reference: string | null;
           etims_status: string;
+          etims_verify_url: string | null;
           id: string;
           issue_date: string | null;
           issued_at: string | null;
@@ -800,8 +819,12 @@ export type Database = {
           credited_minor?: number;
           currency: Database["public"]["Enums"]["currency_code"];
           due_date?: string | null;
+          etims_date?: string | null;
+          etims_recorded_at?: string | null;
+          etims_recorded_by?: string | null;
           etims_reference?: string | null;
           etims_status?: string;
+          etims_verify_url?: string | null;
           id?: string;
           issue_date?: string | null;
           issued_at?: string | null;
@@ -826,8 +849,12 @@ export type Database = {
           credited_minor?: number;
           currency?: Database["public"]["Enums"]["currency_code"];
           due_date?: string | null;
+          etims_date?: string | null;
+          etims_recorded_at?: string | null;
+          etims_recorded_by?: string | null;
           etims_reference?: string | null;
           etims_status?: string;
+          etims_verify_url?: string | null;
           id?: string;
           issue_date?: string | null;
           issued_at?: string | null;
@@ -1606,6 +1633,10 @@ export type Database = {
       };
       admin_database_size_bytes: { Args: never; Returns: number };
       chat_live_available: { Args: never; Returns: boolean };
+      check_etims_details: {
+        Args: { _date: string; _reference: string; _verify_url: string };
+        Returns: undefined;
+      };
       check_rate_limit: {
         Args: {
           p_bucket: string;
@@ -1681,6 +1712,15 @@ export type Database = {
         };
         Returns: undefined;
       };
+      record_credit_note_etims: {
+        Args: {
+          _credit_note_id: string;
+          _date: string;
+          _reference: string;
+          _verify_url: string;
+        };
+        Returns: undefined;
+      };
       record_freelancer_payment: {
         Args: {
           _amount_minor: number;
@@ -1693,6 +1733,15 @@ export type Database = {
           _talent_id: string;
         };
         Returns: string;
+      };
+      record_invoice_etims: {
+        Args: {
+          _date: string;
+          _invoice_id: string;
+          _reference: string;
+          _verify_url: string;
+        };
+        Returns: undefined;
       };
       record_payment: {
         Args: {

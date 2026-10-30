@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { FinanceTabs } from "@/components/portal/finance/finance-tabs";
-import { InvoiceTable } from "@/components/portal/finance/invoice-table";
+import { InvoiceTable, needsEtims } from "@/components/portal/finance/invoice-table";
 import { PageHeader } from "@/components/portal/page-header";
 import { NoAccess, Panel, StatCard } from "@/components/portal/panel";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export default async function FinanceOverviewPage() {
     supabase
       .from("invoices")
       .select(
-        "id, number, status, currency, total_minor, paid_minor, balance_minor, due_date, created_at, client_snapshot, clients(name, company)",
+        "id, number, status, currency, total_minor, paid_minor, balance_minor, due_date, created_at, etims_status, client_snapshot, clients(name, company)",
       )
       .order("created_at", { ascending: false })
       .limit(500),
@@ -53,6 +53,7 @@ export default async function FinanceOverviewPage() {
   });
   const overdue = open.filter((i) => isOverdue(i, today));
   const drafts = (invoices ?? []).filter((i) => i.status === "draft").length;
+  const missingEtims = (invoices ?? []).filter(needsEtims).length;
 
   return (
     <>
@@ -85,13 +86,18 @@ export default async function FinanceOverviewPage() {
         })}
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
         <StatCard
           label="Overdue invoices"
           value={overdue.length}
           hint="Past due date, not fully paid"
         />
         <StatCard label="Drafts" value={drafts} hint="Not yet issued" />
+        <StatCard
+          label="Needs eTIMS"
+          value={missingEtims}
+          hint="Issued, KRA eTIMS number not recorded yet"
+        />
       </div>
 
       <Panel title="Recent invoices" className="mt-6">
