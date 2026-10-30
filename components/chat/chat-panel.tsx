@@ -614,7 +614,7 @@ export default function ChatPanel({
 
       <div className="text-muted-foreground flex items-center justify-between gap-2 px-4 pb-3 text-[11px]">
         <span>
-          AI answers can be wrong. See our{" "}
+          Automated answers can be wrong. See our{" "}
           <Link href="/legal#privacy" className="underline">
             privacy notice
           </Link>
