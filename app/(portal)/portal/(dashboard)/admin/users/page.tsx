@@ -1,7 +1,13 @@
 import { X } from "lucide-react";
 
-import { grantRole, revokeRole } from "@/app/actions/admin";
+import {
+  deactivateUser,
+  grantRole,
+  reactivateUser,
+  revokeRole,
+} from "@/app/actions/admin";
 import { AdminTabs } from "@/components/portal/admin-tabs";
+import { ConfirmSubmitButton } from "@/components/portal/confirm-submit-button";
 import { CreateUserForm } from "@/components/portal/create-user-form";
 import { PageHeader } from "@/components/portal/page-header";
 import { NoAccess, Panel } from "@/components/portal/panel";
@@ -20,11 +26,14 @@ export default async function AdminUsersPage() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return <NoAccess />;
 
-  const [authUsers, { data: roleRows }, { data: profiles }] = await Promise.all([
-    listAuthUsers(),
-    supabase.from("user_roles").select("user_id, role"),
-    supabase.from("profiles").select("id, full_name"),
-  ]);
+  const [authUsers, { data: roleRows }, { data: profiles }, { data: deactivatedRows }] =
+    await Promise.all([
+      listAuthUsers(),
+      supabase.from("user_roles").select("user_id, role"),
+      supabase.from("profiles").select("id, full_name"),
+      supabase.from("deactivated_users").select("user_id"),
+    ]);
+  const deactivatedIds = new Set((deactivatedRows ?? []).map((row) => row.user_id));
 
   const rolesByUser = new Map<string, AppRole[]>();
   for (const row of roleRows ?? []) {
@@ -36,7 +45,7 @@ export default async function AdminUsersPage() {
     <>
       <PageHeader
         title="Main Admin"
-        description="Invite people, then grant or revoke roles. Every change is audit-logged."
+        description="Invite people, grant or revoke roles, and deactivate logins that should no longer have access. Every change is audit-logged."
       />
       <AdminTabs current="/portal/admin/users" />
 
@@ -52,8 +61,9 @@ export default async function AdminUsersPage() {
               {authUsers.map((user) => {
                 const roles = rolesByUser.get(user.id) ?? [];
                 const grantable = ALL_ROLES.filter((role) => !roles.includes(role));
+                const deactivated = user.deactivated || deactivatedIds.has(user.id);
                 return (
-                  <li key={user.id} className="py-4">
+                  <li key={user.id} className={deactivated ? "py-4 opacity-70" : "py-4"}>
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <div>
                         <p className="font-medium">
@@ -69,6 +79,29 @@ export default async function AdminUsersPage() {
                           {user.email} · last sign-in {formatDateTime(user.lastSignInAt)}
                         </p>
                       </div>
+                      {user.id === me.id ? null : deactivated ? (
+                        <form action={reactivateUser} className="flex items-center gap-2">
+                          <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900">
+                            Deactivated
+                          </span>
+                          <input type="hidden" name="userId" value={user.id} />
+                          <Button type="submit" size="sm" variant="outline">
+                            Reactivate
+                          </Button>
+                        </form>
+                      ) : (
+                        <form action={deactivateUser}>
+                          <input type="hidden" name="userId" value={user.id} />
+                          <ConfirmSubmitButton
+                            size="sm"
+                            variant="outline"
+                            aria-label={`Deactivate ${user.email}`}
+                            confirmMessage={`Deactivate ${user.email}? They won't be able to sign in until you reactivate them. Their roles and records are kept.`}
+                          >
+                            Deactivate
+                          </ConfirmSubmitButton>
+                        </form>
+                      )}
                     </div>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">

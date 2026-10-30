@@ -12,6 +12,8 @@ const ACTION_LABELS: Record<string, string> = {
   role_granted: "Granted role",
   role_revoked: "Revoked role",
   user_created: "Created account",
+  user_deactivated: "Deactivated account",
+  user_reactivated: "Reactivated account",
 };
 
 function metadataSummary(metadata: Json) {
