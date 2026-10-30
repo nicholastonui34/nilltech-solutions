@@ -14,7 +14,7 @@ type Holder = {
 const shareCount = new Intl.NumberFormat("en-KE");
 const HOLDER_TYPE_LABELS: Record<string, string> = {
   director: "Director shareholder",
-  investor: "Investor",
+  investor: "Investor shareholder",
 };
 
 /**

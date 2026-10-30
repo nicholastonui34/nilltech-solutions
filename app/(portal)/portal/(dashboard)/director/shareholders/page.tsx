@@ -84,7 +84,7 @@ function HolderFields({
           className="mt-1.5"
         >
           <option value="director">Director shareholder</option>
-          <option value="investor">Investor</option>
+          <option value="investor">Investor shareholder</option>
         </NativeSelect>
       </div>
       <div>

@@ -15,7 +15,7 @@ import {
 const shareCount = new Intl.NumberFormat("en-KE");
 const HOLDER_TYPE_LABELS: Record<string, string> = {
   director: "Director shareholder",
-  investor: "Investor",
+  investor: "Investor shareholder",
 };
 
 // USD figures only appear once the company has any USD activity.
