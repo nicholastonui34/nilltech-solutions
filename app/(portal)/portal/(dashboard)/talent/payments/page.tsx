@@ -2,11 +2,13 @@ import { FileDown } from "lucide-react";
 
 import { PageHeader } from "@/components/portal/page-header";
 import { NoAccess, Panel, StatCard } from "@/components/portal/panel";
+import { PayoutDetailsForm } from "@/components/portal/talent/freelancer-forms";
 import { NoTalentProfile } from "@/components/portal/talent/no-profile";
 import { TalentTabs } from "@/components/portal/talent/talent-tabs";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { PAYMENT_METHOD_LABELS } from "@/lib/finance/labels";
 import { CURRENCIES, formatMoney } from "@/lib/finance/money";
+import { describePayout, type PayoutMethod } from "@/lib/finance/payout";
 import { getOwnTalentProfile } from "@/lib/talent/own-profile";
 
 export default async function TalentPaymentsPage() {
@@ -15,13 +17,22 @@ export default async function TalentPaymentsPage() {
   const { supabase, profile } = await getOwnTalentProfile(user.id);
   if (!supabase || !profile) return <NoTalentProfile />;
 
-  const { data: payments } = await supabase
-    .from("freelancer_payments")
-    .select(
-      "id, number, paid_on, amount_minor, currency, method, reference, description, voided_at, projects(name)",
-    )
-    .eq("talent_id", profile.id)
-    .order("paid_on", { ascending: false });
+  const [{ data: payments }, { data: payout }] = await Promise.all([
+    supabase
+      .from("freelancer_payments")
+      .select(
+        "id, number, paid_on, amount_minor, currency, method, reference, description, voided_at, payout_snapshot, projects(name)",
+      )
+      .eq("talent_id", profile.id)
+      .order("paid_on", { ascending: false }),
+    supabase
+      .from("talent_payout_details")
+      .select(
+        "preferred_method, mpesa_number, mpesa_name, bank_name, bank_branch, bank_account_number, bank_account_name",
+      )
+      .eq("talent_id", profile.id)
+      .maybeSingle(),
+  ]);
 
   const year = new Date().getFullYear().toString();
   const valid = (payments ?? []).filter((p) => !p.voided_at);
@@ -42,6 +53,33 @@ export default async function TalentPaymentsPage() {
         description="What NillTech has paid you. Download a payment advice for each one."
       />
       <TalentTabs current="/portal/talent/payments" stage={profile.stage} />
+
+      <Panel
+        title="Payout details"
+        description="Where we send your money. We pay by M-Pesa or bank transfer to a Kenyan bank."
+        className="mb-6"
+      >
+        {!payout ? (
+          <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            Add your payout details so we can pay you.
+          </p>
+        ) : null}
+        <PayoutDetailsForm
+          current={
+            payout
+              ? {
+                  preferredMethod: payout.preferred_method as PayoutMethod,
+                  mpesaNumber: payout.mpesa_number,
+                  mpesaName: payout.mpesa_name,
+                  bankName: payout.bank_name,
+                  bankBranch: payout.bank_branch,
+                  bankAccountNumber: payout.bank_account_number,
+                  bankAccountName: payout.bank_account_name,
+                }
+              : null
+          }
+        />
+      </Panel>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2">
         {totals.map((t) => [
@@ -76,6 +114,11 @@ export default async function TalentPaymentsPage() {
                     {p.projects?.name ? ` · ${p.projects.name}` : ""}
                     {p.voided_at ? " · void (recorded in error)" : ""}
                   </p>
+                  {describePayout(p.payout_snapshot) ? (
+                    <p className="text-muted-foreground text-xs">
+                      Paid to {describePayout(p.payout_snapshot)}
+                    </p>
+                  ) : null}
                 </div>
                 <a
                   href={`/portal/documents/freelancer-payments/${p.id}`}

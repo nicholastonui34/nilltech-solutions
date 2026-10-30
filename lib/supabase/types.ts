@@ -516,6 +516,7 @@ export type Database = {
           number: string;
           paid_on: string;
           payee_name: string;
+          payout_snapshot: Json | null;
           project_id: string | null;
           recorded_at: string;
           recorded_by: string | null;
@@ -536,6 +537,7 @@ export type Database = {
           number: string;
           paid_on: string;
           payee_name: string;
+          payout_snapshot?: Json | null;
           project_id?: string | null;
           recorded_at?: string;
           recorded_by?: string | null;
@@ -556,6 +558,7 @@ export type Database = {
           number?: string;
           paid_on?: string;
           payee_name?: string;
+          payout_snapshot?: Json | null;
           project_id?: string | null;
           recorded_at?: string;
           recorded_by?: string | null;
@@ -1335,6 +1338,50 @@ export type Database = {
           },
         ];
       };
+      talent_payout_details: {
+        Row: {
+          bank_account_name: string | null;
+          bank_account_number: string | null;
+          bank_branch: string | null;
+          bank_name: string | null;
+          mpesa_name: string | null;
+          mpesa_number: string | null;
+          preferred_method: Database["public"]["Enums"]["payment_method"];
+          talent_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          bank_account_name?: string | null;
+          bank_account_number?: string | null;
+          bank_branch?: string | null;
+          bank_name?: string | null;
+          mpesa_name?: string | null;
+          mpesa_number?: string | null;
+          preferred_method: Database["public"]["Enums"]["payment_method"];
+          talent_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          bank_account_name?: string | null;
+          bank_account_number?: string | null;
+          bank_branch?: string | null;
+          bank_name?: string | null;
+          mpesa_name?: string | null;
+          mpesa_number?: string | null;
+          preferred_method?: Database["public"]["Enums"]["payment_method"];
+          talent_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "talent_payout_details_talent_id_fkey";
+            columns: ["talent_id"];
+            isOneToOne: true;
+            referencedRelation: "talent_applications";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       talent_test_tasks: {
         Row: {
           application_id: string;
@@ -1519,6 +1566,18 @@ export type Database = {
       send_quote: {
         Args: { _quote_id: string; _valid_until: string };
         Returns: string;
+      };
+      set_own_payout_details: {
+        Args: {
+          _bank_account_name: string;
+          _bank_account_number: string;
+          _bank_branch: string;
+          _bank_name: string;
+          _mpesa_name: string;
+          _mpesa_number: string;
+          _preferred_method: Database["public"]["Enums"]["payment_method"];
+        };
+        Returns: undefined;
       };
       set_talent_tax_pin: {
         Args: { _application_id: string; _pin: string };

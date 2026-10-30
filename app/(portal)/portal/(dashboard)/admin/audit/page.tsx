@@ -25,6 +25,7 @@ const ACTION_LABELS: Record<string, string> = {
   talent_document_accepted: "Freelancer accepted document",
   freelancer_payment_recorded: "Recorded freelancer payment",
   freelancer_payment_voided: "Voided freelancer payment",
+  payout_details_updated: "Freelancer updated payout details",
   user_reactivated: "Reactivated account",
 };
 

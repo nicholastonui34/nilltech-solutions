@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import {
   recordFreelancerPayment,
@@ -12,17 +12,52 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
-import { PAYMENT_METHOD_LABELS, PAYMENT_METHODS } from "@/lib/finance/labels";
 import { CURRENCIES } from "@/lib/finance/money";
+import {
+  PAYOUT_METHOD_LABELS,
+  formatMpesaNumber,
+  type PayoutDetails,
+  type PayoutMethod,
+} from "@/lib/finance/payout";
 
 const initialState: FinanceFormState = {};
+
+function PayoutDetailsSummary({ payout }: { payout: PayoutDetails }) {
+  return (
+    <dl className="bg-muted/50 grid gap-x-4 gap-y-1 rounded-lg p-3 text-xs sm:grid-cols-[auto_1fr]">
+      {payout.mpesaNumber ? (
+        <>
+          <dt className="text-muted-foreground">M-Pesa</dt>
+          <dd>
+            {formatMpesaNumber(payout.mpesaNumber)} ({payout.mpesaName})
+          </dd>
+        </>
+      ) : null}
+      {payout.bankAccountNumber ? (
+        <>
+          <dt className="text-muted-foreground">Bank</dt>
+          <dd>
+            {payout.bankName}
+            {payout.bankBranch ? `, ${payout.bankBranch}` : ""}
+          </dd>
+          <dt className="text-muted-foreground">Account</dt>
+          <dd>{payout.bankAccountNumber}</dd>
+          <dt className="text-muted-foreground">Beneficiary</dt>
+          <dd>{payout.bankAccountName}</dd>
+        </>
+      ) : null}
+      <dt className="text-muted-foreground">Prefers</dt>
+      <dd>{PAYOUT_METHOD_LABELS[payout.preferredMethod]}</dd>
+    </dl>
+  );
+}
 
 export function RecordFreelancerPaymentForm({
   talent,
   projects,
   today,
 }: {
-  talent: { id: string; label: string }[];
+  talent: { id: string; label: string; payout: PayoutDetails | null }[];
   projects: { id: string; name: string }[];
   today: string;
 }) {
@@ -30,6 +65,20 @@ export function RecordFreelancerPaymentForm({
     recordFreelancerPayment,
     initialState,
   );
+  const [talentId, setTalentId] = useState("");
+  const selected = talent.find((t) => t.id === talentId);
+  const payout = selected?.payout ?? null;
+  const available: PayoutMethod[] = payout
+    ? [
+        ...(payout.mpesaNumber ? (["mpesa"] as const) : []),
+        ...(payout.bankAccountNumber ? (["bank_transfer"] as const) : []),
+      ]
+    : [];
+  const [method, setMethod] = useState<PayoutMethod | "">("");
+  const chosen: PayoutMethod | "" =
+    method && available.includes(method)
+      ? method
+      : (payout?.preferredMethod ?? available[0] ?? "");
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <div>
@@ -37,7 +86,11 @@ export function RecordFreelancerPaymentForm({
         <NativeSelect
           id="fp-talent"
           name="talentId"
-          defaultValue=""
+          value={talentId}
+          onChange={(event) => {
+            setTalentId(event.target.value);
+            setMethod("");
+          }}
           required
           className="mt-1.5"
         >
@@ -51,6 +104,19 @@ export function RecordFreelancerPaymentForm({
           ))}
         </NativeSelect>
       </div>
+      {selected ? (
+        payout ? (
+          <PayoutDetailsSummary payout={payout} />
+        ) : (
+          <p
+            role="alert"
+            className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900"
+          >
+            {selected.label} hasn&rsquo;t added payout details yet. Ask them to add their
+            M-Pesa or bank details under Payments in their portal.
+          </p>
+        )
+      ) : null}
       <div>
         <Label htmlFor="fp-description">What it&rsquo;s for</Label>
         <Input
@@ -97,12 +163,16 @@ export function RecordFreelancerPaymentForm({
           <NativeSelect
             id="fp-method"
             name="method"
-            defaultValue="mpesa"
+            value={chosen}
+            onChange={(event) => setMethod(event.target.value as PayoutMethod)}
+            required
+            disabled={!available.length}
             className="mt-1.5"
           >
-            {PAYMENT_METHODS.map((method) => (
-              <option key={method} value={method}>
-                {PAYMENT_METHOD_LABELS[method]}
+            {available.length ? null : <option value="">No payout details</option>}
+            {available.map((m) => (
+              <option key={m} value={m}>
+                {m === "mpesa" ? "M-Pesa" : "Bank transfer"}
               </option>
             ))}
           </NativeSelect>
@@ -140,7 +210,7 @@ export function RecordFreelancerPaymentForm({
         lets the freelancer download a payment advice in their portal.
       </p>
       <FormMessage state={state} />
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending || !available.length}>
         {pending ? "Recording…" : "Record payment"}
       </Button>
     </form>

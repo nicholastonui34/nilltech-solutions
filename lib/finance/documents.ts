@@ -8,6 +8,7 @@ import {
   buildQuotePdf,
   buildReceiptPdf,
 } from "@/lib/finance/pdf";
+import { describePayout } from "@/lib/finance/payout";
 import { parseClientSnapshot, parseSellerSnapshot } from "@/lib/finance/snapshots";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -234,7 +235,7 @@ export async function freelancerPaymentPdfResponse(id: string) {
   const { data: payment } = await supabase
     .from("freelancer_payments")
     .select(
-      "number, paid_on, amount_minor, currency, method, reference, description, payee_name, voided_at, seller_snapshot, projects(name)",
+      "number, paid_on, amount_minor, currency, method, reference, description, payee_name, voided_at, seller_snapshot, payout_snapshot, projects(name)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -251,6 +252,7 @@ export async function freelancerPaymentPdfResponse(id: string) {
     description: payment.description,
     projectName: payment.projects?.name ?? null,
     payeeName: payment.payee_name,
+    paidTo: describePayout(payment.payout_snapshot),
     voided: payment.voided_at !== null,
     seller,
   });

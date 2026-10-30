@@ -11,6 +11,7 @@ import { getUserWithRole } from "@/lib/auth/dal";
 import { nairobiDateIso } from "@/lib/format";
 import { PAYMENT_METHOD_LABELS } from "@/lib/finance/labels";
 import { formatMoney } from "@/lib/finance/money";
+import { describePayout, type PayoutMethod } from "@/lib/finance/payout";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { roleLabel } from "@/lib/talent/options";
 
@@ -25,14 +26,16 @@ export default async function FreelancerPayPage() {
     supabase
       .from("freelancer_payments")
       .select(
-        "id, number, paid_on, amount_minor, currency, method, reference, description, payee_name, voided_at, void_reason, projects(name)",
+        "id, number, paid_on, amount_minor, currency, method, reference, description, payee_name, voided_at, void_reason, payout_snapshot, projects(name)",
       )
       .order("paid_on", { ascending: false })
       .order("recorded_at", { ascending: false })
       .limit(200),
     supabase
       .from("talent_applications")
-      .select("id, full_name, primary_role")
+      .select(
+        "id, full_name, primary_role, talent_payout_details(preferred_method, mpesa_number, mpesa_name, bank_name, bank_branch, bank_account_number, bank_account_name)",
+      )
       .eq("stage", "approved")
       .order("full_name"),
     supabase.from("projects").select("id, name").order("name"),
@@ -64,6 +67,11 @@ export default async function FreelancerPayPage() {
                         {p.reference ? ` · ref ${p.reference}` : ""} · {p.description}
                         {p.projects?.name ? ` · ${p.projects.name}` : ""}
                       </p>
+                      {describePayout(p.payout_snapshot) ? (
+                        <p className="text-muted-foreground text-xs">
+                          To {describePayout(p.payout_snapshot)}
+                        </p>
+                      ) : null}
                       {p.voided_at ? (
                         <p className="text-xs text-red-800">Void: {p.void_reason}</p>
                       ) : null}
@@ -89,10 +97,24 @@ export default async function FreelancerPayPage() {
         <Panel title="Record a payment">
           {talent?.length ? (
             <RecordFreelancerPaymentForm
-              talent={talent.map((t) => ({
-                id: t.id,
-                label: `${t.full_name} (${roleLabel(t.primary_role)})`,
-              }))}
+              talent={talent.map((t) => {
+                const p = t.talent_payout_details;
+                return {
+                  id: t.id,
+                  label: `${t.full_name} (${roleLabel(t.primary_role)})`,
+                  payout: p
+                    ? {
+                        preferredMethod: p.preferred_method as PayoutMethod,
+                        mpesaNumber: p.mpesa_number,
+                        mpesaName: p.mpesa_name,
+                        bankName: p.bank_name,
+                        bankBranch: p.bank_branch,
+                        bankAccountNumber: p.bank_account_number,
+                        bankAccountName: p.bank_account_name,
+                      }
+                    : null,
+                };
+              })}
               projects={projects ?? []}
               today={today}
             />

@@ -69,6 +69,8 @@ export type FreelancerPaymentPdfData = {
   description: string;
   projectName: string | null;
   payeeName: string;
+  /** Where the money went, already masked (e.g. "M-Pesa ••••5678 (Name)"). */
+  paidTo: string | null;
   voided: boolean;
   seller: SellerSnapshot;
 };
@@ -630,6 +632,7 @@ export async function buildFreelancerPaymentPdf(data: FreelancerPaymentPdfData) 
     ["For", data.description],
     ...(data.projectName ? ([["Project", data.projectName]] as [string, string][]) : []),
     ["Payment method", PAYMENT_METHOD_LABELS[data.method]],
+    ...(data.paidTo ? ([["Paid to", data.paidTo]] as [string, string][]) : []),
     ["Reference", data.reference ?? "n/a"],
   ];
   for (const [label, value] of rows) {
