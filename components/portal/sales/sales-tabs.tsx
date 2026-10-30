@@ -6,6 +6,7 @@ const tabs = [
   { href: "/portal/sales", label: "Leads" },
   { href: "/portal/sales/bookings", label: "Bookings" },
   { href: "/portal/sales/availability", label: "Availability" },
+  { href: "/portal/sales/chat", label: "Live chat" },
 ] as const;
 
 export function SalesTabs({ current }: { current: (typeof tabs)[number]["href"] }) {

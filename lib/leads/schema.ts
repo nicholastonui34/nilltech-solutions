@@ -3,7 +3,7 @@ import { z } from "zod";
 // Shown when a submission fails for any reason — server-side validation, a
 // failed insert, or the server action itself being unreachable.
 export const SUBMIT_ERROR_MESSAGE =
-  "Something went wrong submitting that. Please email info@nilltechsolutions.com or WhatsApp us instead.";
+  "Something went wrong submitting that. Please email info@nilltechsolutions.com or ask in the chat instead.";
 
 // Honeypot field: real users never fill it in (it's visually hidden), bots
 // filling every field do. Works alongside Turnstile and the per-IP rate

@@ -44,6 +44,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/portal/documents/**": ["./public/brand/nilltech-mark-circle.png"],
     "/legal/**": ["./public/brand/nilltech-mark-circle.png"],
+    // The chat assistant reads the site summary as part of its knowledge.
+    "/api/chat": ["./public/llms.txt"],
   },
   // 75 is the default; 60 is for below-the-fold card photos (ServiceCard).
   images: {

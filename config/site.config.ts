@@ -14,8 +14,9 @@ export const siteConfig = {
 
   contact: {
     email: "info@nilltechsolutions.com",
-    phone: "+254725830334",
-    phoneDisplay: "+254 725 830 334",
+    // Not shown on any page (owner, 2026-10-30). Used only for the WhatsApp
+    // hand-off button inside the chat assistant; invoices take the phone
+    // from finance_settings.
     whatsapp: "https://wa.me/254725830334",
   },
 

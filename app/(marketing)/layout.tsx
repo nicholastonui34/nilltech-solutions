@@ -3,6 +3,7 @@ import { CloudflareWebAnalytics } from "@/components/analytics/cloudflare-web-an
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { BookingFab } from "@/components/layout/booking-fab";
+import { ChatLauncher } from "@/components/chat/chat-launcher";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <main>{children}</main>
       <SiteFooter />
       <BookingFab />
+      <ChatLauncher />
       <AttributionCapture />
       <CloudflareWebAnalytics />
     </>

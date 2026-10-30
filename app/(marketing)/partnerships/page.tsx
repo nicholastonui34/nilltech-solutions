@@ -5,6 +5,7 @@ import { Container } from "@/components/sections/container";
 import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 export const metadata: Metadata = buildMetadata({
   title: "Partnerships",
@@ -34,25 +35,7 @@ export default function PartnershipsPage() {
           </p>
         </Container>
       </section>
-      <Faq
-        items={[
-          {
-            question: "Can you deliver under our brand?",
-            answer:
-              "Yes. We can work as your white-label delivery team, so your clients deal with you and we stay behind the scenes.",
-          },
-          {
-            question: "How do partnerships work commercially?",
-            answer:
-              "Either a fixed price per project or a monthly rate per engineer, invoiced in KES or USD. Contact sales and we'll agree the model that fits your pipeline.",
-          },
-          {
-            question: "How do you protect quality and confidentiality?",
-            answer:
-              "Every engineer is screened and completes a test task before joining a team, every delivery goes through code review and a QA checklist, and we're happy to sign your NDA.",
-          },
-        ]}
-      />
+      <Faq items={faqs.partnerships} />
       <CtaBand
         heading="Let's talk about your pipeline."
         body="Tell us about your clients and projects, and we'll propose how we can help you deliver more."

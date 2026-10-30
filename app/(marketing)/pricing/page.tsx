@@ -5,6 +5,7 @@ import { Container } from "@/components/sections/container";
 import { Faq } from "@/components/sections/faq";
 import { PricingTiers } from "@/components/sections/pricing-tiers";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 export const metadata: Metadata = buildMetadata({
   title: "Pricing",
@@ -33,30 +34,7 @@ export default function PricingPage() {
         </Container>
       </section>
 
-      <Faq
-        items={[
-          {
-            question: "Why is the USD price different from the KES price?",
-            answer:
-              "KES prices are for clients in East Africa. USD prices are for clients in the US, UK and Canada and reflect international project requirements, so they aren't a straight currency conversion.",
-          },
-          {
-            question: "How do payments work?",
-            answer:
-              "Each proposal sets out a payment schedule. You can pay by M-Pesa Paybill or bank transfer, in KES or USD, and every payment gets a receipt.",
-          },
-          {
-            question: "What's included in the price?",
-            answer:
-              "Design, build, testing, launch and free bug fixes for the period in your proposal. Hosting, domains and other third-party services are billed at cost, and new features after launch are quoted separately.",
-          },
-          {
-            question: "Is the estimate my final price?",
-            answer:
-              "No. The estimator gives an indicative range. After a short discovery call we confirm a fixed quote in writing before any work starts.",
-          },
-        ]}
-      />
+      <Faq items={faqs.pricing} />
 
       <CtaBand
         heading="Get a range for your project."

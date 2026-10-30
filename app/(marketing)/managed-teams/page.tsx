@@ -7,6 +7,7 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { serviceSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 const title = "Managed Tech Delivery Teams";
 
@@ -79,42 +80,7 @@ const data: OfferPageData = {
         "We run reviews, QA and reporting, and adjust the team as your priorities change.",
     },
   ],
-  faq: [
-    {
-      question: "How is this different from hiring freelancers?",
-      answer:
-        "Freelancers leave you to manage, review and replace them. NillTech recruits and screens the engineers, manages delivery and quality, and stays accountable for the result. You get one contract and one point of contact.",
-    },
-    {
-      question: "How much does a dedicated developer cost?",
-      answer:
-        "From KES 180,000 per developer per month for East African clients, and from USD 1,800 for clients in the US, UK and Canada. Senior specialists and larger teams cost more; longer engagements cost less.",
-    },
-    {
-      question: "How quickly can a team start?",
-      answer: "Usually within 1 to 2 weeks of agreeing the team size and skills.",
-    },
-    {
-      question: "Where are your engineers based?",
-      answer:
-        "Across East Africa: Kenya, Uganda, Tanzania and Rwanda. Every engineer is screened by our recruitment team and completes a test task before joining a client team.",
-    },
-    {
-      question: "Can your engineers join our existing team?",
-      answer:
-        "Yes. Engineers can work inside your tools, processes and meetings while NillTech keeps responsibility for their reporting, quality and delivery standards. You get regular status reports and a clear route to raise issues.",
-    },
-    {
-      question: "What happens when the engagement ends?",
-      answer:
-        "We run a planned handover: documentation and knowledge transfer to your team, so the work continues without us.",
-    },
-    {
-      question: "Who owns the work?",
-      answer:
-        "You do. Ownership of everything the team builds for you passes to you on payment, as set out in our terms.",
-    },
-  ],
+  faq: faqs.managedTeams,
   ctaHeading: "Tell us what you're building.",
   ctaBody:
     "Book a discovery call and we'll recommend the right team size, skills and monthly cost for your roadmap.",

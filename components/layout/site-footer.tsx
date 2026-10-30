@@ -36,21 +36,6 @@ export function SiteFooter() {
               </a>
             </p>
             <p className="mt-1">
-              <a href={`tel:${siteConfig.contact.phone}`} className="hover:text-white">
-                {siteConfig.contact.phoneDisplay}
-              </a>
-            </p>
-            <p className="mt-1">
-              <a
-                href={siteConfig.contact.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white"
-              >
-                WhatsApp
-              </a>
-            </p>
-            <p className="mt-1">
               {siteConfig.address.locality}, {siteConfig.address.country}
             </p>
           </div>

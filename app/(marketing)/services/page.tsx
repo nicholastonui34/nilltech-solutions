@@ -7,6 +7,7 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { serviceSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 const title = "AI-Powered Software Development";
 
@@ -79,38 +80,7 @@ const data: OfferPageData = {
         "You sign off, we launch, and we fix any bugs free of charge for the period in your proposal. The code is yours on full payment.",
     },
   ],
-  faq: [
-    {
-      question: "How much does a website cost in Kenya?",
-      answer:
-        "A NillTech business website starts from KES 45,000 and usually lands between KES 45,000 and 90,000, depending on pages and features. Online stores start from KES 95,000. Use the estimator for a range based on your project.",
-    },
-    {
-      question: "How long does it take to build a website or system?",
-      answer:
-        "Business websites take 1 to 7 days, online stores 1 to 2 weeks, and business systems or custom software 2 to 4 weeks. Having your content ready at kickoff keeps things on the fast end.",
-    },
-    {
-      question: "Do I own the website and code?",
-      answer:
-        "Yes. Ownership of the code and design we create for you passes to you once the project is paid in full.",
-    },
-    {
-      question: "What do I receive at handover?",
-      answer:
-        "The finished product, deployed and tested, plus the source code with its version history, technical documentation and deployment guides, the test reports, and a handover session with your team.",
-    },
-    {
-      question: "What happens after launch?",
-      answer:
-        "Bug fixes are free for the period stated in your proposal. New features and changes are quoted separately, and hosting or third-party services are billed at cost.",
-    },
-    {
-      question: "Can you accept M-Pesa?",
-      answer:
-        "Yes. You can pay us by M-Pesa Paybill or bank transfer, in KES or USD. Online stores we build include M-Pesa and card checkout.",
-    },
-  ],
+  faq: faqs.services,
   ctaHeading: "Know what you need? Get a price in two minutes.",
   ctaBody:
     "Answer a few questions and the estimator gives you an indicative range and timeline. A fixed quote follows a short discovery call.",

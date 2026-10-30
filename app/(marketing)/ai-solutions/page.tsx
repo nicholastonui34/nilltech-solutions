@@ -7,6 +7,7 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { serviceSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 const title = "AI Solutions for SMEs";
 
@@ -86,28 +87,7 @@ const data: OfferPageData = {
         "We go live, watch the conversations and costs, and fix any bugs free of charge for the period in your proposal.",
     },
   ],
-  faq: [
-    {
-      question: "What can AI do for a small business?",
-      answer:
-        "The quickest wins are answering repeat customer questions on WhatsApp or your website, automating follow-ups and reminders, and pulling information out of documents and forms. We start with the one task that saves your team the most time.",
-    },
-    {
-      question: "How much does an AI chatbot cost in Kenya?",
-      answer:
-        "Setup starts from KES 40,000. Running costs start from about KES 5,000 a month and cover hosting, WhatsApp messaging and AI usage, which we bill at cost. The AI token estimator shows usage costs for different models.",
-    },
-    {
-      question: "Will the AI give customers wrong answers?",
-      answer:
-        "We limit each assistant to the information you approve, test it with you before launch, and set it to hand over to a person when it isn't sure.",
-    },
-    {
-      question: "Is my customer data safe?",
-      answer:
-        "We only connect the data the solution needs, restrict access by role, and use providers with strong data protection. Our privacy notice explains how data is handled.",
-    },
-  ],
+  faq: faqs.aiSolutions,
   ctaHeading: "See it working on your own business.",
   ctaBody:
     "Book a short demo and we'll show you what an AI assistant or automation would look like for your customers and team.",
