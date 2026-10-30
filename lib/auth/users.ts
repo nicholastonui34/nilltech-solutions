@@ -7,6 +7,8 @@ export type AuthUserSummary = {
   email: string;
   createdAt: string;
   lastSignInAt: string | null;
+  /** Set while the account is deactivated (a Supabase Auth ban). */
+  deactivated: boolean;
 };
 
 /**
@@ -26,5 +28,6 @@ export async function listAuthUsers(): Promise<AuthUserSummary[] | null> {
     email: user.email ?? "",
     createdAt: user.created_at,
     lastSignInAt: user.last_sign_in_at ?? null,
+    deactivated: Boolean(user.banned_until && Date.parse(user.banned_until) > Date.now()),
   }));
 }

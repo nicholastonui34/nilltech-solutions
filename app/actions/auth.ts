@@ -45,6 +45,11 @@ export async function signIn(
     if (error.code === "invalid_credentials") {
       return { error: "That email and password don't match an account." };
     }
+    if (error.code === "user_banned") {
+      return {
+        error: "This account has been deactivated. Contact your NillTech administrator.",
+      };
+    }
     if (error.status === 429) {
       return { error: "Too many sign-in attempts. Wait a minute and try again." };
     }

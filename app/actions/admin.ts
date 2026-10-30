@@ -73,6 +73,96 @@ export async function revokeRole(formData: FormData) {
   refresh();
 }
 
+// --- Deactivate / reactivate ---------------------------------------------------
+// Migration …15. Deactivating (1) lists the user in deactivated_users, so
+// has_role / is_any_role deny every role-based RLS policy at once, (2) ends
+// their sessions so nothing can be refreshed, and (3) bans them in Supabase
+// Auth so they can't sign in again. Roles, profile and every record they
+// touched stay as they are, so reactivating restores access.
+
+const userIdSchema = z.object({ userId: z.string().uuid() });
+
+// Effectively permanent; reactivating lifts it.
+const DEACTIVATED_BAN = "876000h";
+
+export async function deactivateUser(formData: FormData) {
+  const actor = await requireSuperAdmin();
+  const { userId } = userIdSchema.parse({ userId: formData.get("userId") });
+  if (userId === actor.id) throw new Error("You can't deactivate your own account.");
+
+  const admin = getSupabaseAdmin();
+  if (!admin) throw new Error("SUPABASE_SERVICE_ROLE_KEY isn't set on this deployment.");
+
+  // Never leave the portal without an active super admin.
+  const [{ data: superAdmins, error: rolesError }, { data: deactivated }] =
+    await Promise.all([
+      admin.from("user_roles").select("user_id").eq("role", "super_admin"),
+      admin.from("deactivated_users").select("user_id"),
+    ]);
+  if (rolesError) throw new Error(rolesError.message);
+  const inactive = new Set((deactivated ?? []).map((row) => row.user_id));
+  if (superAdmins.some((row) => row.user_id === userId)) {
+    const othersActive = superAdmins.filter(
+      (row) => row.user_id !== userId && !inactive.has(row.user_id),
+    ).length;
+    if (othersActive === 0) {
+      throw new Error("This is the last active super admin, so it can't be deactivated.");
+    }
+  }
+
+  const { error: listError } = await admin
+    .from("deactivated_users")
+    .upsert({ user_id: userId, deactivated_by: actor.id }, { onConflict: "user_id" });
+  if (listError) throw new Error(listError.message);
+
+  const { error: sessionsError } = await admin.rpc("end_user_sessions", {
+    _user_id: userId,
+  });
+  if (sessionsError) throw new Error(sessionsError.message);
+
+  const { data, error } = await admin.auth.admin.updateUserById(userId, {
+    ban_duration: DEACTIVATED_BAN,
+  });
+  if (error) throw new Error(error.message);
+
+  await admin.from("audit_log").insert({
+    actor_id: actor.id,
+    action: "user_deactivated",
+    entity_type: "auth.users",
+    entity_id: userId,
+    metadata: { email: data.user.email ?? null },
+  });
+  refresh();
+}
+
+export async function reactivateUser(formData: FormData) {
+  const actor = await requireSuperAdmin();
+  const { userId } = userIdSchema.parse({ userId: formData.get("userId") });
+
+  const admin = getSupabaseAdmin();
+  if (!admin) throw new Error("SUPABASE_SERVICE_ROLE_KEY isn't set on this deployment.");
+
+  const { data, error } = await admin.auth.admin.updateUserById(userId, {
+    ban_duration: "none",
+  });
+  if (error) throw new Error(error.message);
+
+  const { error: listError } = await admin
+    .from("deactivated_users")
+    .delete()
+    .eq("user_id", userId);
+  if (listError) throw new Error(listError.message);
+
+  await admin.from("audit_log").insert({
+    actor_id: actor.id,
+    action: "user_reactivated",
+    entity_type: "auth.users",
+    entity_id: userId,
+    metadata: { email: data.user.email ?? null },
+  });
+  refresh();
+}
+
 export type CreateUserState = {
   error?: string;
   created?: { email: string; temporaryPassword: string };

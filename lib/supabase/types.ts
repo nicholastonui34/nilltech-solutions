@@ -247,6 +247,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      deactivated_users: {
+        Row: {
+          deactivated_at: string;
+          deactivated_by: string | null;
+          user_id: string;
+        };
+        Insert: {
+          deactivated_at?: string;
+          deactivated_by?: string | null;
+          user_id: string;
+        };
+        Update: {
+          deactivated_at?: string;
+          deactivated_by?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       delivery_reviews: {
         Row: {
           created_at: string;
@@ -950,6 +968,7 @@ export type Database = {
     Functions: {
       admin_database_size_bytes: { Args: never; Returns: number };
       delete_old_conversion_events: { Args: never; Returns: undefined };
+      end_user_sessions: { Args: { _user_id: string }; Returns: undefined };
       check_rate_limit: {
         Args: {
           p_bucket: string;
