@@ -25,7 +25,7 @@ import { canAccess } from "@/config/portal";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { formatBytes, formatDateTime, nairobiDateIso } from "@/lib/format";
 import { TALENT_AGREEMENTS_REVIEWED } from "@/config/talent-agreements";
-import { founders } from "@/lib/content/founders";
+import { SIGNATORIES } from "@/config/signatories";
 import { documentKindLabel } from "@/lib/talent/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -303,7 +303,7 @@ export default async function ApplicationDetailPage({
                   <GenerateDocumentForm
                     id={app.id}
                     kinds={generateKinds}
-                    signatories={founders.map((f) => f.name)}
+                    signatories={[...SIGNATORIES]}
                     defaults={{
                       role: roleLabel(app.primary_role),
                       today: nairobiDateIso(),
