@@ -33,13 +33,19 @@ export const portalDashboards: readonly PortalDashboard[] = [
   {
     href: "/portal/director",
     label: "Director",
-    description: "Revenue, margins, pipeline and the share register, read-only.",
+    description: "Revenue, margins, pipeline and the share register.",
     roles: ["director", "super_admin"],
+  },
+  {
+    href: "/portal/shares",
+    label: "My shareholding",
+    description: "Your shares, ownership and their book value.",
+    roles: ["director", "investor", "super_admin"],
   },
   {
     href: "/portal/investor",
     label: "Investor",
-    description: "Company net worth, profit or loss, and your shareholding.",
+    description: "Company net worth and profit or loss.",
     roles: ["investor", "super_admin"],
   },
   {

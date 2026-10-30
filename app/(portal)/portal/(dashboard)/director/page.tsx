@@ -1,10 +1,9 @@
+import Link from "next/link";
 import { PageHeader } from "@/components/portal/page-header";
 import { BarList, NoAccess, Panel, StatCard } from "@/components/portal/panel";
-import { ShareRegister } from "@/components/portal/share-register";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { nairobiDateIso } from "@/lib/format";
 import { CURRENCIES, formatMoney, type Currency } from "@/lib/finance/money";
-import { getShareholderOverview } from "@/lib/shareholders";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const MONTHS = 6;
@@ -34,6 +33,8 @@ function parseEstimate(value: unknown): [number, number] | null {
   const numbers = value.match(/\d+/g)?.map(Number);
   return numbers && numbers.length >= 2 ? [numbers[0], numbers[1]] : null;
 }
+
+const shareCount = new Intl.NumberFormat("en-KE");
 
 /**
  * Director / shareholder view (CLAUDE.md §10): read-only headline numbers
@@ -82,14 +83,9 @@ export default async function DirectorPage() {
       .gte("refunded_on", since < yearStart ? since : yearStart),
   ]);
 
-  const [{ data: holders }, overview] = await Promise.all([
-    supabase
-      .from("shareholders")
-      .select("id, name, shares, holder_type, user_id, ownership_percent")
-      .order("shares", { ascending: false })
-      .order("name"),
-    getShareholderOverview(),
-  ]);
+  const { data: holders } = await supabase.from("shareholders").select("shares");
+  const holderCount = holders?.length ?? 0;
+  const totalShares = (holders ?? []).reduce((sum, h) => sum + h.shares, 0);
 
   // Refunds count as negative payments, so cash collected, net, margin and
   // the monthly bars are all net of money paid back to clients.
@@ -170,13 +166,26 @@ export default async function DirectorPage() {
         description="Headline numbers across finance and sales. Net is cash collected minus expenses recorded in Finance. Read-only; amounts are never converted between currencies."
       />
 
-      <div className="mb-6">
-        <ShareRegister
-          holders={holders ?? []}
-          netWorthKes={overview?.currencies.KES.netWorth ?? 0}
-          currentUserId={user.id}
-        />
-      </div>
+      <Panel
+        className="mb-6"
+        title="Shareholding"
+        description={`${shareCount.format(totalShares)} shares in issue across ${holderCount} ${holderCount === 1 ? "holder" : "holders"}.`}
+      >
+        <div className="flex flex-wrap gap-3 text-sm">
+          <Link
+            href="/portal/shares"
+            className="text-primary underline underline-offset-2"
+          >
+            My shareholding
+          </Link>
+          <Link
+            href="/portal/director/shareholders"
+            className="text-primary underline underline-offset-2"
+          >
+            Share register
+          </Link>
+        </div>
+      </Panel>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CURRENCIES.map((currency) => [
