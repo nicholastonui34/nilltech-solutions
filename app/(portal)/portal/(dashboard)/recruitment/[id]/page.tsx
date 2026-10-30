@@ -1,19 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileDown } from "lucide-react";
+
+import {
+  deleteTalentDocument,
+  deleteTestTask,
+  markTestTaskReviewed,
+} from "@/app/actions/recruitment";
 
 import { PageHeader } from "@/components/portal/page-header";
 import { NoAccess, Panel } from "@/components/portal/panel";
 import {
   ApplicationStageForm,
+  CreateTestTaskForm,
   FreelancerAccountForm,
   RevealTaxPinForm,
   TaxPinForm,
+  UploadDocumentForm,
 } from "@/components/portal/talent/recruitment-forms";
+import { Button } from "@/components/ui/button";
 import { StageBadge } from "@/components/portal/talent/stage-badge";
 import { canAccess } from "@/config/portal";
 import { getUserWithRole } from "@/lib/auth/dal";
-import { formatDateTime } from "@/lib/format";
+import { formatBytes, formatDateTime, nairobiDateIso } from "@/lib/format";
+import { documentKindLabel } from "@/lib/talent/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   countryLabel,
@@ -56,11 +66,33 @@ export default async function ApplicationDetailPage({
   const { data: app } = await supabase
     .from("talent_applications")
     .select(
-      "id, created_at, full_name, email, phone, country, primary_role, skills, years_experience, engagement_preference, portfolio_url, profile_url, availability, message, consent_at, stage, stage_changed_at, screening_notes, test_task_notes, rejection_reason, engagement_type, verification_status, tax_pin_recorded_at, user_id",
+      "id, created_at, full_name, email, phone, country, primary_role, skills, years_experience, engagement_preference, portfolio_url, profile_url, availability, message, consent_at, stage, stage_changed_at, engagement_type, verification_status, tax_pin_recorded_at, user_id",
     )
     .eq("id", id)
     .maybeSingle();
   if (!app) notFound();
+
+  // Internal notes aren't selectable by app roles (applicants could read their
+  // own row); recruitment reads them through this function.
+  const [{ data: notesRows }, { data: tasks }, { data: documents }] = await Promise.all([
+    supabase.rpc("get_talent_internal_notes", { _application_id: app.id }),
+    supabase
+      .from("talent_test_tasks")
+      .select(
+        "id, title, brief, due_on, created_at, submission_url, submission_note, submitted_at, reviewed_at",
+      )
+      .eq("application_id", app.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("talent_documents")
+      .select(
+        "id, kind, title, size_bytes, requires_acceptance, uploaded_at, accepted_at, accepted_name",
+      )
+      .eq("talent_id", app.id)
+      .order("uploaded_at", { ascending: false }),
+  ]);
+  const notes = notesRows?.[0];
+  const canHaveLogin = ["test_task", "test_review", "approved"].includes(app.stage);
 
   const needsKraPin =
     app.stage === "approved" &&
@@ -122,6 +154,137 @@ export default async function ApplicationDetailPage({
               </div>
             ) : null}
           </Panel>
+
+          <Panel
+            title="Test tasks"
+            description={
+              app.user_id
+                ? "The applicant sees the brief in their portal and submits a link there."
+                : "Give them portal access (right) so they can see the brief and submit in the portal."
+            }
+          >
+            {tasks?.length ? (
+              <ul className="divide-border mb-6 divide-y">
+                {tasks.map((task) => (
+                  <li key={task.id} className="py-3 text-sm">
+                    <p className="font-medium">{task.title}</p>
+                    <p className="text-muted-foreground text-xs">
+                      Set {formatDateTime(task.created_at)}
+                      {task.due_on ? ` · due ${task.due_on}` : ""}
+                      {task.reviewed_at
+                        ? ` · reviewed ${formatDateTime(task.reviewed_at)}`
+                        : ""}
+                    </p>
+                    <details className="mt-1">
+                      <summary className="text-muted-foreground cursor-pointer text-xs">
+                        Brief
+                      </summary>
+                      <p className="mt-1 whitespace-pre-wrap">{task.brief}</p>
+                    </details>
+                    {task.submitted_at ? (
+                      <div className="bg-muted/50 mt-2 rounded-lg p-3">
+                        <p>
+                          Submitted {formatDateTime(task.submitted_at)}:{" "}
+                          <ExternalUrl url={task.submission_url} />
+                        </p>
+                        {task.submission_note ? (
+                          <p className="mt-1 whitespace-pre-wrap">
+                            {task.submission_note}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground mt-2 text-xs">
+                        Not submitted yet.
+                      </p>
+                    )}
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {task.submitted_at && !task.reviewed_at ? (
+                        <form action={markTestTaskReviewed}>
+                          <input type="hidden" name="taskId" value={task.id} />
+                          <Button type="submit" size="sm" variant="outline">
+                            Mark reviewed
+                          </Button>
+                        </form>
+                      ) : null}
+                      {!task.submitted_at ? (
+                        <form action={deleteTestTask}>
+                          <input type="hidden" name="taskId" value={task.id} />
+                          <Button
+                            type="submit"
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive"
+                          >
+                            Delete task
+                          </Button>
+                        </form>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {app.stage === "rejected" ? (
+              <p className="text-muted-foreground text-sm">
+                Not progressed, so no new test tasks.
+              </p>
+            ) : (
+              <CreateTestTaskForm id={app.id} minDate={nairobiDateIso()} />
+            )}
+          </Panel>
+
+          <Panel
+            title="Documents"
+            description="Upload your own contract, NDA or letter as a PDF. The freelancer downloads it in their portal and, if required, accepts it by typing their name."
+          >
+            {documents?.length ? (
+              <ul className="divide-border mb-6 divide-y">
+                {documents.map((doc) => (
+                  <li
+                    key={doc.id}
+                    className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium">{doc.title}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {documentKindLabel(doc.kind)} · {formatBytes(doc.size_bytes)} ·{" "}
+                        {doc.accepted_at
+                          ? `accepted by ${doc.accepted_name}, ${formatDateTime(doc.accepted_at)}`
+                          : doc.requires_acceptance
+                            ? "waiting for acceptance"
+                            : "for information"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`/portal/documents/talent/${doc.id}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="text-primary inline-flex items-center gap-1 hover:underline"
+                      >
+                        <FileDown className="size-4" /> PDF
+                      </a>
+                      {!doc.accepted_at ? (
+                        <form action={deleteTalentDocument}>
+                          <input type="hidden" name="documentId" value={doc.id} />
+                          <Button
+                            type="submit"
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive"
+                          >
+                            Remove
+                          </Button>
+                        </form>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <UploadDocumentForm id={app.id} />
+          </Panel>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -131,9 +294,9 @@ export default async function ApplicationDetailPage({
                 id: app.id,
                 stage: app.stage,
                 engagementType: app.engagement_type,
-                screeningNotes: app.screening_notes,
-                testTaskNotes: app.test_task_notes,
-                rejectionReason: app.rejection_reason,
+                screeningNotes: notes?.screening_notes ?? null,
+                testTaskNotes: notes?.test_task_notes ?? null,
+                rejectionReason: notes?.rejection_reason ?? null,
               }}
             />
           </Panel>
@@ -170,12 +333,15 @@ export default async function ApplicationDetailPage({
             )}
           </Panel>
 
-          {app.stage === "approved" ? (
+          {canHaveLogin ? (
             <Panel title="Portal access">
               {app.user_id ? (
                 <p className="text-sm">
-                  Has a portal login (
-                  {ENGAGEMENT_TYPE_LABELS[app.engagement_type ?? "freelance"]}).
+                  Has a portal login
+                  {app.engagement_type
+                    ? ` (${ENGAGEMENT_TYPE_LABELS[app.engagement_type]})`
+                    : ""}
+                  .
                 </p>
               ) : (
                 <FreelancerAccountForm id={app.id} />

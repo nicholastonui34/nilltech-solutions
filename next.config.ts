@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
   partialPrefetching: true,
+  // Talent documents (PDF, 4 MB max) are uploaded through a server action.
+  // Vercel caps request bodies at 4.5 MB, so this is the practical ceiling.
+  experimental: {
+    serverActions: { bodySizeLimit: "4.5mb" },
+  },
   turbopack: {
     rules: {
       "*.css": {

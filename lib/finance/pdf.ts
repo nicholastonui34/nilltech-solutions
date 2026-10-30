@@ -59,6 +59,20 @@ export type QuotePdfData = {
   notes: string | null;
 };
 
+export type FreelancerPaymentPdfData = {
+  number: string;
+  paidOn: string;
+  amountMinor: number;
+  currency: Currency;
+  method: PaymentMethod;
+  reference: string | null;
+  description: string;
+  projectName: string | null;
+  payeeName: string;
+  voided: boolean;
+  seller: SellerSnapshot;
+};
+
 export type CreditNotePdfData = {
   number: string;
   issueDate: string;
@@ -574,6 +588,69 @@ export async function buildQuotePdf(data: QuotePdfData) {
   )) {
     w.text(line, MARGIN, { size: 8.5, color: MUTED });
     w.y -= 11;
+  }
+
+  drawFooter(w, data.seller);
+  return doc.save();
+}
+
+/** Payment advice: confirms to a freelancer what NillTech paid them. */
+export async function buildFreelancerPaymentPdf(data: FreelancerPaymentPdfData) {
+  const { doc, w } = await newDocument(`Payment advice ${data.number}`);
+
+  await drawHeader(doc, w, data.seller, "PAYMENT ADVICE", [
+    ["Advice no.", data.number],
+    ["Date paid", data.paidOn],
+    ["Currency", data.currency],
+  ]);
+
+  if (data.voided) drawStamp(w, "VOID", rgb(0.75, 0.1, 0.1));
+
+  w.text("PAID TO", MARGIN, { size: 8, bold: true, color: MUTED });
+  w.y -= 14;
+  w.text(data.payeeName, MARGIN, { bold: true, size: 10.5 });
+  w.y -= 24;
+
+  w.page.drawRectangle({
+    x: MARGIN,
+    y: w.y - 44,
+    width: PAGE_W - MARGIN * 2,
+    height: 52,
+    color: rgb(0.96, 0.95, 0.98),
+  });
+  w.text("Amount paid", MARGIN + 14, { size: 9, color: MUTED, y: w.y - 12 });
+  w.text(`${data.currency} ${formatAmount(data.amountMinor)}`, MARGIN + 14, {
+    size: 18,
+    bold: true,
+    y: w.y - 34,
+  });
+  w.y -= 74;
+
+  const rows: [string, string][] = [
+    ["For", data.description],
+    ...(data.projectName ? ([["Project", data.projectName]] as [string, string][]) : []),
+    ["Payment method", PAYMENT_METHOD_LABELS[data.method]],
+    ["Reference", data.reference ?? "n/a"],
+  ];
+  for (const [label, value] of rows) {
+    w.text(label, MARGIN, { size: 9.5, color: MUTED });
+    const lines = wrap(w.fonts.regular, value, 9.5, PAGE_W - MARGIN * 2 - 140);
+    for (const line of lines) {
+      w.text(line, MARGIN + 140, { size: 9.5 });
+      w.y -= 13;
+    }
+    w.y -= 3;
+  }
+
+  w.y -= 10;
+  for (const line of wrap(
+    w.fonts.regular,
+    "This advice confirms the payment above. As an independent contractor you are responsible for your own tax on this income, unless your contract says otherwise.",
+    9,
+    PAGE_W - MARGIN * 2,
+  )) {
+    w.text(line, MARGIN, { size: 9, color: MUTED });
+    w.y -= 12;
   }
 
   drawFooter(w, data.seller);

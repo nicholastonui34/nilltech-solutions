@@ -81,7 +81,7 @@ export const portalDashboards: readonly PortalDashboard[] = [
   {
     href: "/portal/recruitment",
     label: "Recruitment",
-    description: "Applications, screening, test tasks and the talent pool.",
+    description: "Applications, screening, test tasks, documents and the talent pool.",
     roles: ["recruitment", "super_admin"],
   },
   {
@@ -92,8 +92,8 @@ export const portalDashboards: readonly PortalDashboard[] = [
   },
   {
     href: "/portal/talent",
-    label: "My profile",
-    description: "Your application status, verification and assignments.",
+    label: "My freelancer portal",
+    description: "Your details, test tasks, projects, payments and documents.",
     roles: ["freelancer"],
   },
   {

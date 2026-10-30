@@ -6,6 +6,7 @@ import {
   addChecklistItem,
   toggleChecklistItem,
   unassignTalent,
+  setProjectDueDate,
   updateProjectStatus,
 } from "@/app/actions/quality";
 import { PageHeader } from "@/components/portal/page-header";
@@ -44,7 +45,7 @@ export default async function ProjectDetailPage({
     supabase
       .from("projects")
       .select(
-        "id, name, description, status, created_at, delivered_at, clients(name, company), qa_checklist_items(id, position, label, done, done_at), project_assignments(talent_id, role_on_project, talent_applications(id, full_name, primary_role)), delivery_reviews(talent_id, rating, notes)",
+        "id, name, description, status, due_on, created_at, delivered_at, clients(name, company), qa_checklist_items(id, position, label, done, done_at), project_assignments(talent_id, role_on_project, talent_applications(id, full_name, primary_role)), delivery_reviews(talent_id, rating, notes)",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -102,6 +103,28 @@ export default async function ProjectDetailPage({
           </form>
         }
       />
+
+      <form action={setProjectDueDate} className="mb-6 flex flex-wrap items-end gap-2">
+        <input type="hidden" name="projectId" value={project.id} />
+        <div>
+          <label htmlFor="project-due" className="text-sm font-medium">
+            Due date
+          </label>
+          <Input
+            id="project-due"
+            name="dueOn"
+            type="date"
+            defaultValue={project.due_on ?? ""}
+            className="mt-1.5 h-8 w-auto"
+          />
+        </div>
+        <Button type="submit" size="sm" variant="outline">
+          Save due date
+        </Button>
+        <span className="text-muted-foreground text-xs">
+          Assigned freelancers see it in their portal.
+        </span>
+      </form>
 
       {project.description ? (
         <p className="text-muted-foreground mb-6 text-sm whitespace-pre-wrap">

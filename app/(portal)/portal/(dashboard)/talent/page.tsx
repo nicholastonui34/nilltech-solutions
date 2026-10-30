@@ -1,47 +1,21 @@
 import { PageHeader } from "@/components/portal/page-header";
 import { NoAccess, Panel } from "@/components/portal/panel";
+import { ProfileEditForm } from "@/components/portal/talent/freelancer-forms";
+import { NoTalentProfile } from "@/components/portal/talent/no-profile";
 import { StageBadge } from "@/components/portal/talent/stage-badge";
+import { TalentTabs } from "@/components/portal/talent/talent-tabs";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { formatDateTime } from "@/lib/format";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { PROJECT_STATUS_LABELS } from "@/lib/talent/labels";
+import { getOwnTalentProfile } from "@/lib/talent/own-profile";
 import { countryLabel, ENGAGEMENT_TYPE_LABELS, roleLabel } from "@/lib/talent/options";
 import { VERIFICATION_LABELS, type VerificationStatus } from "@/lib/verification";
 
-/** Freelancer portal (CLAUDE.md §10): profile, verification, tax info, assignments. RLS scopes it to their own rows. */
+/** Freelancer portal (CLAUDE.md §10): profile, verification and tax info. RLS scopes it to their own row. */
 export default async function TalentProfilePage() {
   const user = await getUserWithRole(["freelancer"]);
   if (!user) return <NoAccess />;
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return <NoAccess />;
-
-  const [{ data: profile }, { data: assignments }] = await Promise.all([
-    supabase
-      .from("talent_applications")
-      .select(
-        "id, full_name, email, country, primary_role, skills, stage, engagement_type, verification_status, tax_pin_recorded_at",
-      )
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("project_assignments")
-      .select("project_id, role_on_project, assigned_at, projects(name, status)")
-      .order("assigned_at", { ascending: false }),
-  ]);
-
-  if (!profile) {
-    return (
-      <>
-        <PageHeader title="Your profile" />
-        <Panel>
-          <p className="text-muted-foreground text-sm">
-            Your account isn&rsquo;t linked to an application yet. Contact the NillTech
-            recruitment team.
-          </p>
-        </Panel>
-      </>
-    );
-  }
+  const { profile } = await getOwnTalentProfile(user.id);
+  if (!profile) return <NoTalentProfile />;
 
   const verification =
     VERIFICATION_LABELS[profile.verification_status as VerificationStatus] ??
@@ -50,22 +24,19 @@ export default async function TalentProfilePage() {
   return (
     <>
       <PageHeader
-        title="Your profile"
-        description={`${roleLabel(profile.primary_role)} · ${countryLabel(profile.country)}`}
+        title={profile.full_name}
+        description={`${roleLabel(profile.primary_role)} · ${countryLabel(profile.country)} · ${profile.email}`}
         actions={<StageBadge stage={profile.stage} />}
       />
+      <TalentTabs current="/portal/talent" stage={profile.stage} />
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Panel title="Engagement">
           <p className="text-sm">
             {profile.engagement_type
               ? ENGAGEMENT_TYPE_LABELS[profile.engagement_type]
-              : "n/a"}
+              : "Decided when you're approved."}
           </p>
-          {profile.skills.length ? (
-            <p className="text-muted-foreground mt-2 text-xs">
-              {profile.skills.join(", ")}
-            </p>
-          ) : null}
         </Panel>
         <Panel title="ID verification">
           <p className="text-sm">{verification}</p>
@@ -85,32 +56,20 @@ export default async function TalentProfilePage() {
         </Panel>
       </div>
 
-      <Panel title="Assignments" className="mt-6">
-        {assignments?.length ? (
-          <ul className="divide-border divide-y">
-            {assignments.map((a) => (
-              <li
-                key={a.project_id}
-                className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
-              >
-                <div>
-                  <p className="font-medium">{a.projects?.name ?? "Project"}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {a.role_on_project ?? "Team member"} · since{" "}
-                    {formatDateTime(a.assigned_at)}
-                  </p>
-                </div>
-                {a.projects ? (
-                  <span className="text-muted-foreground text-xs">
-                    {PROJECT_STATUS_LABELS[a.projects.status]}
-                  </span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted-foreground text-sm">No assignments yet.</p>
-        )}
+      <Panel
+        title="Your details"
+        description="Keep these up to date so the team can reach you and match you to projects. To change your name or email, contact the recruitment team."
+        className="mt-6"
+      >
+        <ProfileEditForm
+          profile={{
+            phone: profile.phone,
+            skills: profile.skills,
+            portfolioUrl: profile.portfolio_url,
+            profileUrl: profile.profile_url,
+            availability: profile.availability,
+          }}
+        />
       </Panel>
     </>
   );

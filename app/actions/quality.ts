@@ -167,3 +167,15 @@ export async function saveDeliveryReview(
   refresh();
   return { success: "Review saved." };
 }
+
+export async function setProjectDueDate(formData: FormData) {
+  const { supabase } = await qualityContext();
+  const id = uuid.parse(formData.get("projectId"));
+  const dueOn = z.union([z.iso.date(), z.literal("")]).parse(formData.get("dueOn") ?? "");
+  const { error } = await supabase
+    .from("projects")
+    .update({ due_on: dueOn || null })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}
