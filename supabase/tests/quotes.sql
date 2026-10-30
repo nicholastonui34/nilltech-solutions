@@ -8,6 +8,7 @@
 --   convert_sent=blocked declined=declined accepted=accepted invoice=draft:15000:2
 --   again=blocked decide_after=blocked client_sees=1 client_sees_draft=0
 --   sales_send=blocked sales_reads=0 director_reads=2 audit=4
+-- Passed on the live project 2026-10-30.
 do $$
 declare
   fin uuid := gen_random_uuid(); dir uuid := gen_random_uuid(); sal uuid := gen_random_uuid();
