@@ -220,6 +220,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      conversion_events: {
+        Row: {
+          created_at: string;
+          event: string;
+          id: number;
+          path: string;
+          props: Json;
+          source: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          event: string;
+          id?: never;
+          path: string;
+          props?: Json;
+          source?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          event?: string;
+          id?: never;
+          path?: string;
+          props?: Json;
+          source?: string | null;
+        };
+        Relationships: [];
+      };
       delivery_reviews: {
         Row: {
           created_at: string;
@@ -922,6 +949,7 @@ export type Database = {
     };
     Functions: {
       admin_database_size_bytes: { Args: never; Returns: number };
+      delete_old_conversion_events: { Args: never; Returns: undefined };
       check_rate_limit: {
         Args: {
           p_bucket: string;
