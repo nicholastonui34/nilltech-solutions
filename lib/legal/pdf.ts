@@ -23,14 +23,14 @@ import {
   wrap,
 } from "@/lib/pdf/text";
 
-const BODY = 9.5;
-const LEADING = 13.5;
-const CONTENT_W = PAGE_W - MARGIN * 2;
+export const BODY = 9.5;
+export const LEADING = 13.5;
+export const CONTENT_W = PAGE_W - MARGIN * 2;
 const FOOTER_SPACE = 40;
 const siteHost = siteConfig.url.replace(/^https?:\/\//, "");
 
 /** Flattens [label](href) for print: external and site links show their address. */
-function printable(text: string) {
+export function printable(text: string) {
   return parseInline(text)
     .map((part) => {
       if (!("href" in part)) return part.text;
@@ -41,7 +41,8 @@ function printable(text: string) {
     .join("");
 }
 
-class Flow {
+/** Multi-page text flow with automatic page breaks. Also used by lib/talent/agreement-pdf.ts. */
+export class Flow {
   pages: PDFPage[] = [];
   page!: PDFPage;
   y = 0;
@@ -117,7 +118,7 @@ class Flow {
   }
 }
 
-function drawBlock(flow: Flow, block: LegalBlock) {
+export function drawBlock(flow: Flow, block: LegalBlock) {
   if (block.type === "p") {
     flow.paragraph(printable(block.text), { color: NAVY });
     flow.gap(6);

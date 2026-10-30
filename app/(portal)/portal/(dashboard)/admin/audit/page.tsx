@@ -23,6 +23,7 @@ const ACTION_LABELS: Record<string, string> = {
   test_task_submitted: "Test task submitted",
   talent_document_uploaded: "Uploaded talent document",
   talent_document_accepted: "Freelancer accepted document",
+  talent_document_generated: "Generated talent document",
   freelancer_payment_recorded: "Recorded freelancer payment",
   freelancer_payment_voided: "Voided freelancer payment",
   payout_details_updated: "Freelancer updated payout details",
