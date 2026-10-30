@@ -176,18 +176,17 @@ const draftItemSchema = z.object({
   unitPrice: z.string(),
 });
 
-export async function saveInvoiceDraft(
-  _prev: FinanceFormState,
-  formData: FormData,
-): Promise<FinanceFormState> {
-  const { supabase } = await financeContext();
-  const invoiceId = uuid.safeParse(formData.get("invoiceId"));
-  const clientId = uuid.safeParse(formData.get("clientId"));
-  const currency = currencySchema.safeParse(formData.get("currency"));
-  if (!invoiceId.success || !clientId.success || !currency.success) {
-    return { error: "Choose a client and currency." };
-  }
+type DraftLine = {
+  position: number;
+  description: string;
+  quantity: number;
+  unit_price_minor: number;
+};
 
+/** Line items and notes posted by the draft editor (invoices and quotes). */
+function parseDraftForm(
+  formData: FormData,
+): { error: string } | { lines: DraftLine[]; notes: string | null } {
   let rawItems: unknown;
   try {
     rawItems = JSON.parse(String(formData.get("items") ?? "[]"));
@@ -195,15 +194,15 @@ export async function saveInvoiceDraft(
     return { error: "Couldn't read the line items." };
   }
   const items = z.array(draftItemSchema).max(100).safeParse(rawItems);
-  if (!items.success) return { error: items.error.issues[0]?.message };
+  if (!items.success)
+    return { error: items.error.issues[0]?.message ?? "Check the lines." };
 
-  const rows = [];
+  const lines: DraftLine[] = [];
   for (const [position, item] of items.data.entries()) {
     const unitPriceMinor = parseAmountToMinor(item.unitPrice);
     if (unitPriceMinor === null)
       return { error: `Line ${position + 1}: enter a valid price.` };
-    rows.push({
-      invoice_id: invoiceId.data,
+    lines.push({
       position,
       description: item.description,
       quantity: item.quantity,
@@ -215,10 +214,26 @@ export async function saveInvoiceDraft(
     String(formData.get("notes") ?? "")
       .trim()
       .slice(0, 2000) || null;
+  return { lines, notes };
+}
+
+export async function saveInvoiceDraft(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const invoiceId = uuid.safeParse(formData.get("documentId"));
+  const clientId = uuid.safeParse(formData.get("clientId"));
+  const currency = currencySchema.safeParse(formData.get("currency"));
+  if (!invoiceId.success || !clientId.success || !currency.success) {
+    return { error: "Choose a client and currency." };
+  }
+  const draft = parseDraftForm(formData);
+  if ("error" in draft) return { error: draft.error };
 
   const { error: updateError } = await supabase
     .from("invoices")
-    .update({ client_id: clientId.data, currency: currency.data, notes })
+    .update({ client_id: clientId.data, currency: currency.data, notes: draft.notes })
     .eq("id", invoiceId.data)
     .eq("status", "draft");
   if (updateError) return { error: dbMessage(updateError) };
@@ -230,8 +245,10 @@ export async function saveInvoiceDraft(
     .eq("invoice_id", invoiceId.data);
   if (deleteError) return { error: dbMessage(deleteError) };
 
-  if (rows.length) {
-    const { error: insertError } = await supabase.from("invoice_items").insert(rows);
+  if (draft.lines.length) {
+    const { error: insertError } = await supabase
+      .from("invoice_items")
+      .insert(draft.lines.map((line) => ({ ...line, invoice_id: invoiceId.data })));
     if (insertError) return { error: dbMessage(insertError) };
   }
 
@@ -592,4 +609,147 @@ export async function deleteExpense(formData: FormData) {
   const { error } = await supabase.from("expenses").delete().eq("id", id.data);
   if (error) throw new Error(dbMessage(error));
   redirect("/portal/finance/expenses");
+}
+
+// --- Quotes ----------------------------------------------------------------
+// Drafts are edited through RLS like invoice drafts; send_quote,
+// decide_quote and convert_quote_to_invoice do the rest in the database.
+
+export async function createQuoteDraft(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { user, supabase } = await financeContext();
+  const clientId = uuid.safeParse(formData.get("clientId"));
+  const currency = currencySchema.safeParse(formData.get("currency"));
+  if (!clientId.success) return { error: "Choose a client." };
+  if (!currency.success) return { error: "Choose a currency." };
+
+  const { data, error } = await supabase
+    .from("quotes")
+    .insert({ client_id: clientId.data, currency: currency.data, created_by: user.id })
+    .select("id")
+    .single();
+  if (error) return { error: dbMessage(error) };
+
+  redirect(`/portal/finance/quotes/${data.id}`);
+}
+
+export async function saveQuoteDraft(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const quoteId = uuid.safeParse(formData.get("documentId"));
+  const clientId = uuid.safeParse(formData.get("clientId"));
+  const currency = currencySchema.safeParse(formData.get("currency"));
+  if (!quoteId.success || !clientId.success || !currency.success) {
+    return { error: "Choose a client and currency." };
+  }
+  const title =
+    String(formData.get("title") ?? "")
+      .trim()
+      .slice(0, 200) || null;
+  const draft = parseDraftForm(formData);
+  if ("error" in draft) return { error: draft.error };
+
+  const { error: updateError } = await supabase
+    .from("quotes")
+    .update({
+      client_id: clientId.data,
+      currency: currency.data,
+      title,
+      notes: draft.notes,
+    })
+    .eq("id", quoteId.data)
+    .eq("status", "draft");
+  if (updateError) return { error: dbMessage(updateError) };
+
+  const { error: deleteError } = await supabase
+    .from("quote_items")
+    .delete()
+    .eq("quote_id", quoteId.data);
+  if (deleteError) return { error: dbMessage(deleteError) };
+
+  if (draft.lines.length) {
+    const { error: insertError } = await supabase
+      .from("quote_items")
+      .insert(draft.lines.map((line) => ({ ...line, quote_id: quoteId.data })));
+    if (insertError) return { error: dbMessage(insertError) };
+  }
+
+  refresh();
+  return { success: "Draft saved." };
+}
+
+export async function deleteQuoteDraft(formData: FormData) {
+  const { supabase } = await financeContext();
+  const quoteId = uuid.parse(formData.get("quoteId"));
+  const { error } = await supabase
+    .from("quotes")
+    .delete()
+    .eq("id", quoteId)
+    .eq("status", "draft");
+  if (error) throw new Error(error.message);
+  redirect("/portal/finance/quotes");
+}
+
+export async function sendQuote(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const quoteId = uuid.safeParse(formData.get("quoteId"));
+  const validUntil = z.iso.date().safeParse(formData.get("validUntil"));
+  if (!quoteId.success) return { error: "Unknown quote." };
+  if (!validUntil.success) return { error: "Choose how long the quote is valid." };
+
+  const { data: number, error } = await supabase.rpc("send_quote", {
+    _quote_id: quoteId.data,
+    _valid_until: validUntil.data,
+  });
+  if (error) return { error: dbMessage(error) };
+
+  // Emailing the quote waits on Resend (CLAUDE.md §8); finance sends the PDF.
+  refresh();
+  return { success: `Numbered ${number}. Download the PDF and send it to the client.` };
+}
+
+export async function decideQuote(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const quoteId = uuid.safeParse(formData.get("quoteId"));
+  const outcome = z.enum(["accepted", "declined"]).safeParse(formData.get("outcome"));
+  if (!quoteId.success) return { error: "Unknown quote." };
+  if (!outcome.success) return { error: "Choose accepted or declined." };
+
+  const { error } = await supabase.rpc("decide_quote", {
+    _quote_id: quoteId.data,
+    _outcome: outcome.data,
+    _note: String(formData.get("note") ?? "").slice(0, 500),
+  });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return {
+    success: outcome.data === "accepted" ? "Marked as accepted." : "Marked as declined.",
+  };
+}
+
+export async function convertQuoteToInvoice(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const quoteId = uuid.safeParse(formData.get("quoteId"));
+  if (!quoteId.success) return { error: "Unknown quote." };
+
+  const { data: invoiceId, error } = await supabase.rpc("convert_quote_to_invoice", {
+    _quote_id: quoteId.data,
+  });
+  if (error) return { error: dbMessage(error) };
+
+  redirect(`/portal/finance/invoices/${invoiceId}`);
 }

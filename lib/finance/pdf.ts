@@ -46,6 +46,19 @@ export type InvoicePdfData = {
   notes: string | null;
 };
 
+export type QuotePdfData = {
+  number: string;
+  issueDate: string;
+  validUntil: string;
+  title: string | null;
+  currency: Currency;
+  seller: SellerSnapshot;
+  client: ClientSnapshot;
+  items: PdfItem[];
+  totalMinor: number;
+  notes: string | null;
+};
+
 export type CreditNotePdfData = {
   number: string;
   issueDate: string;
@@ -281,6 +294,65 @@ function drawFooter(w: Writer, seller: SellerSnapshot) {
   w.text(text, (PAGE_W - width) / 2, { size: 8.5, color: MUTED, y: MARGIN - 8 });
 }
 
+type PdfItem = {
+  description: string;
+  quantity: number;
+  unitPriceMinor: number;
+  lineTotalMinor: number;
+};
+
+/** Line items table (invoices and quotes). Returns the column positions for totals. */
+function drawItems(w: Writer, items: PdfItem[], currency: Currency) {
+  const right = PAGE_W - MARGIN;
+  const cols = { qty: right - 200, unit: right - 90, amount: right };
+  w.page.drawRectangle({
+    x: MARGIN,
+    y: w.y - 6,
+    width: PAGE_W - MARGIN * 2,
+    height: 20,
+    color: rgb(0.96, 0.95, 0.98),
+  });
+  w.text("Description", MARGIN + 8, { size: 8.5, bold: true });
+  w.text("Qty", cols.qty, { size: 8.5, bold: true, align: "right" });
+  w.text("Unit price", cols.unit, { size: 8.5, bold: true, align: "right" });
+  w.text(`Amount (${currency})`, cols.amount - 8, {
+    size: 8.5,
+    bold: true,
+    align: "right",
+  });
+  w.y -= 24;
+
+  for (const item of items) {
+    const lines = wrap(w.fonts.regular, item.description, 9.5, cols.qty - MARGIN - 60);
+    w.text(lines[0], MARGIN + 8);
+    w.text(String(item.quantity), cols.qty, { align: "right" });
+    w.text(formatAmount(item.unitPriceMinor), cols.unit, { align: "right" });
+    w.text(formatAmount(item.lineTotalMinor), cols.amount - 8, { align: "right" });
+    for (const extra of lines.slice(1)) {
+      w.y -= 12;
+      w.text(extra, MARGIN + 8);
+    }
+    w.y -= 10;
+    w.rule(w.y + 4);
+    w.y -= 10;
+  }
+
+  return cols;
+}
+
+function drawNotes(w: Writer, notes: string | null, heading = "NOTES") {
+  if (!notes) return;
+  w.text(heading, MARGIN, { size: 8, bold: true, color: MUTED });
+  w.y -= 14;
+  for (const paragraph of notes.split("\n")) {
+    for (const line of wrap(w.fonts.regular, paragraph, 9, PAGE_W - MARGIN * 2)) {
+      w.text(line, MARGIN, { size: 9 });
+      w.y -= 12;
+    }
+  }
+  w.y -= 12;
+}
+
 export async function buildInvoicePdf(data: InvoicePdfData) {
   const { doc, w } = await newDocument(`Invoice ${data.number}`);
   const balance =
@@ -299,40 +371,7 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
 
   drawParty(w, "BILL TO", data.client);
 
-  // Items table
-  const right = PAGE_W - MARGIN;
-  const cols = { qty: right - 200, unit: right - 90, amount: right };
-  w.page.drawRectangle({
-    x: MARGIN,
-    y: w.y - 6,
-    width: PAGE_W - MARGIN * 2,
-    height: 20,
-    color: rgb(0.96, 0.95, 0.98),
-  });
-  w.text("Description", MARGIN + 8, { size: 8.5, bold: true });
-  w.text("Qty", cols.qty, { size: 8.5, bold: true, align: "right" });
-  w.text("Unit price", cols.unit, { size: 8.5, bold: true, align: "right" });
-  w.text(`Amount (${data.currency})`, cols.amount - 8, {
-    size: 8.5,
-    bold: true,
-    align: "right",
-  });
-  w.y -= 24;
-
-  for (const item of data.items) {
-    const lines = wrap(w.fonts.regular, item.description, 9.5, cols.qty - MARGIN - 60);
-    w.text(lines[0], MARGIN + 8);
-    w.text(String(item.quantity), cols.qty, { align: "right" });
-    w.text(formatAmount(item.unitPriceMinor), cols.unit, { align: "right" });
-    w.text(formatAmount(item.lineTotalMinor), cols.amount - 8, { align: "right" });
-    for (const extra of lines.slice(1)) {
-      w.y -= 12;
-      w.text(extra, MARGIN + 8);
-    }
-    w.y -= 10;
-    w.rule(w.y + 4);
-    w.y -= 10;
-  }
+  const cols = drawItems(w, data.items, data.currency);
 
   // Totals
   w.y -= 4;
@@ -359,15 +398,7 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
   }
   w.y -= 14;
 
-  if (data.notes) {
-    w.text("NOTES", MARGIN, { size: 8, bold: true, color: MUTED });
-    w.y -= 14;
-    for (const line of wrap(w.fonts.regular, data.notes, 9, PAGE_W - MARGIN * 2)) {
-      w.text(line, MARGIN, { size: 9 });
-      w.y -= 12;
-    }
-    w.y -= 12;
-  }
+  drawNotes(w, data.notes);
 
   if (data.status !== "void" && balance > 0) {
     w.rule();
@@ -497,6 +528,53 @@ export async function buildCreditNotePdf(data: CreditNotePdfData) {
     MARGIN,
     { size: 9, color: MUTED },
   );
+
+  drawFooter(w, data.seller);
+  return doc.save();
+}
+
+export async function buildQuotePdf(data: QuotePdfData) {
+  const { doc, w } = await newDocument(`Quote ${data.number}`);
+
+  await drawHeader(doc, w, data.seller, "QUOTE", [
+    ["Quote no.", data.number],
+    ["Date", data.issueDate],
+    ["Valid until", data.validUntil],
+    ["Currency", data.currency],
+  ]);
+
+  drawParty(w, "PREPARED FOR", data.client);
+
+  if (data.title) {
+    w.text(data.title, MARGIN, { bold: true, size: 12 });
+    w.y -= 22;
+  }
+
+  const cols = drawItems(w, data.items, data.currency);
+
+  w.y -= 4;
+  w.text("Total", cols.unit - 40, { bold: true, size: 10.5, align: "right" });
+  w.text(`${data.currency} ${formatAmount(data.totalMinor)}`, cols.amount - 8, {
+    bold: true,
+    size: 10.5,
+    align: "right",
+  });
+  w.y -= 30;
+
+  drawNotes(w, data.notes, "SCOPE AND NOTES");
+
+  w.rule();
+  w.y -= 18;
+  const replyTo = data.seller.email ? ` Reply to ${data.seller.email}` : " Reply";
+  for (const line of wrap(
+    w.fonts.regular,
+    `This quote is valid until ${data.validUntil}.${replyTo} quoting ${data.number} to accept it, and we will send an invoice. Prices are in ${data.currency}. We are not VAT-registered, so no VAT is added.`,
+    8.5,
+    PAGE_W - MARGIN * 2,
+  )) {
+    w.text(line, MARGIN, { size: 8.5, color: MUTED });
+    w.y -= 11;
+  }
 
   drawFooter(w, data.seller);
   return doc.save();

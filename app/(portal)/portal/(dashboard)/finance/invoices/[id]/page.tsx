@@ -106,7 +106,7 @@ export default async function InvoiceDetailPage({
         <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
           <Panel>
             <InvoiceDraftEditor
-              invoiceId={invoice.id}
+              documentId={invoice.id}
               clients={clients}
               initial={{
                 clientId: invoice.client_id,

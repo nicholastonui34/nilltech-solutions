@@ -817,6 +817,128 @@ export type Database = {
           },
         ];
       };
+      quote_items: {
+        Row: {
+          description: string;
+          id: string;
+          line_total_minor: number | null;
+          position: number;
+          quantity: number;
+          quote_id: string;
+          unit_price_minor: number;
+        };
+        Insert: {
+          description: string;
+          id?: string;
+          line_total_minor?: number | null;
+          position?: number;
+          quantity: number;
+          quote_id: string;
+          unit_price_minor: number;
+        };
+        Update: {
+          description?: string;
+          id?: string;
+          line_total_minor?: number | null;
+          position?: number;
+          quantity?: number;
+          quote_id?: string;
+          unit_price_minor?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_quote_id_fkey";
+            columns: ["quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quotes: {
+        Row: {
+          client_id: string;
+          client_snapshot: Json | null;
+          created_at: string;
+          created_by: string | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          decided_at: string | null;
+          decided_by: string | null;
+          decision_note: string | null;
+          id: string;
+          invoice_id: string | null;
+          issue_date: string | null;
+          notes: string | null;
+          number: string | null;
+          seller_snapshot: Json | null;
+          sent_at: string | null;
+          sent_by: string | null;
+          status: Database["public"]["Enums"]["quote_status"];
+          title: string | null;
+          total_minor: number;
+          valid_until: string | null;
+        };
+        Insert: {
+          client_id: string;
+          client_snapshot?: Json | null;
+          created_at?: string;
+          created_by?: string | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          id?: string;
+          invoice_id?: string | null;
+          issue_date?: string | null;
+          notes?: string | null;
+          number?: string | null;
+          seller_snapshot?: Json | null;
+          sent_at?: string | null;
+          sent_by?: string | null;
+          status?: Database["public"]["Enums"]["quote_status"];
+          title?: string | null;
+          total_minor?: number;
+          valid_until?: string | null;
+        };
+        Update: {
+          client_id?: string;
+          client_snapshot?: Json | null;
+          created_at?: string;
+          created_by?: string | null;
+          currency?: Database["public"]["Enums"]["currency_code"];
+          decided_at?: string | null;
+          decided_by?: string | null;
+          decision_note?: string | null;
+          id?: string;
+          invoice_id?: string | null;
+          issue_date?: string | null;
+          notes?: string | null;
+          number?: string | null;
+          seller_snapshot?: Json | null;
+          sent_at?: string | null;
+          sent_by?: string | null;
+          status?: Database["public"]["Enums"]["quote_status"];
+          title?: string | null;
+          total_minor?: number;
+          valid_until?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quotes_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: true;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       refunds: {
         Row: {
           amount_minor: number;
@@ -1098,6 +1220,16 @@ export type Database = {
         };
         Returns: boolean;
       };
+      convert_quote_to_invoice: { Args: { _quote_id: string }; Returns: string };
+      decide_quote: {
+        Args: {
+          _note: string;
+          _outcome: Database["public"]["Enums"]["quote_status"];
+          _quote_id: string;
+        };
+        Returns: undefined;
+      };
+      send_quote: { Args: { _quote_id: string; _valid_until: string }; Returns: string };
       invoice_money_status: {
         Args: { _credited: number; _paid: number; _refunded: number; _total: number };
         Returns: Database["public"]["Enums"]["invoice_status"];
@@ -1181,6 +1313,7 @@ export type Database = {
       lead_status: "new" | "contacted" | "qualified" | "disqualified";
       lead_tier: "hot" | "warm" | "cold";
       payment_method: "mpesa" | "bank_transfer" | "other";
+      quote_status: "draft" | "sent" | "accepted" | "declined";
       project_status: "active" | "in_review" | "delivered" | "on_hold";
       talent_stage:
         "applied" | "screening" | "test_task" | "test_review" | "approved" | "rejected";

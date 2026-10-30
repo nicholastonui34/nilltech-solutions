@@ -3,7 +3,11 @@
 import { useActionState, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 
-import { saveInvoiceDraft, type FinanceFormState } from "@/app/actions/finance";
+import {
+  saveInvoiceDraft,
+  saveQuoteDraft,
+  type FinanceFormState,
+} from "@/app/actions/finance";
 import { FormMessage } from "@/components/portal/finance/form-message";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,21 +26,29 @@ type Row = { key: number; description: string; quantity: string; unitPrice: stri
 
 const initialState: FinanceFormState = {};
 
+/** Draft editor shared by invoices and quotes (same line-item shape). */
 export function InvoiceDraftEditor({
-  invoiceId,
+  kind = "invoice",
+  documentId,
   clients,
   initial,
 }: {
-  invoiceId: string;
+  kind?: "invoice" | "quote";
+  documentId: string;
   clients: { id: string; label: string }[];
   initial: {
     clientId: string;
     currency: Currency;
+    /** Quotes only: a short heading such as "Company website". */
+    title?: string;
     notes: string;
     items: { description: string; quantity: number; unitPriceMinor: number }[];
   };
 }) {
-  const [state, formAction, pending] = useActionState(saveInvoiceDraft, initialState);
+  const [state, formAction, pending] = useActionState(
+    kind === "quote" ? saveQuoteDraft : saveInvoiceDraft,
+    initialState,
+  );
   const [currency, setCurrency] = useState<Currency>(initial.currency);
   const [rows, setRows] = useState<Row[]>(() =>
     initial.items.length
@@ -63,7 +75,7 @@ export function InvoiceDraftEditor({
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      <input type="hidden" name="invoiceId" value={invoiceId} />
+      <input type="hidden" name="documentId" value={documentId} />
       <input
         type="hidden"
         name="items"
@@ -111,6 +123,20 @@ export function InvoiceDraftEditor({
           </NativeSelect>
         </div>
       </div>
+
+      {kind === "quote" ? (
+        <div>
+          <Label htmlFor="title">Quote title (optional)</Label>
+          <Input
+            id="title"
+            name="title"
+            defaultValue={initial.title ?? ""}
+            maxLength={200}
+            placeholder="For example: Company website"
+            className="mt-1.5"
+          />
+        </div>
+      ) : null}
 
       <fieldset>
         <legend className="mb-2 text-sm font-medium">Line items</legend>
@@ -212,7 +238,11 @@ export function InvoiceDraftEditor({
       </p>
 
       <div>
-        <Label htmlFor="notes">Notes on the invoice (optional)</Label>
+        <Label htmlFor="notes">
+          {kind === "quote"
+            ? "Notes on the quote, such as scope and timeline (optional)"
+            : "Notes on the invoice (optional)"}
+        </Label>
         <Textarea
           id="notes"
           name="notes"
