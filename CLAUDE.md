@@ -8,7 +8,7 @@ This file is the single source of truth for Claude Code when working in this rep
 - **Positioning line:** "We Build the Team. You Own the Outcome." Never use "Your Outsourcing Partner for Scale."
 - **Not a freelancer marketplace. Not an agency.** Every UI/copy decision must reinforce that, not undercut it.
 - **Markets:** Kenya, Uganda, Tanzania, Rwanda (primary growth) + US, UK, Canada.
-- **Contact — single source of truth in `config/site.config.ts`:** info@nilltechsolutions.com · +254 725 830 334 (call + WhatsApp).
+- **Contact — single source of truth in `config/site.config.ts`:** info@nilltechsolutions.com. The phone/WhatsApp number (+254 725 830 334) is **not shown on any page** (owner, 2026-10-30): visitors use the website chat, which hands over to a person or WhatsApp. It still appears on invoices, receipts and quotes (from `finance_settings`).
 - **Brand tokens:**
   | Token  | Value                                                  |
   | ------ | ------------------------------------------------------ |
@@ -56,6 +56,7 @@ Verify every price on the vendor's live pricing page before committing, and reco
 | SMS                                     | Africa's Talking (prepaid) — **deferred, coming soon**            | Usage                                                                                      | KES 0 (not active)                    | 2026-10-24 (no official rate card found; aggregators estimate ~KES 0.80/SMS, sender ID KES 5,000–15,000 one-off — confirm before activating)                  |
 | ID verification                         | Persona — **deferred, coming soon**                               | Usage-based                                                                                | KES 0 (not active)                    | 2026-10-24 (no free tier found; Essential plan $250/mo, 12-month minimum — confirm vendor before activating)                                                  |
 | AI APIs (quote estimator)               | Cheapest capable model + hard monthly spend cap                   | Usage                                                                                      | `{{BUDGET: KES ~6,000 cap}}`          | `{{VERIFY}}` — not searched this pass                                                                                                                         |
+| Website chat assistant                  | Anthropic, Claude Haiku 5.5                                       | Usage, hard cap KES 1,000/month in `config/chat.ts` (FAQ-only answers once reached)        | ≤ KES 12,000 (cap)                    | 2026-10-30 (Anthropic model docs: $0.10/M input, $0.50/M output)                                                                                              |
 | Domain                                  | Existing registrar                                                | Renewal                                                                                    | ~KES 2,000                            | `{{VERIFY}}` — depends on current registrar                                                                                                                   |
 
 **Rules:**
@@ -94,13 +95,13 @@ Primary nav (max 6): **Services · AI Solutions · AI Data · Managed Teams · A
 
 Action-specific CTAs mapped by intent — never generic "Submit" or "Learn more":
 
-| CTA                   | Used for                                                                           |
-| --------------------- | ---------------------------------------------------------------------------------- |
-| Book a Discovery Call | Managed teams, custom software                                                     |
-| Book a Demo           | AI solutions, products with live demos                                             |
-| Get a Free Quote      | Services (feeds AI quote estimator)                                                |
-| Contact Sales         | Partnerships, enterprise                                                           |
-| Talk on WhatsApp      | Secondary channel only: a link on `/contact` and in the footer (owner, 2026-10-29) |
+| CTA                   | Used for                                                                         |
+| --------------------- | -------------------------------------------------------------------------------- |
+| Book a Discovery Call | Managed teams, custom software                                                   |
+| Book a Demo           | AI solutions, products with live demos                                           |
+| Get a Free Quote      | Services (feeds AI quote estimator)                                              |
+| Contact Sales         | Partnerships, enterprise                                                         |
+| Talk on WhatsApp      | Only inside the website chat, when it hands over to a person (owner, 2026-10-30) |
 
 - **Booking: our own system at `/book`** (owner decision 2026-10-29, replacing the Cal.com plan). "Book a Discovery Call", "Book a Demo" and "Contact Sales" open `/book` with the call type preselected; the sticky mobile button is "Book a call". Every booking is also a lead (source `booking`, +3 score). Hours and blocked dates are set in the portal (Sales → Availability); slot length, notice and horizon live in `config/booking.ts`. Confirmation emails wait on Resend: the visitor gets an on-screen confirmation, a calendar file and an "Add to Google Calendar" link, and the team confirms manually.
 - Every CTA fires a tracked conversion event: `cta_click`, `form_start`, `form_submit`, `booking_complete`, `whatsapp_click`, `call_click`, `quote_generated`. Since 2026-10-29 they are stored (`lib/analytics.ts` → `POST /api/events` → `conversion_events`, migration `…14`): anonymous (no cookie, visitor id, IP or form contents), short labels only, rate-limited per visitor, kept 13 months, shown on the Marketing and Analytics dashboards.
@@ -323,6 +324,8 @@ Staged, gated — each phase ends with typecheck, lint, tests, Lighthouse report
 
   - [x] Generated freelancer documents (owner, 2026-10-30: "create the three documents, NDA, contract and onboarding letter", freelancers, generated in the portal). Migration `…22` (applied): `talent_documents.reference` and `generated_from`, numbering `NTS-NDA-`, `NTS-FSA-` and `NTS-OL-YYYY-NNNN` via `next_talent_document_number()` (recruitment/super_admin). Text in `lib/talent/agreements.ts` (NDA in the style of the owner's client NDA-2026-0001, freelance services agreement, onboarding letter), laid out by `lib/talent/agreement-pdf.ts` on the shared multi-page engine (`Flow` now exported from `lib/legal/pdf.ts`). Recruitment → applicant → Documents → "Generate a document": NDA from the test-task stage, agreement and letter once approved as freelance (full-time hires get no generated contract). Every business term (rate, basis, currency, payment days, notice, non-solicitation months, NDA years, scope, dates) comes from the form; the signatory is picked from `config/signatories.ts`. The PDF goes to the private bucket and the freelancer's Documents tab; agreements require typed-name acceptance. **Drafted by Claude, not legal advice:** `config/talent-agreements.ts` `TALENT_AGREEMENTS_REVIEWED = false` shows a warning until the owner's advocate approves the text.
 
+  - [x] Website chat assistant + live chat (owner, 2026-10-30: phone and WhatsApp numbers off every page, replaced by a chat that answers most questions and hands over to a person). Migration `…23` (applied): `chat_conversations`, `chat_messages`, `chat_agent_presence`, `chat_ai_usage`; sales/super_admin read and answer; visitors never touch the tables (server routes with the service role and a per-chat secret token, only its SHA-256 stored, not readable by app roles). "Chat with us" button on every public page (panel lazy-loaded, no cost to page speed). Answers come from Claude Haiku 5.5 grounded in `llms.txt` and the page FAQs (`lib/content/faqs.ts`, now shared by the pages and the bot), told never to invent facts or give a phone number; monthly spend capped at KES 1,000 (`config/chat.ts`, usage on Main Admin); without the key, over the cap or on error it answers from a keyword FAQ match. When it can't help or the visitor asks for a person it offers: chat with a person (only when someone in sales has Sales → Live chat open, within booking hours and not a blocked time), leave a message (becomes a lead, source `chat`), continue on WhatsApp, or book a call. Assistant-only chats aren't stored; chats handed to a person are kept 12 months. Privacy notice lists Anthropic (United States). Phone removed from the contact page, footer, booking page, JSON-LD and `llms.txt`.
+
   - [x] Old-site redirects (2026-10-30, §14). The old nilltechsolutions.com is a Nuxt app with no sitemap; its routes were read from its JS route table. `next.config.ts` `OLD_SITE_REDIRECTS` sends 19 old URLs (about, contact, FAQ, privacy, terms, six `/services/*` pages, and the old app's `/auth`, `/admin`, `/client`, `/freelancer` areas) to their nearest new page with a 301; every one checked against a local production build. Cutover plan, DNS and email warnings and rollback in `docs/migration.md`.
 
 ## 18. Open Inputs (keep updated)
@@ -339,6 +342,8 @@ Last tidied 2026-10-29. Grouped by what the owner needs to do. Resolved items ar
 - **Advocate review of the freelancer documents.** The NDA, freelance services agreement and onboarding letter in `lib/talent/agreements.ts` were drafted by Claude. Have a Kenyan advocate review them (especially electronic acceptance, IP assignment, non-solicitation and withholding tax), then set `TALENT_AGREEMENTS_REVIEWED = true` in `config/talent-agreements.ts`.
 - **Booking hours (do this first after the booking release).** Portal → Sales → Availability: add your weekly hours. Until hours exist, `/book` shows "No open times" and a message link, and the Bookings tab shows a warning.
 - **Booking follow-up routine.** Until Resend exists, nobody is emailed automatically: check Sales → Bookings daily, confirm each call by email and send the video link for video calls. Confirm the default rules in `config/booking.ts` (30-minute calls, 4 hours' notice, 21 days ahead).
+- **Chat assistant key.** Create an Anthropic account (console.anthropic.com), add billing, set a monthly spend limit there too (about US$8), create an API key and add it in Vercel as `ANTHROPIC_API_KEY` (Production). Never paste it in chat. Until then the chat answers from the FAQs only.
+- **Live chat routine.** Whoever covers sales keeps Portal → Sales → Live chat open during booking hours; that's what makes "Chat with a person" appear for visitors. Outside that, visitors leave a message (a lead in Sales).
 - **Turnstile on Preview (optional).** Keys are in Vercel for Production only. Add them to Preview if preview deployments should be protected; without them a preview falls back to the honeypot only.
 
 ### Owner content

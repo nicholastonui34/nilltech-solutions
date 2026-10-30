@@ -8,6 +8,7 @@ import { CourseList } from "@/components/sections/course-list";
 import { JsonLd } from "@/components/seo/json-ld";
 import { courseSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 const title = "NillTech Academy";
 
@@ -70,23 +71,7 @@ const data: OfferPageData = {
         "Use what you learn on your own projects, or apply to join our delivery teams.",
     },
   ],
-  faq: [
-    {
-      question: "Are the courses really free?",
-      answer:
-        "Yes. Free courses are open to everyone with no sign-up or payment. Paid courses, when they launch, will be clearly marked.",
-    },
-    {
-      question: "Do I need experience to start?",
-      answer:
-        "No. Each course says who it's for and what you need before you start, and beginner courses assume no background.",
-    },
-    {
-      question: "Can you train our company's team?",
-      answer:
-        "Yes. Contact us with your team's size and goals, and we'll plan training around the tools and work you already do.",
-    },
-  ],
+  faq: faqs.academy,
   ctaHeading: "Want training for your team?",
   ctaBody:
     "Tell us what your team needs to learn, and we'll put together a plan and a price.",

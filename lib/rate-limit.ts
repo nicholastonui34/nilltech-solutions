@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const RATE_LIMITED_MESSAGE =
-  "You've sent several requests in a short time. Please wait a few minutes and try again, or message us on WhatsApp.";
+  "You've sent several requests in a short time. Please wait a few minutes and try again, or ask in the chat.";
 
 // Per visitor, per form: enough for real people who retry or correct a
 // mistake, low enough to make scripted spam pointless.

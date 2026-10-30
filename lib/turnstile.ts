@@ -26,10 +26,10 @@ export async function verifyTurnstile(token: string | undefined): Promise<boolea
     return result.success === true;
   } catch {
     // Cloudflare unreachable: fail closed — the visitor can retry, and the
-    // form shows the direct email/WhatsApp fallback.
+    // form shows the direct email fallback.
     return false;
   }
 }
 
 export const TURNSTILE_FAILED_MESSAGE =
-  "We couldn't confirm you're human. Please try again, or email or WhatsApp us instead.";
+  "We couldn't confirm you're human. Please try again, or email us or ask in the chat instead.";

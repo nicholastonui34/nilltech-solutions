@@ -7,6 +7,7 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import { serviceSchema } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/seo";
+import { faqs } from "@/lib/content/faqs";
 
 const title = "AI Training and Data Annotation";
 
@@ -96,38 +97,7 @@ const data: OfferPageData = {
         "You get regular reports on volume, quality and open questions, and we adjust the team and guidelines as your model changes.",
     },
   ],
-  faq: [
-    {
-      question: "What is RLHF?",
-      answer:
-        "RLHF (reinforcement learning from human feedback) trains an AI model using human judgements of its answers. People rank or score responses, and the model learns to prefer the answers people rate higher. NillTech provides the trained, managed teams that produce those judgements.",
-    },
-    {
-      question: "What kinds of data do you annotate?",
-      answer:
-        "Image, text, audio, video and document data: for example bounding boxes and tags for images, entity tagging and classification for text, transcription for audio, and data extraction from documents.",
-    },
-    {
-      question: "How do you keep quality consistent?",
-      answer:
-        "Every project starts with written guidelines and a pilot batch you review. In production, reviewers check the team's work against the guidelines, and edge cases are escalated instead of guessed.",
-    },
-    {
-      question: "Where is the team based?",
-      answer:
-        "In East Africa: Kenya, Uganda, Tanzania and Rwanda. NillTech recruits, trains and manages the team, so you work with one company, not individual contractors.",
-    },
-    {
-      question: "How is our data protected?",
-      answer:
-        "Access is limited to the people working on your project, and we follow your data handling rules. Our privacy notice explains how we handle data, and we can sign an NDA before you share anything.",
-    },
-    {
-      question: "How much does annotation or RLHF work cost?",
-      answer:
-        "It depends on the task, data type, volume, quality bar and turnaround, so we quote per project after scoping. A pilot batch shows the real cost per item before you commit to volume.",
-    },
-  ],
+  faq: faqs.aiDataServices,
   ctaHeading: "Tell us what your model needs.",
   ctaBody:
     "Book a discovery call and we'll scope the task, agree the guidelines and plan a pilot batch.",

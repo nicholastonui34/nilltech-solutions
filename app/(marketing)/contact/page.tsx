@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarClock, Mail, MessageCircle, Phone } from "lucide-react";
+import { CalendarClock, Mail } from "lucide-react";
 
 import { ContactForm } from "@/components/sections/contact-form";
 import { Container } from "@/components/sections/container";
@@ -12,7 +12,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Contact",
   description:
-    "Contact NillTech Solutions in Nairobi: book a free call online, send us your project details, email info@nilltechsolutions.com or call +254 725 830 334.",
+    "Contact NillTech Solutions in Nairobi: book a free call online, send us your project details, email info@nilltechsolutions.com or ask in the website chat.",
   path: "/contact",
 });
 
@@ -20,8 +20,9 @@ export const metadata: Metadata = buildMetadata({
 // server action. It degrades gracefully — on-screen success/error either
 // way — if SUPABASE_SERVICE_ROLE_KEY isn't configured yet. Direct contact
 // methods stay alongside it as a redundant, always-working fallback.
-// Booking a call is the main route (owner, 2026-10-29); WhatsApp stays here
-// as a secondary channel for visitors who'd rather message.
+// Booking a call is the main route (owner, 2026-10-29). Phone and WhatsApp
+// numbers aren't shown anywhere (owner, 2026-10-30): the chat assistant
+// offers WhatsApp or a live agent when it can't answer.
 const methods = [
   {
     icon: Mail,
@@ -29,20 +30,6 @@ const methods = [
     value: siteConfig.contact.email,
     href: `mailto:${siteConfig.contact.email}`,
     event: "cta_click" as const,
-  },
-  {
-    icon: Phone,
-    label: "Call",
-    value: siteConfig.contact.phoneDisplay,
-    href: `tel:${siteConfig.contact.phone}`,
-    event: "call_click" as const,
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: "Message us on WhatsApp",
-    href: siteConfig.contact.whatsapp,
-    event: "whatsapp_click" as const,
   },
 ];
 

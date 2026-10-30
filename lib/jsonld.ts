@@ -10,7 +10,6 @@ export function organizationSchema() {
     url: siteConfig.url,
     logo: `${siteConfig.url}/brand/nilltech-logo.jpg`,
     email: siteConfig.contact.email,
-    telephone: siteConfig.contact.phone,
     foundingDate: "2024-12-18",
   };
 }
@@ -22,7 +21,6 @@ export function localBusinessSchema() {
     name: siteConfig.legalName,
     url: siteConfig.url,
     email: siteConfig.contact.email,
-    telephone: siteConfig.contact.phone,
     address: {
       "@type": "PostalAddress",
       addressLocality: siteConfig.address.locality,

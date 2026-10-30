@@ -1,6 +1,7 @@
 import { AdminTabs } from "@/components/portal/admin-tabs";
 import { PageHeader } from "@/components/portal/page-header";
 import { NoAccess, Panel, StatCard } from "@/components/portal/panel";
+import { CHAT_MONTHLY_CAP_KES, CHAT_MONTHLY_CAP_USD_MICROS } from "@/config/chat";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { daysAgoIso, formatBytes, formatDateTime } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -28,6 +29,11 @@ function integrations(): Integration[] {
       name: "Cloudflare Turnstile",
       status: has("TURNSTILE_SECRET_KEY") ? "configured" : "missing",
       note: "Public forms only have a honeypot until this is set.",
+    },
+    {
+      name: "Chat assistant (Anthropic)",
+      status: has("ANTHROPIC_API_KEY") ? "configured" : "missing",
+      note: "Without it the website chat answers from the FAQs only.",
     },
     {
       name: "Resend email",
@@ -74,7 +80,11 @@ export default async function AdminHealthPage() {
 
   const weekAgo = daysAgoIso(7);
 
-  const [dbSize, leadsTotal, leadsWeek, failedRuns, issuedInvoices, payments] =
+  const month = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Nairobi" })
+    .format(new Date())
+    .slice(0, 7);
+
+  const [dbSize, leadsTotal, leadsWeek, failedRuns, issuedInvoices, payments, chatUsage] =
     await Promise.all([
       supabase.rpc("admin_database_size_bytes"),
       supabase.from("leads").select("id", { count: "exact", head: true }),
@@ -94,7 +104,14 @@ export default async function AdminHealthPage() {
         .select("id", { count: "exact", head: true })
         .neq("status", "draft"),
       supabase.from("payments").select("id", { count: "exact", head: true }),
+      supabase
+        .from("chat_ai_usage")
+        .select("requests, cost_usd_micros")
+        .eq("month", month)
+        .maybeSingle(),
     ]);
+  const chatCostMicros = chatUsage.data?.cost_usd_micros ?? 0;
+  const chatCapUsedPct = Math.round((chatCostMicros / CHAT_MONTHLY_CAP_USD_MICROS) * 100);
 
   const dbBytes = dbSize.data ?? null;
   const dbOverTrigger = dbBytes !== null && dbBytes >= DB_TRIGGER_BYTES;
@@ -132,7 +149,7 @@ export default async function AdminHealthPage() {
         </p>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Database size"
           value={dbBytes !== null ? formatBytes(dbBytes) : "Unavailable"}
@@ -140,6 +157,11 @@ export default async function AdminHealthPage() {
         />
         <StatCard label="Leads, all time" value={leadsTotal.count ?? "n/a"} />
         <StatCard label="Leads, last 7 days" value={leadsWeek.count ?? "n/a"} />
+        <StatCard
+          label="Chat assistant, this month"
+          value={`US$${(chatCostMicros / 1_000_000).toFixed(2)}`}
+          hint={`${chatUsage.data?.requests ?? 0} answers · ${chatCapUsedPct}% of the KES ${CHAT_MONTHLY_CAP_KES.toLocaleString("en-KE")} cap; FAQ answers only once reached`}
+        />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

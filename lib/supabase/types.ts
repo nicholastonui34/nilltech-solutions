@@ -186,6 +186,139 @@ export type Database = {
           },
         ];
       };
+      chat_agent_presence: {
+        Row: {
+          last_seen_at: string;
+          user_id: string;
+        };
+        Insert: {
+          last_seen_at?: string;
+          user_id: string;
+        };
+        Update: {
+          last_seen_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      chat_ai_usage: {
+        Row: {
+          cache_read_tokens: number;
+          cache_write_tokens: number;
+          cost_usd_micros: number;
+          input_tokens: number;
+          month: string;
+          output_tokens: number;
+          requests: number;
+        };
+        Insert: {
+          cache_read_tokens?: number;
+          cache_write_tokens?: number;
+          cost_usd_micros?: number;
+          input_tokens?: number;
+          month: string;
+          output_tokens?: number;
+          requests?: number;
+        };
+        Update: {
+          cache_read_tokens?: number;
+          cache_write_tokens?: number;
+          cost_usd_micros?: number;
+          input_tokens?: number;
+          month?: string;
+          output_tokens?: number;
+          requests?: number;
+        };
+        Relationships: [];
+      };
+      chat_conversations: {
+        Row: {
+          assigned_to: string | null;
+          closed_at: string | null;
+          closed_by: string | null;
+          created_at: string;
+          id: string;
+          last_message_at: string;
+          lead_id: string | null;
+          page_path: string | null;
+          status: string;
+          visitor_email: string | null;
+          visitor_name: string;
+          visitor_token_hash: string;
+        };
+        Insert: {
+          assigned_to?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          created_at?: string;
+          id?: string;
+          last_message_at?: string;
+          lead_id?: string | null;
+          page_path?: string | null;
+          status?: string;
+          visitor_email?: string | null;
+          visitor_name: string;
+          visitor_token_hash: string;
+        };
+        Update: {
+          assigned_to?: string | null;
+          closed_at?: string | null;
+          closed_by?: string | null;
+          created_at?: string;
+          id?: string;
+          last_message_at?: string;
+          lead_id?: string | null;
+          page_path?: string | null;
+          status?: string;
+          visitor_email?: string | null;
+          visitor_name?: string;
+          visitor_token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: false;
+            referencedRelation: "leads";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      chat_messages: {
+        Row: {
+          agent_id: string | null;
+          body: string;
+          conversation_id: string;
+          created_at: string;
+          id: number;
+          sender: string;
+        };
+        Insert: {
+          agent_id?: string | null;
+          body: string;
+          conversation_id: string;
+          created_at?: string;
+          id?: never;
+          sender: string;
+        };
+        Update: {
+          agent_id?: string | null;
+          body?: string;
+          conversation_id?: string;
+          created_at?: string;
+          id?: never;
+          sender?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "chat_conversations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       clients: {
         Row: {
           address: string | null;
@@ -1472,6 +1605,7 @@ export type Database = {
         Returns: undefined;
       };
       admin_database_size_bytes: { Args: never; Returns: number };
+      chat_live_available: { Args: never; Returns: boolean };
       check_rate_limit: {
         Args: {
           p_bucket: string;
@@ -1490,6 +1624,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      delete_old_chats: { Args: never; Returns: undefined };
       delete_old_conversion_events: { Args: never; Returns: undefined };
       end_user_sessions: { Args: { _user_id: string }; Returns: undefined };
       get_talent_internal_notes: {
@@ -1535,6 +1670,17 @@ export type Database = {
       nairobi_today: { Args: never; Returns: string };
       next_document_number: { Args: { _doc_type: string }; Returns: string };
       next_talent_document_number: { Args: { _kind: string }; Returns: string };
+      record_chat_ai_usage: {
+        Args: {
+          _cache_read: number;
+          _cache_write: number;
+          _cost_micros: number;
+          _input: number;
+          _month: string;
+          _output: number;
+        };
+        Returns: undefined;
+      };
       record_freelancer_payment: {
         Args: {
           _amount_minor: number;

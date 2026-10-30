@@ -599,8 +599,8 @@ function Confirmation({
               className="text-primary underline underline-offset-2"
             >
               {siteConfig.contact.email}
-            </a>{" "}
-            or call {siteConfig.contact.phoneDisplay}.
+            </a>
+            .
           </li>
         </ul>
       </div>

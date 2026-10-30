@@ -32,7 +32,7 @@ export type LegalDocument = {
   sections: LegalSection[];
 };
 
-const { email, phoneDisplay } = siteConfig.contact;
+const { email } = siteConfig.contact;
 const company = siteConfig.legalName;
 const mail = `[${email}](mailto:${email})`;
 
@@ -40,7 +40,7 @@ export const privacyNotice: LegalDocument = {
   slug: "privacy-notice",
   anchor: "privacy",
   title: "Privacy notice",
-  updated: "29 October 2026",
+  updated: "30 October 2026",
   intro: `This notice explains what personal data ${company} (“NillTech”, “we”) collects through this website and our client and team portal, why we collect it, who we share it with, how long we keep it, and the rights you have under the Kenya Data Protection Act, 2019.`,
   sections: [
     {
@@ -49,7 +49,7 @@ export const privacyNotice: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: `${company} is a company registered in Kenya and is the data controller for the personal data described here. You can reach us at ${mail}, on ${phoneDisplay}, or by post at P.O. Box 2007-00202, Nairobi, Kenya.`,
+          text: `${company} is a company registered in Kenya and is the data controller for the personal data described here. You can reach us at ${mail}, through the chat on this website, or by post at P.O. Box 2007-00202, Nairobi, Kenya.`,
         },
       ],
     },
@@ -99,6 +99,16 @@ export const privacyNotice: LegalDocument = {
               "Sign in to the portal",
               "Email, name, role, sign-in activity, and a record of key actions (such as role changes and financial actions)",
               "To give you secure access and keep an audit trail (performance of a contract and our legitimate interest in security)",
+            ],
+            [
+              "Chat with the assistant on this website",
+              "Your questions and the assistant’s answers. These are sent to our AI provider to write each answer; we don’t store a conversation that stays with the assistant",
+              "To answer your questions (steps taken at your request, and our legitimate interest in helping visitors)",
+            ],
+            [
+              "Ask in the chat for a person, or leave a message there",
+              "Your name, email (required to leave a message, otherwise optional), the page you were on, the recent questions and answers from the assistant, and the messages you exchange with our team",
+              "To answer you and follow up about your enquiry (steps taken at your request before a contract)",
             ],
             [
               "Submit any form",
@@ -156,6 +166,11 @@ export const privacyNotice: LegalDocument = {
               "European Union, with a global delivery network",
             ],
             [
+              "Anthropic",
+              "AI provider that writes the chat assistant’s answers from our website content. Under its commercial terms it doesn’t use this data to train its models",
+              "United States",
+            ],
+            [
               "Cloudflare",
               "Turnstile spam and bot protection on our forms, and cookieless website analytics",
               "Global network",
@@ -179,7 +194,7 @@ export const privacyNotice: LegalDocument = {
       blocks: [
         {
           type: "p",
-          text: "Because our providers operate outside Kenya, your data is processed abroad, mainly in Germany, which has data protection law at least as strong as Kenya’s. We rely on our providers’ contractual data protection commitments as appropriate safeguards, as section 48 of the Act requires, and we only transfer what is needed for the purposes above.",
+          text: "Because our providers operate outside Kenya, your data is processed abroad, mainly in Germany, which has data protection law at least as strong as Kenya’s, and, for the chat assistant’s answers, in the United States. We rely on our providers’ contractual data protection commitments as appropriate safeguards, as section 48 of the Act requires, and we only transfer what is needed for the purposes above.",
         },
       ],
     },
@@ -206,6 +221,14 @@ export const privacyNotice: LegalDocument = {
             [
               "Invoices, receipts and payment records",
               "5 years from the end of the relevant tax period (Tax Procedures Act, s. 23), longer if a proceeding is open",
+            ],
+            [
+              "Chats with the assistant alone",
+              "Not stored by us; kept in your browser until you close the tab",
+            ],
+            [
+              "Live chats with our team",
+              "12 months after the last message (a message left in the chat is kept like an enquiry)",
             ],
             ["Hashed IP records used to limit repeated form submissions", "24 hours"],
             ["Anonymous button and form usage records", "13 months"],
