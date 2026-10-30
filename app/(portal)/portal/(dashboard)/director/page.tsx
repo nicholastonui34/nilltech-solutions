@@ -53,25 +53,34 @@ export default async function DirectorPage() {
   const yearStart = `${today.slice(0, 4)}-01-01`;
   const since = `${months[0]}-01`;
 
-  const [{ data: payments }, { data: invoices }, { data: leads }, { data: expenses }] =
-    await Promise.all([
-      supabase
-        .from("payments")
-        .select("amount_minor, currency, paid_on")
-        .gte("paid_on", since < yearStart ? since : yearStart),
-      supabase
-        .from("invoices")
-        .select("currency, total_minor, paid_minor, status")
-        .in("status", ["issued", "partially_paid"]),
-      supabase
-        .from("leads")
-        .select("created_at, status, tier, estimate:metadata->estimateKes")
-        .gte("created_at", since),
-      supabase
-        .from("expenses")
-        .select("amount_minor, currency, spent_on")
-        .gte("spent_on", since < yearStart ? since : yearStart),
-    ]);
+  const [
+    { data: payments },
+    { data: invoices },
+    { data: leads },
+    { data: expenses },
+    { data: refunds },
+  ] = await Promise.all([
+    supabase
+      .from("payments")
+      .select("amount_minor, currency, paid_on")
+      .gte("paid_on", since < yearStart ? since : yearStart),
+    supabase
+      .from("invoices")
+      .select("currency, balance_minor, status")
+      .in("status", ["issued", "partially_paid"]),
+    supabase
+      .from("leads")
+      .select("created_at, status, tier, estimate:metadata->estimateKes")
+      .gte("created_at", since),
+    supabase
+      .from("expenses")
+      .select("amount_minor, currency, spent_on")
+      .gte("spent_on", since < yearStart ? since : yearStart),
+    supabase
+      .from("refunds")
+      .select("amount_minor, currency, refunded_on")
+      .gte("refunded_on", since < yearStart ? since : yearStart),
+  ]);
 
   const [{ data: holders }, overview] = await Promise.all([
     supabase
@@ -82,7 +91,16 @@ export default async function DirectorPage() {
     getShareholderOverview(),
   ]);
 
-  const paid = payments ?? [];
+  // Refunds count as negative payments, so cash collected, net, margin and
+  // the monthly bars are all net of money paid back to clients.
+  const paid = [
+    ...(payments ?? []),
+    ...(refunds ?? []).map((r) => ({
+      amount_minor: -r.amount_minor,
+      currency: r.currency,
+      paid_on: r.refunded_on,
+    })),
+  ];
   const sumPaid = (currency: Currency, from: string) =>
     paid
       .filter((p) => p.currency === currency && p.paid_on >= from)
@@ -104,7 +122,7 @@ export default async function DirectorPage() {
   const outstanding = (currency: Currency) =>
     (invoices ?? [])
       .filter((i) => i.currency === currency)
-      .reduce((sum, i) => sum + i.total_minor - i.paid_minor, 0);
+      .reduce((sum, i) => sum + Math.max(i.balance_minor ?? 0, 0), 0);
 
   const allLeads = leads ?? [];
   const openLeads = allLeads.filter((l) => l.status !== "disqualified");
@@ -139,7 +157,8 @@ export default async function DirectorPage() {
         .reduce((sum, p) => sum + p.amount_minor, 0);
       return {
         label: monthLabel.format(new Date(`${month}-01T00:00:00Z`)),
-        value,
+        // A month of refunds can be negative: bars stop at zero, the label doesn't.
+        value: Math.max(value, 0),
         display: formatMoney(value, currency),
       };
     });

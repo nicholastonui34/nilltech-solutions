@@ -5,8 +5,10 @@ import { ArrowLeft, FileDown } from "lucide-react";
 import { deleteInvoiceDraft } from "@/app/actions/finance";
 import { InvoiceDraftEditor } from "@/components/portal/finance/invoice-draft-editor";
 import {
+  IssueCreditNoteForm,
   IssueInvoiceForm,
   RecordPaymentForm,
+  RecordRefundForm,
   VoidInvoiceForm,
 } from "@/components/portal/finance/invoice-actions";
 import { InvoiceStatusBadge } from "@/components/portal/finance/invoice-status-badge";
@@ -48,7 +50,7 @@ export default async function InvoiceDetailPage({
     supabase
       .from("invoices")
       .select(
-        "*, clients(id, name, company, email), invoice_items(id, position, description, quantity, unit_price_minor, line_total_minor), payments(id, receipt_number, amount_minor, method, reference, paid_on, recorded_at)",
+        "*, clients(id, name, company, email), invoice_items(id, position, description, quantity, unit_price_minor, line_total_minor), payments(id, receipt_number, amount_minor, method, reference, paid_on, recorded_at), credit_notes(id, number, amount_minor, reason, issue_date, issued_at), refunds(id, number, amount_minor, method, reference, refunded_on, reason, recorded_at)",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -60,8 +62,26 @@ export default async function InvoiceDetailPage({
   const payments = [...invoice.payments].sort((a, b) =>
     a.paid_on.localeCompare(b.paid_on),
   );
+  const creditNotes = [...invoice.credit_notes].sort((a, b) =>
+    a.issued_at.localeCompare(b.issued_at),
+  );
+  const refunds = [...invoice.refunds].sort((a, b) =>
+    a.recorded_at.localeCompare(b.recorded_at),
+  );
   const today = nairobiDateIso();
-  const balance = invoice.total_minor - invoice.paid_minor;
+  // Total, less credit notes, less payments kept (paid minus refunded).
+  // Negative means the client has credit to be refunded.
+  const balance =
+    invoice.balance_minor ??
+    invoice.total_minor -
+      invoice.credited_minor -
+      (invoice.paid_minor - invoice.refunded_minor);
+  const creditable = invoice.total_minor - invoice.credited_minor;
+  const canCredit =
+    (invoice.status === "issued" ||
+      invoice.status === "partially_paid" ||
+      invoice.status === "paid") &&
+    creditable > 0;
   const clientName = invoice.clients?.company ?? invoice.clients?.name ?? "n/a";
 
   const back = (
@@ -193,6 +213,16 @@ export default async function InvoiceDetailPage({
                       {formatMoney(invoice.total_minor, invoice.currency)}
                     </td>
                   </tr>
+                  {invoice.credited_minor > 0 ? (
+                    <tr>
+                      <td colSpan={3} className="text-muted-foreground text-right">
+                        Less credit notes
+                      </td>
+                      <td className="text-muted-foreground text-right whitespace-nowrap">
+                        {formatMoney(invoice.credited_minor, invoice.currency)}
+                      </td>
+                    </tr>
+                  ) : null}
                   <tr>
                     <td colSpan={3} className="text-muted-foreground text-right">
                       Paid
@@ -201,14 +231,24 @@ export default async function InvoiceDetailPage({
                       {formatMoney(invoice.paid_minor, invoice.currency)}
                     </td>
                   </tr>
+                  {invoice.refunded_minor > 0 ? (
+                    <tr>
+                      <td colSpan={3} className="text-muted-foreground text-right">
+                        Refunded
+                      </td>
+                      <td className="text-muted-foreground text-right whitespace-nowrap">
+                        {formatMoney(invoice.refunded_minor, invoice.currency)}
+                      </td>
+                    </tr>
+                  ) : null}
                   <tr>
                     <td colSpan={3} className="text-right font-semibold">
-                      Balance due
+                      {balance < 0 ? "Credit owed to client" : "Balance due"}
                     </td>
                     <td className="text-right font-semibold whitespace-nowrap">
                       {invoice.status === "void"
                         ? "n/a"
-                        : formatMoney(balance, invoice.currency)}
+                        : formatMoney(Math.abs(balance), invoice.currency)}
                     </td>
                   </tr>
                 </tfoot>
@@ -255,6 +295,57 @@ export default async function InvoiceDetailPage({
               <p className="text-muted-foreground text-sm">No payments recorded.</p>
             )}
           </Panel>
+
+          {creditNotes.length ? (
+            <Panel title="Credit notes">
+              <ul className="divide-border divide-y">
+                {creditNotes.map((note) => (
+                  <li
+                    key={note.id}
+                    className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium tabular-nums">
+                        {formatMoney(note.amount_minor, invoice.currency)} credited
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {note.number} · {note.issue_date} · {note.reason}
+                      </p>
+                    </div>
+                    <Button asChild variant="outline" size="sm">
+                      <a
+                        href={`/portal/documents/credit-notes/${note.id}`}
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        <FileDown /> Credit note
+                      </a>
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          ) : null}
+
+          {refunds.length ? (
+            <Panel title="Refunds">
+              <ul className="divide-border divide-y">
+                {refunds.map((refund) => (
+                  <li key={refund.id} className="py-3 text-sm">
+                    <p className="font-medium tabular-nums">
+                      {formatMoney(refund.amount_minor, invoice.currency)} refunded ·{" "}
+                      {PAYMENT_METHOD_LABELS[refund.method]}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {refund.number} · {refund.refunded_on}
+                      {refund.reference ? ` · ref ${refund.reference}` : ""} ·{" "}
+                      {refund.reason}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-6">
@@ -269,7 +360,34 @@ export default async function InvoiceDetailPage({
               />
             </Panel>
           ) : null}
-          {invoice.status === "issued" && invoice.paid_minor === 0 ? (
+          {balance < 0 ? (
+            <Panel
+              title="Record a refund"
+              description="The client has paid more than they now owe on this invoice."
+            >
+              <RecordRefundForm
+                invoiceId={invoice.id}
+                currency={invoice.currency}
+                maxAmount={(-balance / 100).toFixed(2)}
+                today={today}
+              />
+            </Panel>
+          ) : null}
+          {canCredit ? (
+            <Panel
+              title="Issue a credit note"
+              description="Reduce or cancel what this invoice is owed. If the client has already paid, record a refund afterwards."
+            >
+              <IssueCreditNoteForm
+                invoiceId={invoice.id}
+                currency={invoice.currency}
+                maxAmount={(creditable / 100).toFixed(2)}
+              />
+            </Panel>
+          ) : null}
+          {invoice.status === "issued" &&
+          invoice.paid_minor === 0 &&
+          invoice.credited_minor === 0 ? (
             <Panel title="Void">
               <VoidInvoiceForm invoiceId={invoice.id} />
             </Panel>

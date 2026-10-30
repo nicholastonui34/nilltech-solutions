@@ -29,7 +29,7 @@ export type InvoicePdfData = {
   number: string;
   issueDate: string;
   dueDate: string;
-  status: "issued" | "partially_paid" | "paid" | "void";
+  status: "issued" | "partially_paid" | "paid" | "void" | "credited";
   currency: Currency;
   seller: SellerSnapshot;
   client: ClientSnapshot;
@@ -41,7 +41,21 @@ export type InvoicePdfData = {
   }[];
   totalMinor: number;
   paidMinor: number;
+  creditedMinor: number;
+  refundedMinor: number;
   notes: string | null;
+};
+
+export type CreditNotePdfData = {
+  number: string;
+  issueDate: string;
+  invoiceNumber: string;
+  invoiceTotalMinor: number;
+  amountMinor: number;
+  currency: Currency;
+  reason: string;
+  seller: SellerSnapshot;
+  client: ClientSnapshot;
 };
 
 export type ReceiptPdfData = {
@@ -54,6 +68,8 @@ export type ReceiptPdfData = {
   invoiceNumber: string;
   invoiceTotalMinor: number;
   paidToDateMinor: number;
+  /** Credit notes issued up to this receipt. */
+  creditedToDateMinor: number;
   seller: SellerSnapshot;
   client: ClientSnapshot;
 };
@@ -267,7 +283,8 @@ function drawFooter(w: Writer, seller: SellerSnapshot) {
 
 export async function buildInvoicePdf(data: InvoicePdfData) {
   const { doc, w } = await newDocument(`Invoice ${data.number}`);
-  const balance = data.totalMinor - data.paidMinor;
+  const balance =
+    data.totalMinor - data.creditedMinor - (data.paidMinor - data.refundedMinor);
 
   await drawHeader(doc, w, data.seller, "INVOICE", [
     ["Invoice no.", data.number],
@@ -278,6 +295,7 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
 
   if (data.status === "paid") drawStamp(w, "PAID", rgb(0.05, 0.55, 0.3));
   if (data.status === "void") drawStamp(w, "VOID", rgb(0.75, 0.1, 0.1));
+  if (data.status === "credited") drawStamp(w, "CREDITED", rgb(0.1, 0.4, 0.65));
 
   drawParty(w, "BILL TO", data.client);
 
@@ -321,9 +339,18 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
   const totals: [string, string, boolean][] = [
     ["Total", `${data.currency} ${formatAmount(data.totalMinor)}`, true],
   ];
-  if (data.paidMinor > 0) {
-    totals.push(["Paid", `${data.currency} ${formatAmount(data.paidMinor)}`, false]);
-    totals.push(["Balance due", `${data.currency} ${formatAmount(balance)}`, true]);
+  const money = (minor: number) => `${data.currency} ${formatAmount(minor)}`;
+  if (data.creditedMinor > 0) {
+    totals.push(["Less credit notes", money(data.creditedMinor), false]);
+  }
+  if (data.paidMinor > 0) totals.push(["Paid", money(data.paidMinor), false]);
+  if (data.refundedMinor > 0) totals.push(["Refunded", money(data.refundedMinor), false]);
+  if (data.creditedMinor > 0 || data.paidMinor > 0) {
+    totals.push([
+      balance < 0 ? "Credit due to you" : "Balance due",
+      money(Math.abs(balance)),
+      true,
+    ]);
   }
   for (const [label, value, bold] of totals) {
     w.text(label, cols.unit - 40, { bold, size: bold ? 10.5 : 9.5, align: "right" });
@@ -360,7 +387,8 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
 
 export async function buildReceiptPdf(data: ReceiptPdfData) {
   const { doc, w } = await newDocument(`Receipt ${data.receiptNumber}`);
-  const balance = data.invoiceTotalMinor - data.paidToDateMinor;
+  const balance =
+    data.invoiceTotalMinor - data.creditedToDateMinor - data.paidToDateMinor;
 
   await drawHeader(doc, w, data.seller, "RECEIPT", [
     ["Receipt no.", data.receiptNumber],
@@ -390,8 +418,16 @@ export async function buildReceiptPdf(data: ReceiptPdfData) {
     ["Payment method", PAYMENT_METHOD_LABELS[data.method]],
     ["Reference", data.reference ?? "n/a"],
     ["Invoice total", `${data.currency} ${formatAmount(data.invoiceTotalMinor)}`],
+    ...(data.creditedToDateMinor > 0
+      ? ([
+          [
+            "Credit notes to date",
+            `${data.currency} ${formatAmount(data.creditedToDateMinor)}`,
+          ],
+        ] as [string, string][])
+      : []),
     ["Paid to date", `${data.currency} ${formatAmount(data.paidToDateMinor)}`],
-    ["Balance remaining", `${data.currency} ${formatAmount(balance)}`],
+    ["Balance remaining", `${data.currency} ${formatAmount(Math.max(balance, 0))}`],
   ];
   for (const [label, value] of rows) {
     w.text(label, MARGIN, { size: 9.5, color: MUTED });
@@ -404,6 +440,63 @@ export async function buildReceiptPdf(data: ReceiptPdfData) {
     size: 9,
     color: MUTED,
   });
+
+  drawFooter(w, data.seller);
+  return doc.save();
+}
+
+export async function buildCreditNotePdf(data: CreditNotePdfData) {
+  const { doc, w } = await newDocument(`Credit note ${data.number}`);
+
+  await drawHeader(doc, w, data.seller, "CREDIT NOTE", [
+    ["Credit note no.", data.number],
+    ["Date", data.issueDate],
+    ["Against invoice", data.invoiceNumber],
+    ["Currency", data.currency],
+  ]);
+
+  drawParty(w, "ISSUED TO", data.client);
+
+  w.y -= 8;
+  w.page.drawRectangle({
+    x: MARGIN,
+    y: w.y - 44,
+    width: PAGE_W - MARGIN * 2,
+    height: 52,
+    color: rgb(0.96, 0.95, 0.98),
+  });
+  w.text("Amount credited", MARGIN + 14, { size: 9, color: MUTED, y: w.y - 12 });
+  w.text(`${data.currency} ${formatAmount(data.amountMinor)}`, MARGIN + 14, {
+    size: 18,
+    bold: true,
+    y: w.y - 34,
+  });
+  w.y -= 74;
+
+  const rows: [string, string][] = [
+    ["Invoice", data.invoiceNumber],
+    ["Invoice total", `${data.currency} ${formatAmount(data.invoiceTotalMinor)}`],
+  ];
+  for (const [label, value] of rows) {
+    w.text(label, MARGIN, { size: 9.5, color: MUTED });
+    w.text(value, MARGIN + 140, { size: 9.5 });
+    w.y -= 16;
+  }
+
+  w.y -= 8;
+  w.text("REASON", MARGIN, { size: 8, bold: true, color: MUTED });
+  w.y -= 14;
+  for (const line of wrap(w.fonts.regular, data.reason, 9.5, PAGE_W - MARGIN * 2)) {
+    w.text(line, MARGIN, { size: 9.5 });
+    w.y -= 13;
+  }
+
+  w.y -= 12;
+  w.text(
+    `This credit note reduces the amount due on invoice ${data.invoiceNumber} by the amount above.`,
+    MARGIN,
+    { size: 9, color: MUTED },
+  );
 
   drawFooter(w, data.seller);
   return doc.save();

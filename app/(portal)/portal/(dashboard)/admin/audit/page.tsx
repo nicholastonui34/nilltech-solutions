@@ -13,6 +13,8 @@ const ACTION_LABELS: Record<string, string> = {
   role_revoked: "Revoked role",
   user_created: "Created account",
   user_deactivated: "Deactivated account",
+  credit_note_issued: "Issued credit note",
+  refund_recorded: "Recorded refund",
   user_reactivated: "Reactivated account",
 };
 

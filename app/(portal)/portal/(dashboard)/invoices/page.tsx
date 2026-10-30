@@ -19,7 +19,7 @@ export default async function ClientInvoicesPage() {
   const { data: invoices } = await supabase
     .from("invoices")
     .select(
-      "id, number, status, currency, total_minor, paid_minor, issue_date, due_date, payments(id, receipt_number, amount_minor, paid_on)",
+      "id, number, status, currency, total_minor, paid_minor, balance_minor, issue_date, due_date, payments(id, receipt_number, amount_minor, paid_on), credit_notes(id, number, amount_minor)",
     )
     .neq("status", "draft")
     .order("issue_date", { ascending: false });
@@ -30,7 +30,7 @@ export default async function ClientInvoicesPage() {
     <>
       <PageHeader
         title="Your invoices"
-        description="Download invoices and receipts as PDFs."
+        description="Download invoices, receipts and credit notes as PDFs."
       />
       <Panel>
         {invoices?.length ? (
@@ -45,9 +45,8 @@ export default async function ClientInvoicesPage() {
                     </p>
                     <p className="mt-1 text-sm tabular-nums">
                       {formatMoney(invoice.total_minor, invoice.currency)}
-                      {invoice.status !== "void" &&
-                      invoice.total_minor > invoice.paid_minor
-                        ? ` · ${formatMoney(invoice.total_minor - invoice.paid_minor, invoice.currency)} due`
+                      {invoice.status !== "void" && (invoice.balance_minor ?? 0) > 0
+                        ? ` · ${formatMoney(invoice.balance_minor ?? 0, invoice.currency)} due`
                         : ""}
                     </p>
                   </div>
@@ -66,6 +65,23 @@ export default async function ClientInvoicesPage() {
                     </a>
                   </div>
                 </div>
+                {invoice.credit_notes.length ? (
+                  <ul className="mt-2 flex flex-wrap gap-3">
+                    {invoice.credit_notes.map((note) => (
+                      <li key={note.id}>
+                        <a
+                          href={`/portal/documents/credit-notes/${note.id}`}
+                          target="_blank"
+                          rel="noopener"
+                          className="text-primary inline-flex items-center gap-1 text-xs hover:underline"
+                        >
+                          <FileDown className="size-3.5" /> Credit note {note.number} (
+                          {formatMoney(note.amount_minor, invoice.currency)})
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 {invoice.payments.length ? (
                   <ul className="mt-2 flex flex-wrap gap-3">
                     {invoice.payments.map((payment) => (
