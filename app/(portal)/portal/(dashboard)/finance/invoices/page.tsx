@@ -27,7 +27,7 @@ export default async function InvoicesPage({
   let query = supabase
     .from("invoices")
     .select(
-      "id, number, status, currency, total_minor, paid_minor, due_date, created_at, clients(name, company)",
+      "id, number, status, currency, total_minor, paid_minor, balance_minor, due_date, created_at, clients(name, company)",
     )
     .order("created_at", { ascending: false })
     .limit(500);

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getCurrentUser } from "@/lib/auth/dal";
-import { buildInvoicePdf, buildReceiptPdf } from "@/lib/finance/pdf";
+import { buildCreditNotePdf, buildInvoicePdf, buildReceiptPdf } from "@/lib/finance/pdf";
 import { parseClientSnapshot, parseSellerSnapshot } from "@/lib/finance/snapshots";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -35,7 +35,7 @@ export async function invoicePdfResponse(id: string) {
   const { data: invoice } = await supabase
     .from("invoices")
     .select(
-      "number, status, currency, issue_date, due_date, total_minor, paid_minor, notes, seller_snapshot, client_snapshot, invoice_items(position, description, quantity, unit_price_minor, line_total_minor)",
+      "number, status, currency, issue_date, due_date, total_minor, paid_minor, credited_minor, refunded_minor, notes, seller_snapshot, client_snapshot, invoice_items(position, description, quantity, unit_price_minor, line_total_minor)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -72,6 +72,8 @@ export async function invoicePdfResponse(id: string) {
       })),
     totalMinor: invoice.total_minor,
     paidMinor: invoice.paid_minor,
+    creditedMinor: invoice.credited_minor,
+    refundedMinor: invoice.refunded_minor,
     notes: invoice.notes,
   });
 
@@ -105,6 +107,12 @@ export async function receiptPdfResponse(id: string) {
     .eq("invoice_id", payment.invoice_id)
     .lte("recorded_at", payment.recorded_at);
   const paidToDate = (earlier ?? []).reduce((sum, p) => sum + p.amount_minor, 0);
+  const { data: credits } = await supabase
+    .from("credit_notes")
+    .select("amount_minor")
+    .eq("invoice_id", payment.invoice_id)
+    .lte("issued_at", payment.recorded_at);
+  const creditedToDate = (credits ?? []).reduce((sum, c) => sum + c.amount_minor, 0);
 
   const bytes = await buildReceiptPdf({
     receiptNumber: payment.receipt_number,
@@ -116,9 +124,43 @@ export async function receiptPdfResponse(id: string) {
     invoiceNumber: invoice.number,
     invoiceTotalMinor: invoice.total_minor,
     paidToDateMinor: paidToDate,
+    creditedToDateMinor: creditedToDate,
     seller,
     client,
   });
 
   return pdfResponse(bytes, `${payment.receipt_number}.pdf`);
+}
+
+export async function creditNotePdfResponse(id: string) {
+  if (!UUID_PATTERN.test(id)) return notFound();
+  const user = await getCurrentUser();
+  if (!user) return new Response("Sign in required", { status: 401 });
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return notFound();
+
+  const { data: note } = await supabase
+    .from("credit_notes")
+    .select(
+      "number, invoice_number, amount_minor, currency, reason, issue_date, seller_snapshot, client_snapshot, invoices(total_minor)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  const seller = parseSellerSnapshot(note?.seller_snapshot ?? null);
+  const client = parseClientSnapshot(note?.client_snapshot ?? null);
+  if (!note || !note.invoices || !seller || !client) return notFound();
+
+  const bytes = await buildCreditNotePdf({
+    number: note.number,
+    issueDate: note.issue_date,
+    invoiceNumber: note.invoice_number,
+    invoiceTotalMinor: note.invoices.total_minor,
+    amountMinor: note.amount_minor,
+    currency: note.currency,
+    reason: note.reason,
+    seller,
+    client,
+  });
+
+  return pdfResponse(bytes, `${note.number}.pdf`);
 }

@@ -247,6 +247,59 @@ export type Database = {
         };
         Relationships: [];
       };
+      credit_notes: {
+        Row: {
+          amount_minor: number;
+          client_snapshot: Json | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          id: string;
+          invoice_id: string;
+          invoice_number: string;
+          issue_date: string;
+          issued_at: string;
+          issued_by: string | null;
+          number: string;
+          reason: string;
+          seller_snapshot: Json;
+        };
+        Insert: {
+          amount_minor: number;
+          client_snapshot?: Json | null;
+          currency: Database["public"]["Enums"]["currency_code"];
+          id?: string;
+          invoice_id: string;
+          invoice_number: string;
+          issue_date: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          number: string;
+          reason: string;
+          seller_snapshot: Json;
+        };
+        Update: {
+          amount_minor?: number;
+          client_snapshot?: Json | null;
+          currency?: Database["public"]["Enums"]["currency_code"];
+          id?: string;
+          invoice_id?: string;
+          invoice_number?: string;
+          issue_date?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          number?: string;
+          reason?: string;
+          seller_snapshot?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "credit_notes_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       deactivated_users: {
         Row: {
           deactivated_at: string;
@@ -490,10 +543,12 @@ export type Database = {
       };
       invoices: {
         Row: {
+          balance_minor: number | null;
           client_id: string;
           client_snapshot: Json | null;
           created_at: string;
           created_by: string | null;
+          credited_minor: number;
           currency: Database["public"]["Enums"]["currency_code"];
           due_date: string | null;
           etims_reference: string | null;
@@ -505,6 +560,7 @@ export type Database = {
           notes: string | null;
           number: string | null;
           paid_minor: number;
+          refunded_minor: number;
           seller_snapshot: Json | null;
           status: Database["public"]["Enums"]["invoice_status"];
           total_minor: number;
@@ -513,6 +569,9 @@ export type Database = {
           voided_by: string | null;
         };
         Insert: {
+          balance_minor?: never;
+          credited_minor?: number;
+          refunded_minor?: number;
           client_id: string;
           client_snapshot?: Json | null;
           created_at?: string;
@@ -536,6 +595,9 @@ export type Database = {
           voided_by?: string | null;
         };
         Update: {
+          balance_minor?: never;
+          credited_minor?: number;
+          refunded_minor?: number;
           client_id?: string;
           client_snapshot?: Json | null;
           created_at?: string;
@@ -751,6 +813,56 @@ export type Database = {
             columns: ["client_id"];
             isOneToOne: false;
             referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      refunds: {
+        Row: {
+          amount_minor: number;
+          currency: Database["public"]["Enums"]["currency_code"];
+          id: string;
+          invoice_id: string;
+          method: Database["public"]["Enums"]["payment_method"];
+          number: string;
+          reason: string;
+          recorded_at: string;
+          recorded_by: string | null;
+          reference: string | null;
+          refunded_on: string;
+        };
+        Insert: {
+          amount_minor: number;
+          currency: Database["public"]["Enums"]["currency_code"];
+          id?: string;
+          invoice_id: string;
+          method: Database["public"]["Enums"]["payment_method"];
+          number: string;
+          reason: string;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          reference?: string | null;
+          refunded_on: string;
+        };
+        Update: {
+          amount_minor?: number;
+          currency?: Database["public"]["Enums"]["currency_code"];
+          id?: string;
+          invoice_id?: string;
+          method?: Database["public"]["Enums"]["payment_method"];
+          number?: string;
+          reason?: string;
+          recorded_at?: string;
+          recorded_by?: string | null;
+          reference?: string | null;
+          refunded_on?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "refunds_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
             referencedColumns: ["id"];
           },
         ];
@@ -986,6 +1098,14 @@ export type Database = {
         };
         Returns: boolean;
       };
+      invoice_money_status: {
+        Args: { _credited: number; _paid: number; _refunded: number; _total: number };
+        Returns: Database["public"]["Enums"]["invoice_status"];
+      };
+      issue_credit_note: {
+        Args: { _amount_minor: number; _invoice_id: string; _reason: string };
+        Returns: string;
+      };
       issue_invoice: {
         Args: { _due_date: string; _invoice_id: string };
         Returns: string;
@@ -1007,6 +1127,17 @@ export type Database = {
           _notes: string;
           _paid_on: string;
           _reference: string;
+        };
+        Returns: string;
+      };
+      record_refund: {
+        Args: {
+          _amount_minor: number;
+          _invoice_id: string;
+          _method: Database["public"]["Enums"]["payment_method"];
+          _reason: string;
+          _reference: string;
+          _refunded_on: string;
         };
         Returns: string;
       };
@@ -1045,7 +1176,8 @@ export type Database = {
         | "fees_taxes"
         | "other";
       engagement_type: "freelance" | "full_time";
-      invoice_status: "draft" | "issued" | "partially_paid" | "paid" | "void";
+      invoice_status:
+        "draft" | "issued" | "partially_paid" | "paid" | "void" | "credited";
       lead_status: "new" | "contacted" | "qualified" | "disqualified";
       lead_tier: "hot" | "warm" | "cold";
       payment_method: "mpesa" | "bank_transfer" | "other";

@@ -20,15 +20,19 @@ export default async function FinanceOverviewPage() {
   const today = nairobiDateIso();
   const monthStart = `${today.slice(0, 7)}-01`;
 
-  const [{ data: invoices }, { data: payments }] = await Promise.all([
+  const [{ data: invoices }, { data: payments }, { data: refunds }] = await Promise.all([
     supabase
       .from("invoices")
       .select(
-        "id, number, status, currency, total_minor, paid_minor, due_date, created_at, client_snapshot, clients(name, company)",
+        "id, number, status, currency, total_minor, paid_minor, balance_minor, due_date, created_at, client_snapshot, clients(name, company)",
       )
       .order("created_at", { ascending: false })
       .limit(500),
     supabase.from("payments").select("amount_minor, currency").gte("paid_on", monthStart),
+    supabase
+      .from("refunds")
+      .select("amount_minor, currency")
+      .gte("refunded_on", monthStart),
   ]);
 
   const open = (invoices ?? []).filter(
@@ -37,10 +41,15 @@ export default async function FinanceOverviewPage() {
   const byCurrency = (currency: Currency) => ({
     outstanding: open
       .filter((i) => i.currency === currency)
-      .reduce((sum, i) => sum + i.total_minor - i.paid_minor, 0),
-    collected: (payments ?? [])
-      .filter((p) => p.currency === currency)
-      .reduce((sum, p) => sum + p.amount_minor, 0),
+      .reduce((sum, i) => sum + Math.max(i.balance_minor ?? 0, 0), 0),
+    // Cash kept this month: payments received less refunds paid out.
+    collected:
+      (payments ?? [])
+        .filter((p) => p.currency === currency)
+        .reduce((sum, p) => sum + p.amount_minor, 0) -
+      (refunds ?? [])
+        .filter((r) => r.currency === currency)
+        .reduce((sum, r) => sum + r.amount_minor, 0),
   });
   const overdue = open.filter((i) => isOverdue(i, today));
   const drafts = (invoices ?? []).filter((i) => i.status === "draft").length;
@@ -122,6 +131,8 @@ export default async function FinanceOverviewPage() {
                 [
                   ["invoices", "Invoices"],
                   ["payments", "Payments and receipts"],
+                  ["credit-notes", "Credit notes"],
+                  ["refunds", "Refunds"],
                   ["expenses", "Expenses"],
                 ] as const
               ).map(([kind, label]) => (

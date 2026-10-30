@@ -387,6 +387,68 @@ export async function recordPayment(
   return { success: "Payment recorded and receipt issued." };
 }
 
+// --- Credit notes and refunds ----------------------------------------------
+// The issue_credit_note and record_refund RPCs check the role, the limits
+// (credits never exceed the invoice; refunds never exceed the client's
+// credit), number the document and write the audit log.
+
+export async function issueCreditNote(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const invoiceId = uuid.safeParse(formData.get("invoiceId"));
+  const amountMinor = parseAmountToMinor(String(formData.get("amount") ?? ""));
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!invoiceId.success) return { error: "Unknown invoice." };
+  if (amountMinor === null || amountMinor <= 0)
+    return { error: "Enter the amount to credit." };
+  if (reason.length < 3) return { error: "Give a reason for the credit note." };
+
+  const { error } = await supabase.rpc("issue_credit_note", {
+    _invoice_id: invoiceId.data,
+    _amount_minor: amountMinor,
+    _reason: reason,
+  });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return { success: "Credit note issued." };
+}
+
+export async function recordRefund(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const invoiceId = uuid.safeParse(formData.get("invoiceId"));
+  const method = z
+    .enum(PAYMENT_METHODS as [PaymentMethod, ...PaymentMethod[]])
+    .safeParse(formData.get("method"));
+  const refundedOn = z.iso.date().safeParse(formData.get("refundedOn"));
+  const amountMinor = parseAmountToMinor(String(formData.get("amount") ?? ""));
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!invoiceId.success) return { error: "Unknown invoice." };
+  if (amountMinor === null || amountMinor <= 0)
+    return { error: "Enter the amount refunded." };
+  if (!method.success) return { error: "Choose how it was refunded." };
+  if (!refundedOn.success) return { error: "Choose the date of the refund." };
+  if (reason.length < 3) return { error: "Give a reason for the refund." };
+
+  const { error } = await supabase.rpc("record_refund", {
+    _invoice_id: invoiceId.data,
+    _amount_minor: amountMinor,
+    _method: method.data,
+    _reference: String(formData.get("reference") ?? ""),
+    _refunded_on: refundedOn.data,
+    _reason: reason,
+  });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return { success: "Refund recorded." };
+}
+
 // --- Settings --------------------------------------------------------------
 
 const settingsSchema = z.object({

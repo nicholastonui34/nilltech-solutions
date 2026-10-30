@@ -12,6 +12,8 @@ export type InvoiceRow = {
   currency: Currency;
   total_minor: number;
   paid_minor: number;
+  /** Generated column: total less credit notes, payments kept and refunds. */
+  balance_minor: number | null;
   due_date: string | null;
   created_at: string;
   clients: { name: string; company: string | null } | null;
@@ -59,7 +61,7 @@ export function InvoiceTable({
                 {invoice.status === "void" || invoice.status === "draft"
                   ? "n/a"
                   : formatMoney(
-                      invoice.total_minor - invoice.paid_minor,
+                      invoice.balance_minor ?? invoice.total_minor - invoice.paid_minor,
                       invoice.currency,
                     )}
               </td>

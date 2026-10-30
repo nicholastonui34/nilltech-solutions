@@ -9,7 +9,13 @@ import {
 } from "@/lib/finance/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export const EXPORT_KINDS = ["invoices", "payments", "expenses"] as const;
+export const EXPORT_KINDS = [
+  "invoices",
+  "payments",
+  "credit-notes",
+  "refunds",
+  "expenses",
+] as const;
 export type ExportKind = (typeof EXPORT_KINDS)[number];
 
 /** Date range from ?month=YYYY-MM or ?year=YYYY; neither means all time. */
@@ -65,7 +71,7 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
     let query = supabase
       .from("invoices")
       .select(
-        "number, status, currency, issue_date, due_date, total_minor, paid_minor, clients(name, company)",
+        "number, status, currency, issue_date, due_date, total_minor, paid_minor, credited_minor, refunded_minor, balance_minor, clients(name, company)",
       )
       .neq("status", "draft")
       .order("issue_date", { ascending: true })
@@ -82,7 +88,9 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       "Due date",
       "Currency",
       "Total",
+      "Credited",
       "Paid",
+      "Refunded",
       "Balance",
     ];
     rows = (data ?? []).map((i) => [
@@ -93,8 +101,10 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       i.due_date,
       i.currency,
       csvAmount(i.total_minor),
+      csvAmount(i.credited_minor),
       csvAmount(i.paid_minor),
-      csvAmount(i.status === "void" ? 0 : i.total_minor - i.paid_minor),
+      csvAmount(i.refunded_minor),
+      csvAmount(i.status === "void" ? 0 : (i.balance_minor ?? 0)),
     ]);
   } else if (kind === "payments") {
     let query = supabase
@@ -127,6 +137,70 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       csvAmount(p.amount_minor),
       PAYMENT_METHOD_LABELS[p.method],
       p.reference,
+    ]);
+  } else if (kind === "credit-notes") {
+    let query = supabase
+      .from("credit_notes")
+      .select(
+        "number, issue_date, invoice_number, currency, amount_minor, reason, invoices(clients(name, company))",
+      )
+      .order("issue_date", { ascending: true })
+      .order("number", { ascending: true });
+    if (period.from && period.to) {
+      query = query.gte("issue_date", period.from).lt("issue_date", period.to);
+    }
+    const { data } = await query;
+    header = [
+      "Credit note number",
+      "Date",
+      "Invoice number",
+      "Client",
+      "Currency",
+      "Amount",
+      "Reason",
+    ];
+    rows = (data ?? []).map((c) => [
+      c.number,
+      c.issue_date,
+      c.invoice_number,
+      clientName(c.invoices?.clients ?? null),
+      c.currency,
+      csvAmount(c.amount_minor),
+      c.reason,
+    ]);
+  } else if (kind === "refunds") {
+    let query = supabase
+      .from("refunds")
+      .select(
+        "number, refunded_on, currency, amount_minor, method, reference, reason, invoices(number, clients(name, company))",
+      )
+      .order("refunded_on", { ascending: true })
+      .order("number", { ascending: true });
+    if (period.from && period.to) {
+      query = query.gte("refunded_on", period.from).lt("refunded_on", period.to);
+    }
+    const { data } = await query;
+    header = [
+      "Refund number",
+      "Date refunded",
+      "Invoice number",
+      "Client",
+      "Currency",
+      "Amount",
+      "Method",
+      "Reference",
+      "Reason",
+    ];
+    rows = (data ?? []).map((r) => [
+      r.number,
+      r.refunded_on,
+      r.invoices?.number,
+      clientName(r.invoices?.clients ?? null),
+      r.currency,
+      csvAmount(r.amount_minor),
+      PAYMENT_METHOD_LABELS[r.method],
+      r.reference,
+      r.reason,
     ]);
   } else {
     let query = supabase

@@ -8,6 +8,7 @@ export const INVOICE_STATUSES: readonly InvoiceStatus[] = [
   "issued",
   "partially_paid",
   "paid",
+  "credited",
   "void",
 ];
 
@@ -16,6 +17,7 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
   issued: "Issued",
   partially_paid: "Partly paid",
   paid: "Paid",
+  credited: "Credited",
   void: "Void",
 };
 

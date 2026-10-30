@@ -6,6 +6,7 @@ const styles: Record<InvoiceStatus | "overdue", string> = {
   issued: "bg-primary/10 text-primary",
   partially_paid: "bg-amber-100 text-amber-900",
   paid: "bg-emerald-100 text-emerald-800",
+  credited: "bg-sky-100 text-sky-900",
   void: "bg-muted text-muted-foreground line-through",
   overdue: "bg-red-100 text-red-800",
 };
