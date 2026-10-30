@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 
 import { CtaBand } from "@/components/sections/cta-band";
 import { Container } from "@/components/sections/container";
-import { founders } from "@/lib/content/founders";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -12,15 +10,6 @@ export const metadata: Metadata = buildMetadata({
     "NillTech Solutions is a managed technology delivery company in Nairobi, Kenya, building software and AI with screened East African teams since 2024.",
   path: "/about",
 });
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 const principles = [
   {
@@ -76,43 +65,8 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {founders.length > 0 ? (
-            <>
-              <h2 className="mt-14 text-2xl font-semibold">Founders</h2>
-              <ul className="mt-6 grid gap-8 sm:grid-cols-3">
-                {founders.map((f) => (
-                  <li key={f.name} className="flex flex-col items-start gap-3">
-                    {f.photo ? (
-                      <Image
-                        src={f.photo}
-                        alt={f.name}
-                        width={96}
-                        height={96}
-                        className="size-24 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="from-nilltech-purple to-nilltech-blue flex size-24 items-center justify-center rounded-full bg-gradient-to-br text-2xl font-semibold text-white"
-                        aria-hidden
-                      >
-                        {initials(f.name)}
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-semibold">{f.name}</p>
-                      <p className="text-muted-foreground text-sm">{f.role}</p>
-                      {f.bio ? (
-                        <p className="text-muted-foreground mt-2 text-sm">{f.bio}</p>
-                      ) : null}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-
           <p className="text-muted-foreground mt-14 text-xs">
-            Last updated: 25 October 2026
+            Last updated: 30 October 2026
           </p>
         </Container>
       </section>

@@ -4,7 +4,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
 import { z } from "zod";
 
-import { founders } from "@/lib/content/founders";
+import { SIGNATORIES } from "@/config/signatories";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { CURRENCIES, parseAmountToMinor, type Currency } from "@/lib/finance/money";
 import { buildAgreementPdf } from "@/lib/talent/agreement-pdf";
@@ -417,7 +417,7 @@ export async function generateTalentDocument(
 
   const signatoryName = text(formData, "signatoryName");
   const signatoryTitle = text(formData, "signatoryTitle");
-  if (!founders.some((f) => f.name === signatoryName))
+  if (!(SIGNATORIES as readonly string[]).includes(signatoryName))
     return { error: "Choose who signs for NillTech." };
   if (signatoryTitle.length < 2 || signatoryTitle.length > 80) {
     return { error: "Enter the signatory's title, for example Director." };

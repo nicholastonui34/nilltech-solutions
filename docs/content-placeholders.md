@@ -8,14 +8,13 @@ hasn't supplied yet render nothing instead of fake proof.
 
 ## Hidden until real content exists
 
-| Where                         | What's needed                                                                                               | File                                                |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `/about` founder bios, photos | Short bio and a photo for Nicholas Tonui, Wendy Achieng and Fumbwe Hamisi (initials badge shows until then) | `app/(marketing)/about/page.tsx` (`founders` array) |
-| `/work` case studies          | Real client projects with permission to publish                                                             | `lib/content/case-studies.ts`                       |
-| Testimonials, logo wall       | Real quotes and logos with permission                                                                       | not built yet                                       |
-| `/podcast` episodes, Shorts   | YouTube channel URL and episode list                                                                        | `lib/content/podcast-episodes.ts`                   |
-| `/academy` free courses       | Course list, lessons, optional videos                                                                       | `lib/content/courses.ts`                            |
-| `/blog` posts                 | Real posts                                                                                                  | `lib/content/blog-posts.ts`                         |
+| Where                       | What's needed                                   | File                              |
+| --------------------------- | ----------------------------------------------- | --------------------------------- |
+| `/work` case studies        | Real client projects with permission to publish | `lib/content/case-studies.ts`     |
+| Testimonials, logo wall     | Real quotes and logos with permission           | not built yet                     |
+| `/podcast` episodes, Shorts | YouTube channel URL and episode list            | `lib/content/podcast-episodes.ts` |
+| `/academy` free courses     | Course list, lessons, optional videos           | `lib/content/courses.ts`          |
+| `/blog` posts               | Real posts                                      | `lib/content/blog-posts.ts`       |
 
 ## Photos to replace brand graphics (owner, 2026-10-29)
 
