@@ -4,10 +4,22 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { refresh } from "next/cache";
 import { z } from "zod";
 
+import { founders } from "@/lib/content/founders";
 import { getUserWithRole } from "@/lib/auth/dal";
+import { CURRENCIES, parseAmountToMinor, type Currency } from "@/lib/finance/money";
+import { buildAgreementPdf } from "@/lib/talent/agreement-pdf";
+import {
+  RATE_BASES,
+  buildContract,
+  buildNda,
+  buildOnboardingLetter,
+  type AgreementDocument,
+  type RateBasis,
+} from "@/lib/talent/agreements";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
+  countryLabel,
   TALENT_STAGES,
   type EngagementType,
   type TalentStage,
@@ -347,4 +359,233 @@ export async function deleteTalentDocument(formData: FormData) {
     await admin.storage.from(DOCUMENT_BUCKET).remove(data.map((d) => d.storage_path));
   }
   refresh();
+}
+
+// --- Generated documents --------------------------------------------------------
+// NDA, freelance services agreement and onboarding letter, drafted from
+// lib/talent/agreements.ts with recruitment's inputs, saved as PDFs next to
+// uploaded documents. Business terms always come from the form.
+
+const longDate = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const displayDate = (iso: string) => longDate.format(new Date(`${iso}T00:00:00Z`));
+const todayIso = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Nairobi" }).format(new Date());
+
+const text = (formData: FormData, name: string) =>
+  String(formData.get(name) ?? "").trim();
+const whole = (min: number, max: number, message: string) =>
+  z.coerce.number().int(message).min(min, message).max(max, message);
+
+export async function generateTalentDocument(
+  _prev: RecruitmentFormState,
+  formData: FormData,
+): Promise<RecruitmentFormState> {
+  const { user, supabase } = await recruitmentContext();
+  const id = uuid.safeParse(formData.get("id"));
+  const kind = z
+    .enum(["nda", "contract", "onboarding_letter"])
+    .safeParse(formData.get("kind"));
+  if (!id.success) return { error: "Unknown application." };
+  if (!kind.success) return { error: "Choose a document." };
+
+  const { data: app } = await supabase
+    .from("talent_applications")
+    .select("id, full_name, email, phone, country, stage, engagement_type")
+    .eq("id", id.data)
+    .maybeSingle();
+  if (!app) return { error: "Unknown application." };
+  if (
+    kind.data === "nda" &&
+    !["test_task", "test_review", "approved"].includes(app.stage)
+  ) {
+    return { error: "An NDA can be generated from the test-task stage onwards." };
+  }
+  if (kind.data !== "nda") {
+    if (app.stage !== "approved") return { error: "Approve the applicant first." };
+    if (app.engagement_type !== "freelance") {
+      return {
+        error:
+          "These templates are for freelancers. For a full-time hire, upload an employment contract reviewed by your advocate.",
+      };
+    }
+  }
+
+  const signatoryName = text(formData, "signatoryName");
+  const signatoryTitle = text(formData, "signatoryTitle");
+  if (!founders.some((f) => f.name === signatoryName))
+    return { error: "Choose who signs for NillTech." };
+  if (signatoryTitle.length < 2 || signatoryTitle.length > 80) {
+    return { error: "Enter the signatory's title, for example Director." };
+  }
+
+  // Link earlier generated documents (latest NDA and agreement) by reference.
+  const { data: earlier } = await supabase
+    .from("talent_documents")
+    .select("kind, reference, uploaded_at")
+    .eq("talent_id", app.id)
+    .not("reference", "is", null)
+    .order("uploaded_at", { ascending: false });
+  const latestRef = (k: string) => earlier?.find((d) => d.kind === k)?.reference ?? null;
+
+  const { data: reference, error: numberError } = await supabase.rpc(
+    "next_talent_document_number",
+    { _kind: kind.data },
+  );
+  if (numberError || !reference)
+    return { error: numberError?.message ?? "Couldn't number the document." };
+
+  const common = {
+    reference,
+    date: displayDate(todayIso()),
+    freelancer: {
+      name: app.full_name,
+      email: app.email,
+      phone: app.phone,
+      country: countryLabel(app.country),
+    },
+    signatory: { name: signatoryName, title: signatoryTitle },
+  };
+
+  let doc: AgreementDocument;
+  let params: Record<string, unknown>;
+  if (kind.data === "nda") {
+    const parsed = z
+      .object({
+        purpose: z.string().min(10, "Describe the purpose of the NDA.").max(300),
+        durationYears: whole(
+          1,
+          10,
+          "The NDA should last 1 to 10 years after the engagement.",
+        ),
+      })
+      .safeParse({
+        purpose: text(formData, "purpose"),
+        durationYears: text(formData, "durationYears"),
+      });
+    if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+    params = parsed.data;
+    doc = buildNda({ ...common, ...parsed.data });
+  } else if (kind.data === "contract") {
+    const parsed = z
+      .object({
+        role: z.string().min(2, "Enter the role.").max(100),
+        startDate: z.iso.date("Choose the start date."),
+        endDate: z.union([z.iso.date(), z.literal("")]),
+        scope: z
+          .string()
+          .min(20, "Describe the services (at least a sentence).")
+          .max(2000),
+        currency: z.enum(CURRENCIES as [Currency, ...Currency[]]),
+        rateBasis: z.enum(RATE_BASES as unknown as [RateBasis, ...RateBasis[]]),
+        paymentTermsDays: whole(0, 90, "Payment terms must be 0 to 90 days."),
+        noticeDays: whole(1, 180, "Notice must be 1 to 180 days."),
+        nonSolicitMonths: whole(0, 24, "Non-solicitation must be 0 to 24 months."),
+      })
+      .safeParse({
+        role: text(formData, "role"),
+        startDate: text(formData, "startDate"),
+        endDate: text(formData, "endDate"),
+        scope: text(formData, "scope"),
+        currency: text(formData, "currency"),
+        rateBasis: text(formData, "rateBasis"),
+        paymentTermsDays: text(formData, "paymentTermsDays"),
+        noticeDays: text(formData, "noticeDays"),
+        nonSolicitMonths: text(formData, "nonSolicitMonths"),
+      });
+    if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+    const rateMinor = parseAmountToMinor(text(formData, "rate"));
+    if (rateMinor === null || rateMinor <= 0) return { error: "Enter the rate." };
+    if (parsed.data.endDate && parsed.data.endDate < parsed.data.startDate) {
+      return { error: "The end date must be after the start date." };
+    }
+    params = { ...parsed.data, rateMinor };
+    doc = buildContract({
+      ...common,
+      ...parsed.data,
+      startDate: displayDate(parsed.data.startDate),
+      endDate: parsed.data.endDate ? displayDate(parsed.data.endDate) : null,
+      rateMinor,
+      ndaReference: latestRef("nda"),
+    });
+  } else {
+    const parsed = z
+      .object({
+        role: z.string().min(2, "Enter the role.").max(100),
+        startDate: z.iso.date("Choose the start date."),
+        contactName: z.string().min(2, "Enter the NillTech contact's name.").max(100),
+        contactEmail: z.email("Enter the NillTech contact's email."),
+        workingPattern: z.string().max(200),
+        tools: z.string().max(300),
+        firstWeek: z.string().max(1500),
+      })
+      .safeParse({
+        role: text(formData, "role"),
+        startDate: text(formData, "startDate"),
+        contactName: text(formData, "contactName"),
+        contactEmail: text(formData, "contactEmail"),
+        workingPattern: text(formData, "workingPattern"),
+        tools: text(formData, "tools"),
+        firstWeek: text(formData, "firstWeek"),
+      });
+    if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+    params = parsed.data;
+    doc = buildOnboardingLetter({
+      ...common,
+      role: parsed.data.role,
+      startDate: displayDate(parsed.data.startDate),
+      reportingTo: { name: parsed.data.contactName, email: parsed.data.contactEmail },
+      workingPattern: parsed.data.workingPattern || null,
+      tools: parsed.data.tools || null,
+      firstWeek: parsed.data.firstWeek || null,
+      ndaReference: latestRef("nda"),
+      contractReference: latestRef("contract"),
+    });
+  }
+
+  const admin = getSupabaseAdmin();
+  if (!admin) return { error: "SUPABASE_SERVICE_ROLE_KEY isn't set on this deployment." };
+
+  const bytes = await buildAgreementPdf(doc);
+  const path = `${app.id}/${randomUUID()}.pdf`;
+  const { error: uploadError } = await admin.storage
+    .from(DOCUMENT_BUCKET)
+    .upload(path, bytes, { contentType: "application/pdf", upsert: false });
+  if (uploadError) return { error: uploadError.message };
+
+  const requiresAcceptance =
+    kind.data !== "onboarding_letter" || formData.get("requiresAcceptance") === "on";
+  const { error } = await supabase.from("talent_documents").insert({
+    talent_id: app.id,
+    kind: kind.data,
+    title: `${doc.shortTitle} (${reference})`,
+    storage_path: path,
+    file_name: `${reference}.pdf`,
+    size_bytes: bytes.byteLength,
+    requires_acceptance: requiresAcceptance,
+    uploaded_by: user.id,
+    reference,
+    generated_from: { ...params, signatory: common.signatory },
+  });
+  if (error) {
+    await admin.storage.from(DOCUMENT_BUCKET).remove([path]);
+    return { error: error.message };
+  }
+
+  await admin.from("audit_log").insert({
+    actor_id: user.id,
+    action: "talent_document_generated",
+    entity_type: "talent_applications",
+    entity_id: app.id,
+    metadata: { reference, kind: kind.data },
+  });
+
+  refresh();
+  return {
+    success: `${doc.shortTitle} ${reference} created and added to their Documents.`,
+  };
 }

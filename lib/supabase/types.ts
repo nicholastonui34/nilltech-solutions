@@ -1290,8 +1290,10 @@ export type Database = {
           accepted_at: string | null;
           accepted_name: string | null;
           file_name: string;
+          generated_from: Json | null;
           id: string;
           kind: string;
+          reference: string | null;
           requires_acceptance: boolean;
           size_bytes: number;
           storage_path: string;
@@ -1304,8 +1306,10 @@ export type Database = {
           accepted_at?: string | null;
           accepted_name?: string | null;
           file_name: string;
+          generated_from?: Json | null;
           id?: string;
           kind: string;
+          reference?: string | null;
           requires_acceptance?: boolean;
           size_bytes: number;
           storage_path: string;
@@ -1318,8 +1322,10 @@ export type Database = {
           accepted_at?: string | null;
           accepted_name?: string | null;
           file_name?: string;
+          generated_from?: Json | null;
           id?: string;
           kind?: string;
+          reference?: string | null;
           requires_acceptance?: boolean;
           size_bytes?: number;
           storage_path?: string;
@@ -1528,6 +1534,7 @@ export type Database = {
       };
       nairobi_today: { Args: never; Returns: string };
       next_document_number: { Args: { _doc_type: string }; Returns: string };
+      next_talent_document_number: { Args: { _kind: string }; Returns: string };
       record_freelancer_payment: {
         Args: {
           _amount_minor: number;

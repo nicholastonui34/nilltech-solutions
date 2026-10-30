@@ -14,6 +14,7 @@ import {
   ApplicationStageForm,
   CreateTestTaskForm,
   FreelancerAccountForm,
+  GenerateDocumentForm,
   RevealTaxPinForm,
   TaxPinForm,
   UploadDocumentForm,
@@ -23,6 +24,8 @@ import { StageBadge } from "@/components/portal/talent/stage-badge";
 import { canAccess } from "@/config/portal";
 import { getUserWithRole } from "@/lib/auth/dal";
 import { formatBytes, formatDateTime, nairobiDateIso } from "@/lib/format";
+import { TALENT_AGREEMENTS_REVIEWED } from "@/config/talent-agreements";
+import { founders } from "@/lib/content/founders";
 import { documentKindLabel } from "@/lib/talent/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -92,6 +95,14 @@ export default async function ApplicationDetailPage({
       .order("uploaded_at", { ascending: false }),
   ]);
   const notes = notesRows?.[0];
+  const generateKinds = [
+    ...(["test_task", "test_review", "approved"].includes(app.stage)
+      ? (["nda"] as const)
+      : []),
+    ...(app.stage === "approved" && app.engagement_type === "freelance"
+      ? (["contract", "onboarding_letter"] as const)
+      : []),
+  ];
   const canHaveLogin = ["test_task", "test_review", "approved"].includes(app.stage);
 
   const needsKraPin =
@@ -236,7 +247,7 @@ export default async function ApplicationDetailPage({
 
           <Panel
             title="Documents"
-            description="Upload your own contract, NDA or letter as a PDF. The freelancer downloads it in their portal and, if required, accepts it by typing their name."
+            description="Generate an NDA, agreement or onboarding letter, or upload your own PDF. The freelancer downloads it in their portal and, if required, accepts it by typing their name."
           >
             {documents?.length ? (
               <ul className="divide-border mb-6 divide-y">
@@ -283,7 +294,41 @@ export default async function ApplicationDetailPage({
                 ))}
               </ul>
             ) : null}
-            <UploadDocumentForm id={app.id} />
+            {generateKinds.length ? (
+              <details className="border-border mb-6 rounded-lg border p-4" open>
+                <summary className="cursor-pointer text-sm font-medium">
+                  Generate a document
+                </summary>
+                <div className="mt-4">
+                  <GenerateDocumentForm
+                    id={app.id}
+                    kinds={generateKinds}
+                    signatories={founders.map((f) => f.name)}
+                    defaults={{
+                      role: roleLabel(app.primary_role),
+                      today: nairobiDateIso(),
+                      contactName: user.fullName ?? "",
+                      contactEmail: user.email ?? "",
+                    }}
+                    reviewed={TALENT_AGREEMENTS_REVIEWED}
+                  />
+                </div>
+              </details>
+            ) : (
+              <p className="text-muted-foreground mb-4 text-xs">
+                {app.engagement_type === "full_time"
+                  ? "Generated agreements are for freelancers. For a full-time hire, upload an employment contract reviewed by your advocate."
+                  : "An NDA can be generated from the test-task stage; the agreement and onboarding letter once they're approved as a freelancer."}
+              </p>
+            )}
+            <details className="mb-2">
+              <summary className="cursor-pointer text-sm font-medium">
+                Upload your own PDF
+              </summary>
+              <div className="mt-4">
+                <UploadDocumentForm id={app.id} />
+              </div>
+            </details>
           </Panel>
         </div>
 
