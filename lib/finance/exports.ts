@@ -71,7 +71,7 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
     let query = supabase
       .from("invoices")
       .select(
-        "number, status, currency, issue_date, due_date, total_minor, paid_minor, credited_minor, refunded_minor, balance_minor, clients(name, company)",
+        "number, status, currency, issue_date, due_date, total_minor, paid_minor, credited_minor, refunded_minor, balance_minor, etims_status, etims_reference, etims_date, clients(name, company)",
       )
       .neq("status", "draft")
       .order("issue_date", { ascending: true })
@@ -92,6 +92,8 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       "Paid",
       "Refunded",
       "Balance",
+      "KRA eTIMS number",
+      "eTIMS date",
     ];
     rows = (data ?? []).map((i) => [
       i.number,
@@ -105,6 +107,8 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       csvAmount(i.paid_minor),
       csvAmount(i.refunded_minor),
       csvAmount(i.status === "void" ? 0 : (i.balance_minor ?? 0)),
+      i.etims_status === "recorded" ? i.etims_reference : null,
+      i.etims_status === "recorded" ? i.etims_date : null,
     ]);
   } else if (kind === "payments") {
     let query = supabase
@@ -142,7 +146,7 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
     let query = supabase
       .from("credit_notes")
       .select(
-        "number, issue_date, invoice_number, currency, amount_minor, reason, invoices(clients(name, company))",
+        "number, issue_date, invoice_number, currency, amount_minor, reason, etims_reference, etims_date, invoices(clients(name, company))",
       )
       .order("issue_date", { ascending: true })
       .order("number", { ascending: true });
@@ -158,6 +162,8 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       "Currency",
       "Amount",
       "Reason",
+      "KRA eTIMS number",
+      "eTIMS date",
     ];
     rows = (data ?? []).map((c) => [
       c.number,
@@ -167,6 +173,8 @@ export async function financeExportResponse(kind: string, params: URLSearchParam
       c.currency,
       csvAmount(c.amount_minor),
       c.reason,
+      c.etims_reference,
+      c.etims_date,
     ]);
   } else if (kind === "refunds") {
     let query = supabase

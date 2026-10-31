@@ -25,6 +25,13 @@ import {
 import type { ClientSnapshot, SellerSnapshot } from "@/lib/finance/snapshots";
 import { PAYMENT_METHOD_LABELS, type PaymentMethod } from "@/lib/finance/labels";
 
+/** KRA eTIMS details recorded by Finance after issuing on eTIMS. */
+export type EtimsDetails = {
+  reference: string;
+  date: string;
+  verifyUrl: string | null;
+} | null;
+
 export type InvoicePdfData = {
   number: string;
   issueDate: string;
@@ -44,6 +51,7 @@ export type InvoicePdfData = {
   creditedMinor: number;
   refundedMinor: number;
   notes: string | null;
+  etims: EtimsDetails;
 };
 
 export type QuotePdfData = {
@@ -85,6 +93,7 @@ export type CreditNotePdfData = {
   reason: string;
   seller: SellerSnapshot;
   client: ClientSnapshot;
+  etims: EtimsDetails;
 };
 
 export type ReceiptPdfData = {
@@ -369,6 +378,37 @@ function drawNotes(w: Writer, notes: string | null, heading = "NOTES") {
   w.y -= 12;
 }
 
+function etimsRows(etims: EtimsDetails): [string, string][] {
+  return etims ? [["KRA eTIMS no.", etims.reference]] : [];
+}
+
+/** The KRA verification link, when Finance recorded one. */
+function drawEtimsVerify(w: Writer, etims: EtimsDetails) {
+  if (!etims?.verifyUrl) return;
+  w.text(`Verify this document with KRA (eTIMS, ${etims.date}):`, MARGIN, {
+    size: 8.5,
+    color: MUTED,
+  });
+  w.y -= 12;
+  // A link has no spaces to wrap at, so break it by width.
+  const maxWidth = PAGE_W - MARGIN * 2;
+  let line = "";
+  const lines: string[] = [];
+  for (const ch of etims.verifyUrl) {
+    if (line && w.fonts.regular.widthOfTextAtSize(line + ch, 8.5) > maxWidth) {
+      lines.push(line);
+      line = "";
+    }
+    line += ch;
+  }
+  if (line) lines.push(line);
+  for (const part of lines) {
+    w.text(part, MARGIN, { size: 8.5 });
+    w.y -= 11;
+  }
+  w.y -= 8;
+}
+
 export async function buildInvoicePdf(data: InvoicePdfData) {
   const { doc, w } = await newDocument(`Invoice ${data.number}`);
   const balance =
@@ -379,6 +419,7 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
     ["Issue date", data.issueDate],
     ["Due date", data.dueDate],
     ["Currency", data.currency],
+    ...etimsRows(data.etims),
   ]);
 
   if (data.status === "paid") drawStamp(w, "PAID", rgb(0.05, 0.55, 0.3));
@@ -415,6 +456,7 @@ export async function buildInvoicePdf(data: InvoicePdfData) {
   w.y -= 14;
 
   drawNotes(w, data.notes);
+  drawEtimsVerify(w, data.etims);
 
   if (data.status !== "void" && balance > 0) {
     w.rule();
@@ -500,6 +542,7 @@ export async function buildCreditNotePdf(data: CreditNotePdfData) {
     ["Date", data.issueDate],
     ["Against invoice", data.invoiceNumber],
     ["Currency", data.currency],
+    ...etimsRows(data.etims),
   ]);
 
   drawParty(w, "ISSUED TO", data.client);
@@ -544,6 +587,8 @@ export async function buildCreditNotePdf(data: CreditNotePdfData) {
     MARGIN,
     { size: 9, color: MUTED },
   );
+  w.y -= 18;
+  drawEtimsVerify(w, data.etims);
 
   drawFooter(w, data.seller);
   return doc.save();

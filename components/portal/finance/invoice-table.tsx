@@ -16,8 +16,19 @@ export type InvoiceRow = {
   balance_minor: number | null;
   due_date: string | null;
   created_at: string;
+  /** "recorded" once Finance has entered the KRA eTIMS number. */
+  etims_status: string;
   clients: { name: string; company: string | null } | null;
 };
+
+/** Issued (not void) and the KRA eTIMS number isn't recorded yet. */
+export function needsEtims(invoice: Pick<InvoiceRow, "status" | "etims_status">) {
+  return (
+    invoice.status !== "draft" &&
+    invoice.status !== "void" &&
+    invoice.etims_status !== "recorded"
+  );
+}
 
 export function InvoiceTable({
   invoices,
@@ -70,6 +81,11 @@ export function InvoiceTable({
                   status={invoice.status}
                   overdue={isOverdue(invoice, today)}
                 />
+                {needsEtims(invoice) ? (
+                  <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-amber-900">
+                    Needs eTIMS
+                  </span>
+                ) : null}
               </td>
             </tr>
           ))}

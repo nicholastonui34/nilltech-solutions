@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import {
   issueCreditNote,
   issueInvoice,
+  recordEtims,
   recordPayment,
   recordRefund,
   voidInvoice,
@@ -264,6 +265,74 @@ export function RecordRefundForm({
       <FormMessage state={state} />
       <Button type="submit" variant="outline" disabled={pending}>
         {pending ? "Recording…" : "Record refund"}
+      </Button>
+    </form>
+  );
+}
+
+export function RecordEtimsForm({
+  kind,
+  documentId,
+  minDate,
+  today,
+  current,
+}: {
+  kind: "invoice" | "credit_note";
+  documentId: string;
+  minDate: string;
+  today: string;
+  current?: { reference: string | null; date: string | null; verifyUrl: string | null };
+}) {
+  const [state, formAction, pending] = useActionState(recordEtims, initialState);
+  const id = (field: string) => `etims-${field}-${documentId}`;
+  return (
+    <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="kind" value={kind} />
+      <input type="hidden" name="documentId" value={documentId} />
+      <div>
+        <Label htmlFor={id("reference")}>KRA invoice number</Label>
+        <Input
+          id={id("reference")}
+          name="reference"
+          defaultValue={current?.reference ?? ""}
+          maxLength={60}
+          required
+          className="mt-1.5"
+        />
+      </div>
+      <div>
+        <Label htmlFor={id("date")}>Date on eTIMS</Label>
+        <Input
+          id={id("date")}
+          name="etimsDate"
+          type="date"
+          min={minDate}
+          max={today}
+          defaultValue={current?.date ?? today}
+          required
+          className="mt-1.5"
+        />
+      </div>
+      <div>
+        <Label htmlFor={id("url")}>KRA verification link (optional)</Label>
+        <Input
+          id={id("url")}
+          name="verifyUrl"
+          type="url"
+          inputMode="url"
+          placeholder="https://...kra.go.ke/..."
+          defaultValue={current?.verifyUrl ?? ""}
+          maxLength={500}
+          className="mt-1.5"
+        />
+      </div>
+      <FormMessage state={state} />
+      <Button type="submit" size="sm" disabled={pending}>
+        {pending
+          ? "Saving…"
+          : current?.reference
+            ? "Update eTIMS details"
+            : "Save eTIMS details"}
       </Button>
     </form>
   );

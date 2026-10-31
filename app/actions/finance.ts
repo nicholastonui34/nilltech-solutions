@@ -338,6 +338,11 @@ async function submitToEtims(invoiceId: string) {
     .update({
       etims_status: status,
       etims_reference: result.status === "submitted" ? result.reference : null,
+      // Anything typed on the draft is cleared; Finance records it after issuing.
+      etims_date: null,
+      etims_verify_url: null,
+      etims_recorded_at: null,
+      etims_recorded_by: null,
     })
     .eq("id", invoiceId);
 
@@ -815,4 +820,41 @@ export async function voidFreelancerPayment(
 
   refresh();
   return { success: "Payment voided and its expense removed." };
+}
+
+/**
+ * Records the KRA eTIMS details of an invoice or credit note after Finance
+ * has issued it in KRA's eTIMS (owner, 2026-10-30: recorded by hand until
+ * an automatic connection exists). Re-saving corrects them; both are
+ * audit-logged by the database.
+ */
+export async function recordEtims(
+  _prev: FinanceFormState,
+  formData: FormData,
+): Promise<FinanceFormState> {
+  const { supabase } = await financeContext();
+  const kind = z.enum(["invoice", "credit_note"]).safeParse(formData.get("kind"));
+  const documentId = uuid.safeParse(formData.get("documentId"));
+  const etimsDate = z.iso.date().safeParse(formData.get("etimsDate"));
+  const reference = String(formData.get("reference") ?? "").trim();
+  const verifyUrl = String(formData.get("verifyUrl") ?? "").trim();
+  if (!kind.success || !documentId.success) return { error: "Unknown document." };
+  if (reference.length < 3) return { error: "Enter the KRA invoice number from eTIMS." };
+  if (!etimsDate.success) return { error: "Choose the date on the eTIMS invoice." };
+
+  const args = { _reference: reference, _date: etimsDate.data, _verify_url: verifyUrl };
+  const { error } =
+    kind.data === "invoice"
+      ? await supabase.rpc("record_invoice_etims", {
+          _invoice_id: documentId.data,
+          ...args,
+        })
+      : await supabase.rpc("record_credit_note_etims", {
+          _credit_note_id: documentId.data,
+          ...args,
+        });
+  if (error) return { error: dbMessage(error) };
+
+  refresh();
+  return { success: "eTIMS details saved." };
 }

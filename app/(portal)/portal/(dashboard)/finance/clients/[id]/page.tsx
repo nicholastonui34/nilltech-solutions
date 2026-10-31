@@ -33,7 +33,7 @@ export default async function ClientDetailPage({
     supabase
       .from("invoices")
       .select(
-        "id, number, status, currency, total_minor, paid_minor, balance_minor, due_date, created_at, clients(name, company)",
+        "id, number, status, currency, total_minor, paid_minor, balance_minor, due_date, created_at, etims_status, clients(name, company)",
       )
       .eq("client_id", id)
       .order("created_at", { ascending: false }),
